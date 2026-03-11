@@ -25,13 +25,24 @@ export default function CurrentForecast() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [cooldown, setCooldown] = useState(0);
+
+  // Auto-refresh: 5 min -> 300 segundos
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (cooldown > 0) {
+      timer = setTimeout(() => setCooldown(c => c - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   const fetchWeather = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Coordendas Maracay aprox: Lat 10.24, Lon -67.59
-      // Open-Meteo variables: wind_speed_10m, wind_direction_10m, visibility, temperature_2m, surface_pressure, cloud_cover
+      // Cooldown timer de 30 segundos manual
+      setCooldown(30);
+
       const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=10.24&longitude=-67.59&current=temperature_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m");
       if (!res.ok) throw new Error("Error al consultar API meteorológica");
       
@@ -41,7 +52,7 @@ export default function CurrentForecast() {
       const newWeather: WeatherData = {
         windSpeed: current.wind_speed_10m,
         windDirection: current.wind_direction_10m,
-        visibility: current.visibility ? current.visibility / 1000 : null, // Convertir a km
+        visibility: current.visibility ? current.visibility : null, // Guardar en metros
         temperature: current.temperature_2m,
         pressure: current.surface_pressure,
         cloudCover: current.cloud_cover,
@@ -50,22 +61,36 @@ export default function CurrentForecast() {
       setData(newWeather);
       setLastUpdated(new Date());
 
-      // Guardado silencioso en Supabase
-      // NOTA ACADÉMICA (Seguridad): En producción, las políticas RLS de Supabase 
-      // deberían restringir qué dominios pueden hacer este INSERT usando el anon_key,
-      // o preferiblemente mover esta lógica a un Backend Seguro (uso de service_role).
+      // Validación contra último registro
       try {
-        await supabase.from("weather_logs").insert([{
-          location: "BARAGUA",
-          wind_speed: newWeather.windSpeed,
-          wind_direction: newWeather.windDirection,
-          visibility: newWeather.visibility ? newWeather.visibility * 1000 : null, // guardado en metros según SQL opcional, o km
-          temperature: newWeather.temperature,
-          pressure_qnh: newWeather.pressure,
-          cloud_cover: newWeather.cloudCover ? `${newWeather.cloudCover}%` : null
-        }]);
+        const { data: dbData } = await supabase
+          .from("weather_logs")
+          .select("wind_speed, temperature, pressure_qnh")
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        let isDuplicate = false;
+        if (dbData && dbData.length > 0) {
+          const last = dbData[0];
+          isDuplicate = 
+            Number(last.wind_speed) === newWeather.windSpeed &&
+            Number(last.temperature) === newWeather.temperature &&
+            Number(last.pressure_qnh) === newWeather.pressure;
+        }
+
+        if (!isDuplicate) {
+          await supabase.from("weather_logs").insert([{
+            location: "BARAGUA",
+            wind_speed: newWeather.windSpeed,
+            wind_direction: newWeather.windDirection,
+            visibility: newWeather.visibility, // Ya está en metros consistentemente
+            temperature: newWeather.temperature,
+            pressure_qnh: newWeather.pressure,
+            cloud_cover: newWeather.cloudCover ? `${newWeather.cloudCover}%` : null
+          }]);
+        }
       } catch (dbError) {
-        console.error("Error guardando histórico en DB", dbError);
+        console.error("Error validando/guardando histórico en DB", dbError);
       }
       
     } catch (err: any) {
@@ -77,7 +102,7 @@ export default function CurrentForecast() {
 
   useEffect(() => {
     fetchWeather();
-    // Actualizar cada 5 minutos
+    // Auto actualizar cada 5 minutos
     const interval = setInterval(fetchWeather, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
@@ -99,11 +124,19 @@ export default function CurrentForecast() {
           )}
           <button 
             onClick={fetchWeather} 
-            disabled={loading}
-            className="flex items-center space-x-2 text-xs bg-[#1e293b] hover:bg-[#334155] text-white px-3 py-1.5 rounded border border-gray-600 transition-colors disabled:opacity-50"
+            disabled={loading || cooldown > 0}
+            className="flex items-center space-x-2 text-xs bg-[#1e293b] hover:bg-[#334155] text-white px-3 py-1.5 rounded border border-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-32 justify-center"
           >
-            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-            <span>Actualizar</span>
+            {loading ? (
+              <RefreshCw size={14} className="animate-spin" />
+            ) : cooldown > 0 ? (
+              <span>Espera {cooldown}s</span>
+            ) : (
+              <>
+                <RefreshCw size={14} />
+                <span>Actualizar</span>
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -119,7 +152,7 @@ export default function CurrentForecast() {
         <Widget 
           title="Visibilidad" 
           icon={Eye} 
-          value={data.visibility !== null ? `${data.visibility.toFixed(1)} km` : "--"} 
+          value={data.visibility !== null ? `${(data.visibility / 1000).toFixed(1)} km` : "--"} 
           desc="VFR" 
           loading={loading && !data.visibility}
         />

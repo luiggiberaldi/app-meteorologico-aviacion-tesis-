@@ -44,13 +44,18 @@ export default function OperationalAlerts() {
         if (wind > 30) triggers.push(`Vientos Fuertes (${wind})`);
         triggerValues = `Alerta disparada por: ${triggers.join(" y ")}`;
         
-      } else if (vis <= 5000 || wind >= 20) {
+      } else if ((vis >= 1500 && vis <= 5000) || (wind >= 20 && wind <= 30)) {
         level = "YELLOW";
         message = "ALERTA AMARILLA: Precaución Operacional, condiciones marginales";
         const triggers = [];
-        if (vis <= 5000) triggers.push(`Visibilidad Reducida (${(vis/1000).toFixed(1)} km)`);
-        if (wind >= 20) triggers.push(`Vientos Moderados (${wind})`);
+        if (vis >= 1500 && vis <= 5000) triggers.push(`Visibilidad Reducida (${(vis/1000).toFixed(1)} km)`);
+        if (wind >= 20 && wind <= 30) triggers.push(`Vientos Moderados (${wind})`);
         triggerValues = `Alerta disparada por: ${triggers.join(" y ")}`;
+
+      } else if (vis > 5000 && wind < 20) {
+        level = "GREEN";
+        message = "Condiciones Óptimas para Operaciones VFR";
+        triggerValues = `Visibilidad: ${(vis / 1000).toFixed(1)} km | Viento: ${wind}`;
       }
 
       setAlert({ level, message, triggerValues: triggerValues.trim() });
