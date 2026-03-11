@@ -9,7 +9,7 @@ El presente manual tiene como propósito orientar al personal de meteorología d
 - El enlace de acceso a la plataforma proporcionado por la Base.
 
 ## 3. Acceso al Sistema
-La dirección de acceso al sistema es: https://app-meteorologico-aviacion-tesis.vercel.app
+La dirección de acceso al sistema es: https://sermetavia-baragua.vercel.app
 Para ingresar al sistema, únicamente necesita abrir el enlace web en su navegador. La plataforma está diseñada de forma inmediata (sin pantallas de inicio de sesión complejas por ahora) para permitir una rápida consulta operativa 24/7. 
 
 Una vez dentro, observará el Panel Principal, diseñado en tonos oscuros (modo nocturno) para reducir la fatiga visual durante las jornadas nocturnas y resaltar indicadores críticos de colores (Alertas).
