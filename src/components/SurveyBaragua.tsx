@@ -96,10 +96,13 @@ export default function SurveyBaragua() {
 
   return (
     <section className="bg-[#1e293b] rounded-xl border border-gray-700 p-5 flex flex-col">
-      <div className="mb-4 border-b border-gray-700 pb-3 flex items-center justify-between">
+      <div className="mb-4 border-b border-gray-700 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-y-2">
         <h3 className="text-md font-semibold text-white">Cuestionario Baragua</h3>
-        <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded border border-gray-700">Instrumento de Recolección</span>
+        <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded border border-gray-700 w-max">Instrumento de Recolección</span>
       </div>
+      <p className="text-xs text-gray-400 italic mb-5 leading-relaxed">
+        Instrumento de recolección de datos | 7 ítems | Escala dicotómica (Sí/No) | Población: Personal de Meteorología SERMETAVIA - Baragua
+      </p>
 
       {success ? (
         <div className="flex-1 flex flex-col items-center justify-center space-y-3 py-10">

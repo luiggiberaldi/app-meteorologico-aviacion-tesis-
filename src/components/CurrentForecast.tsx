@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Wind, Eye, Gauge, Cloud, Thermometer, RefreshCw } from "lucide-react";
+import { Wind, Eye, Gauge, Cloud, Thermometer, RefreshCw, Droplets } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 interface WeatherData {
@@ -11,6 +11,7 @@ interface WeatherData {
   temperature: number | null;
   pressure: number | null;
   cloudCover: number | null;
+  humidity: number | null;
 }
 
 export default function CurrentForecast() {
@@ -21,6 +22,7 @@ export default function CurrentForecast() {
     temperature: null,
     pressure: null,
     cloudCover: null,
+    humidity: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function CurrentForecast() {
       // Cooldown timer de 30 segundos manual
       setCooldown(30);
 
-      const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=10.24&longitude=-67.59&current=temperature_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m");
+      const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=10.24&longitude=-67.59&current=temperature_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,relative_humidity_2m");
       if (!res.ok) throw new Error("Error al consultar API meteorológica");
       
       const json = await res.json();
@@ -56,6 +58,7 @@ export default function CurrentForecast() {
         temperature: current.temperature_2m,
         pressure: current.surface_pressure,
         cloudCover: current.cloud_cover,
+        humidity: current.relative_humidity_2m,
       };
 
       setData(newWeather);
@@ -65,7 +68,7 @@ export default function CurrentForecast() {
       try {
         const { data: dbData } = await supabase
           .from("weather_logs")
-          .select("wind_speed, temperature, pressure_qnh")
+          .select("wind_speed, temperature, pressure_qnh, humidity")
           .order("created_at", { ascending: false })
           .limit(1);
 
@@ -75,7 +78,8 @@ export default function CurrentForecast() {
           isDuplicate = 
             Number(last.wind_speed) === newWeather.windSpeed &&
             Number(last.temperature) === newWeather.temperature &&
-            Number(last.pressure_qnh) === newWeather.pressure;
+            Number(last.pressure_qnh) === newWeather.pressure &&
+            Number(last.humidity) === newWeather.humidity;
         }
 
         if (!isDuplicate) {
@@ -86,7 +90,8 @@ export default function CurrentForecast() {
             visibility: newWeather.visibility, // Ya está en metros consistentemente
             temperature: newWeather.temperature,
             pressure_qnh: newWeather.pressure,
-            cloud_cover: newWeather.cloudCover ? `${newWeather.cloudCover}%` : null
+            cloud_cover: newWeather.cloudCover ? `${newWeather.cloudCover}%` : null,
+            humidity: newWeather.humidity
           }]);
         }
       } catch (dbError) {
@@ -176,6 +181,13 @@ export default function CurrentForecast() {
           value={data.temperature !== null ? `${data.temperature} °C` : "-- °C"} 
           desc="Actual" 
           loading={loading && !data.temperature}
+        />
+        <Widget 
+          title="Humedad" 
+          icon={Droplets} 
+          value={data.humidity !== null ? `${data.humidity}%` : "--%"} 
+          desc="Relativa" 
+          loading={loading && !data.humidity}
         />
       </div>
     </section>

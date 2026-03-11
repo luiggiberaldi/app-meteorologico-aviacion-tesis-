@@ -25,6 +25,7 @@ export default function SurveyResults() {
   const [stats, setStats] = useState<SurveyStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [kr20, setKr20] = useState<number | null>(null);
 
   const fetchSurveyResults = async () => {
     setLoading(true);
@@ -48,6 +49,36 @@ export default function SurveyResults() {
         };
       });
 
+      // Calcular KR-20
+      const nItems = 7;
+      const nResponses = data.length;
+      let calculatedKr20 = null;
+      
+      if (nResponses > 1) {
+        let sumPq = 0;
+        Object.keys(QUESTIONS_MAP).forEach((key) => {
+          const p = data.filter((row) => row[key] === true).length / nResponses;
+          const q = 1 - p;
+          sumPq += p * q;
+        });
+
+        const totalScores = data.map(row => {
+          let score = 0;
+          Object.keys(QUESTIONS_MAP).forEach(key => {
+            if (row[key] === true) score++;
+          });
+          return score;
+        });
+
+        const meanTotalScore = totalScores.reduce((a, b) => a + b, 0) / nResponses;
+        const varianceTotal = totalScores.reduce((a, b) => a + Math.pow(b - meanTotalScore, 2), 0) / nResponses;
+
+        if (varianceTotal > 0) {
+          calculatedKr20 = (nItems / (nItems - 1)) * (1 - (sumPq / varianceTotal));
+        }
+      }
+
+      setKr20(calculatedKr20);
       setStats(calculatedStats);
     } catch (err: any) {
       setError(err.message || "Error al cargar resultados de encuesta");
@@ -119,6 +150,24 @@ export default function SurveyResults() {
               </div>
             );
           })}
+          
+          {/* Confiabilidad KR-20 */}
+          {kr20 !== null && (
+            <div className="mt-8 pt-4 border-t border-gray-700 print:border-gray-300">
+              <h4 className="text-sm font-semibold text-gray-300 print:text-gray-800 mb-2">Confiabilidad del Instrumento (KR-20)</h4>
+              <div className="bg-black/30 print:bg-gray-100 p-3 rounded-md border border-gray-800 print:border-gray-300 flex items-center justify-between">
+                <div>
+                  <span className="block text-2xl font-bold text-[#f59e0b] print:text-gray-900">{kr20.toFixed(2)}</span>
+                  <span className="text-xs text-gray-400 print:text-gray-600 font-medium">
+                    {kr20 >= 0.70 ? "✅ Instrumento Confiable" : "⚠️ Revisar Instrumento"}
+                  </span>
+                </div>
+                <div className="text-xs text-right text-gray-500 print:text-gray-500 w-32 hidden sm:block">
+                  <p>Métrica de consistencia interna para dicotómicas.</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

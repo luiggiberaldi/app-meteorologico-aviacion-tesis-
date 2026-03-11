@@ -12,6 +12,7 @@ CREATE TABLE weather_logs (
     visibility NUMERIC, -- Metros o Km
     temperature NUMERIC, -- Grados Celsius (°C)
     pressure_qnh NUMERIC, -- hPa
+    humidity NUMERIC, -- Porcentaje (%)
     cloud_cover TEXT, -- Ej: FEW, SCT, BKN, OVC
     raw_metar TEXT -- Opcional, por si se usa en la Fase 3
 );
