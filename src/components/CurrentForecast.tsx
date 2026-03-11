@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Wind, Eye, Gauge, Cloud, Thermometer, RefreshCw, Droplets } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -38,7 +38,7 @@ export default function CurrentForecast() {
     return () => clearTimeout(timer);
   }, [cooldown]);
 
-  const fetchWeather = async () => {
+  const fetchWeather = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -103,14 +103,14 @@ export default function CurrentForecast() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWeather();
     // Auto actualizar cada 5 minutos
     const interval = setInterval(fetchWeather, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchWeather]);
 
   return (
     <section>

@@ -93,7 +93,7 @@ export default function MetarTafGamet() {
               value={metar}
               onChange={(e) => setMetar(e.target.value)}
               placeholder="Pegue el código METAR aquí..."
-              className="w-full h-24 bg-gray-900 border border-gray-700 rounded-md p-3 text-sm text-gray-200 focus:outline-none focus:border-[#10b981] font-mono resize-none transition-colors"
+              className="w-full min-h-[96px] bg-gray-900 border border-gray-700 rounded-md p-3 text-sm text-gray-200 focus:outline-none focus:border-[#10b981] font-mono resize-none transition-colors"
             />
             <button 
               onClick={() => parseCode(metar, "METAR")}
@@ -110,7 +110,7 @@ export default function MetarTafGamet() {
               value={taf}
               onChange={(e) => setTaf(e.target.value)}
               placeholder="Pegue el código TAF aquí..."
-              className="w-full h-24 bg-gray-900 border border-gray-700 rounded-md p-3 text-sm text-gray-200 focus:outline-none focus:border-[#10b981] font-mono resize-none transition-colors"
+              className="w-full min-h-[96px] bg-gray-900 border border-gray-700 rounded-md p-3 text-sm text-gray-200 focus:outline-none focus:border-[#10b981] font-mono resize-none transition-colors"
             />
             <button 
               onClick={() => parseCode(taf, "TAF")}

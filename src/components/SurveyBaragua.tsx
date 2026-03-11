@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
-import { Send, CheckCircle, AlertCircle, RotateCcw } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, Trash2 } from "lucide-react";
 
 const QUESTIONS = [
   { id: "q1_forecast_current", text: "¿El servicio de pronóstico actual le permite obtener la información meteorológica de forma rápida?" },
@@ -29,6 +29,11 @@ export default function SurveyBaragua() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const CONFIRM_WORD = "ELIMINAR";
 
   const handleRadioChange = (questionId: string, value: boolean) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -107,24 +112,39 @@ export default function SurveyBaragua() {
     }
   };
 
-  const handleReset = () => {
-    const confirmed = window.confirm(
-      "¿Está seguro que desea reiniciar el formulario? Esta acción solo limpia la pantalla, los datos ya enviados permanecen guardados."
-    );
-    if (!confirmed) return;
+  const handleResetAllResults = async () => {
+    if (resetConfirmText !== CONFIRM_WORD) return;
+    
+    setResetLoading(true);
+    try {
+      const { error } = await supabase
+        .from("survey_responses")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000");
 
-    setRespondentCode("");
-    setAnswers({
-      q1_forecast_current: null,
-      q2_records_kept: null,
-      q3_operations_control: null,
-      q4_effectiveness: null,
-      q5_design_steps: null,
-      q6_techniques: null,
-      q7_results_impact: null,
-    });
-    setError(null);
-    setSuccess(false);
+      if (error) throw error;
+
+      setShowResetModal(false);
+      setResetConfirmText("");
+      setRespondentCode("");
+      setAnswers({
+        q1_forecast_current: null,
+        q2_records_kept: null,
+        q3_operations_control: null,
+        q4_effectiveness: null,
+        q5_design_steps: null,
+        q6_techniques: null,
+        q7_results_impact: null,
+      });
+      setError(null);
+      setSuccess(false);
+      window.alert("✅ Todos los resultados han sido eliminados correctamente.");
+    } catch (err: any) {
+      setError("Error al reiniciar: " + (err.message || "Error desconocido"));
+      setShowResetModal(false);
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   return (
@@ -239,18 +259,71 @@ export default function SurveyBaragua() {
                 </>
               )}
             </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="w-full mt-2 flex items-center justify-center space-x-2 bg-transparent hover:bg-red-900/20 text-gray-500 hover:text-red-400 border border-gray-700 hover:border-red-700/50 py-2 rounded-md transition-colors text-sm"
-            >
-              <RotateCcw size={14} />
-              <span>Reiniciar Formulario</span>
-            </button>
           </div>
+          
+          <button
+            type="button"
+            onClick={() => {
+              const first = window.confirm(
+                "⚠️ ADVERTENCIA CRÍTICA\n\nEsta acción eliminará PERMANENTEMENTE todos los resultados de la encuesta en la base de datos.\n\n¿Está absolutamente seguro de continuar?"
+              );
+              if (!first) return;
+
+              const second = window.confirm(
+                "🚨 SEGUNDA CONFIRMACIÓN\n\nEsta operación es IRREVERSIBLE y eliminará los datos del análisis KR-20.\n\n¿Confirma que desea borrar TODOS los datos de survey_responses?"
+              );
+              if (!second) return;
+
+              setResetConfirmText("");
+              setShowResetModal(true);
+            }}
+            className="w-full mt-4 flex items-center justify-center space-x-2 bg-transparent hover:bg-red-900/20 text-red-600/50 hover:text-red-400 border border-red-900/30 hover:border-red-700/50 py-2 rounded-md transition-colors text-xs"
+          >
+            <Trash2 size={12} />
+            <span>Reiniciar todos los resultados (Admin)</span>
+          </button>
           
         </form>
       )}
+
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1e293b] border border-red-700/50 rounded-xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
+            <div className="flex items-center space-x-3">
+              <Trash2 className="text-red-500 shrink-0" size={22} />
+              <h3 className="text-red-400 font-bold text-base">Confirmación Final Requerida</h3>
+            </div>
+            <p className="text-gray-300 text-sm">
+              Para confirmar, escriba exactamente <span className="font-mono font-bold text-red-400">ELIMINAR</span> en el campo de abajo:
+            </p>
+            <input
+              type="text"
+              value={resetConfirmText}
+              onChange={(e) => setResetConfirmText(e.target.value)}
+              placeholder="Escriba ELIMINAR"
+              className="w-full bg-gray-900 border border-gray-700 focus:border-red-500 rounded-md p-2 text-sm text-white outline-none font-mono"
+            />
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={() => { setShowResetModal(false); setResetConfirmText(""); }}
+                className="flex-1 py-2 rounded-md border border-gray-600 text-gray-400 hover:bg-gray-700 text-sm transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleResetAllResults}
+                disabled={resetConfirmText !== CONFIRM_WORD || resetLoading}
+                className="flex-1 py-2 rounded-md bg-red-700 hover:bg-red-600 text-white text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {resetLoading ? "Eliminando..." : "Confirmar Borrado"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </section>
   );
 }
