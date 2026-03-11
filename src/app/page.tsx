@@ -19,17 +19,14 @@ export default function DashboardPage() {
         <CurrentForecast />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Módulo 2: METAR / TAF / GAMET */}
-        <div id="metar" className="scroll-mt-6">
-          <MetarTafGamet />
-        </div>
+      {/* Módulo 2: METAR / TAF / GAMET */}
+      <div id="metar" className="scroll-mt-6">
+        <MetarTafGamet />
+      </div>
 
-        {/* Módulo 3: Alertas Operacionales */}
-        <div id="alertas" className="scroll-mt-6">
-          <OperationalAlerts />
-        </div>
+      {/* Módulo 3: Alertas Operacionales */}
+      <div id="alertas" className="scroll-mt-6">
+        <OperationalAlerts />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
