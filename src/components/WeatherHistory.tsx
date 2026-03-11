@@ -73,7 +73,7 @@ export default function WeatherHistory() {
         <p className="text-center text-sm text-gray-500 py-6">No hay registros meteorológicos almacenados todavía.</p>
       ) : (
         <div className="overflow-x-auto rounded-md border border-gray-700 print:border-gray-300">
-          <table className="w-full text-sm text-left">
+          <table className="w-full min-w-[600px] text-sm text-left">
             <thead className="bg-[#0f172a] print:bg-gray-100 text-gray-300 print:text-gray-700 text-xs uppercase font-semibold">
               <tr>
                 <th className="px-4 py-3 border-b border-gray-700 print:border-gray-300">Fecha / Hora</th>
