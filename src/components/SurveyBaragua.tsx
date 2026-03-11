@@ -31,6 +31,7 @@ export default function SurveyBaragua() {
   const [success, setSuccess] = useState(false);
 
   const [showResetModal, setShowResetModal] = useState(false);
+  const [resetStep, setResetStep] = useState<1 | 2 | 3>(1);
   const [resetConfirmText, setResetConfirmText] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const CONFIRM_WORD = "ELIMINAR";
@@ -125,6 +126,7 @@ export default function SurveyBaragua() {
       if (error) throw error;
 
       setShowResetModal(false);
+      setResetStep(1);
       setResetConfirmText("");
       setRespondentCode("");
       setAnswers({
@@ -142,6 +144,7 @@ export default function SurveyBaragua() {
     } catch (err: any) {
       setError("Error al reiniciar: " + (err.message || "Error desconocido"));
       setShowResetModal(false);
+      setResetStep(1);
     } finally {
       setResetLoading(false);
     }
@@ -264,16 +267,7 @@ export default function SurveyBaragua() {
           <button
             type="button"
             onClick={() => {
-              const first = window.confirm(
-                "⚠️ ADVERTENCIA CRÍTICA\n\nEsta acción eliminará PERMANENTEMENTE todos los resultados de la encuesta en la base de datos.\n\n¿Está absolutamente seguro de continuar?"
-              );
-              if (!first) return;
-
-              const second = window.confirm(
-                "🚨 SEGUNDA CONFIRMACIÓN\n\nEsta operación es IRREVERSIBLE y eliminará los datos del análisis KR-20.\n\n¿Confirma que desea borrar TODOS los datos de survey_responses?"
-              );
-              if (!second) return;
-
+              setResetStep(1);
               setResetConfirmText("");
               setShowResetModal(true);
             }}
@@ -287,38 +281,99 @@ export default function SurveyBaragua() {
       )}
 
       {showResetModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1e293b] border border-red-700/50 rounded-xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
-            <div className="flex items-center space-x-3">
-              <Trash2 className="text-red-500 shrink-0" size={22} />
-              <h3 className="text-red-400 font-bold text-base">Confirmación Final Requerida</h3>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+          <div className="bg-[#1e293b] border border-red-900/50 rounded-xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Cabecera */}
+            <div className="bg-red-950/40 px-6 py-4 border-b border-red-900/50 flex items-center space-x-3">
+               <AlertCircle className="text-red-500 shrink-0" size={24} />
+               <h3 className="text-red-400 font-bold text-lg">
+                 {resetStep === 1 ? "Advertencia Crítica" : resetStep === 2 ? "Confirmación Irreversible" : "Validación Final"}
+               </h3>
             </div>
-            <p className="text-gray-300 text-sm">
-              Para confirmar, escriba exactamente <span className="font-mono font-bold text-red-400">ELIMINAR</span> en el campo de abajo:
-            </p>
-            <input
-              type="text"
-              value={resetConfirmText}
-              onChange={(e) => setResetConfirmText(e.target.value)}
-              placeholder="Escriba ELIMINAR"
-              className="w-full bg-gray-900 border border-gray-700 focus:border-red-500 rounded-md p-2 text-sm text-white outline-none font-mono"
-            />
-            <div className="flex space-x-3">
+            
+            {/* Cuerpo */}
+            <div className="p-6 space-y-4">
+              {resetStep === 1 && (
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Esta acción eliminará <strong className="text-red-400 font-bold">PERMANENTEMENTE</strong> todos los resultados de la encuesta en la base de datos.
+                  <br/><br/>
+                  ¿Está absolutamente seguro de continuar con el borrado?
+                </p>
+              )}
+              {resetStep === 2 && (
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Esta operación es <strong className="text-red-400 font-bold">IRREVERSIBLE</strong> y eliminará los datos del análisis KR-20 para todos los usuarios.
+                  <br/><br/>
+                  ¿Confirma que desea borrar TODOS los datos?
+                </p>
+              )}
+              {resetStep === 3 && (
+                <>
+                  <p className="text-gray-300 text-sm">
+                    Para ejecutar el borrado, escriba la palabra <span className="font-mono font-bold text-red-500 tracking-widest bg-red-950/50 px-2 py-1 rounded inline-block">ELIMINAR</span> en el campo inferior:
+                  </p>
+                  <input
+                    type="text"
+                    value={resetConfirmText}
+                    onChange={(e) => setResetConfirmText(e.target.value)}
+                    placeholder="Escriba ELIMINAR"
+                    className="w-full mt-2 bg-gray-900 border border-gray-700 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-md p-3 text-sm text-white outline-none font-mono text-center tracking-widest transition-all"
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Acciones */}
+            <div className="bg-black/40 px-6 py-4 border-t border-gray-800 flex space-x-3">
               <button
                 type="button"
-                onClick={() => { setShowResetModal(false); setResetConfirmText(""); }}
-                className="flex-1 py-2 rounded-md border border-gray-600 text-gray-400 hover:bg-gray-700 text-sm transition-colors"
+                onClick={() => { setShowResetModal(false); setResetStep(1); setResetConfirmText(""); }}
+                className="flex-1 py-2.5 rounded-md border border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white text-sm font-medium transition-colors"
               >
                 Cancelar
               </button>
-              <button
-                type="button"
-                onClick={handleResetAllResults}
-                disabled={resetConfirmText !== CONFIRM_WORD || resetLoading}
-                className="flex-1 py-2 rounded-md bg-red-700 hover:bg-red-600 text-white text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {resetLoading ? "Eliminando..." : "Confirmar Borrado"}
-              </button>
+              
+              {resetStep === 1 && (
+                <button
+                  type="button"
+                  onClick={() => setResetStep(2)}
+                  className="flex-1 py-2.5 rounded-md bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-red-900/20"
+                >
+                  Sí, continuar
+                </button>
+              )}
+
+              {resetStep === 2 && (
+                <button
+                  type="button"
+                  onClick={() => setResetStep(3)}
+                  className="flex-1 py-2.5 rounded-md bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors flex items-center justify-center space-x-2 shadow-lg shadow-red-900/20"
+                >
+                  <Trash2 size={16} />
+                  <span>Sí, borrar todo</span>
+                </button>
+              )}
+
+              {resetStep === 3 && (
+                <button
+                  type="button"
+                  onClick={handleResetAllResults}
+                  disabled={resetConfirmText !== CONFIRM_WORD || resetLoading}
+                  className="flex-1 py-2.5 rounded-md bg-red-700 hover:bg-red-500 text-white text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg shadow-red-900/20"
+                >
+                  {resetLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Aplicando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={16} />
+                      <span>Confirmar Borrado</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
