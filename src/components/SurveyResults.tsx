@@ -54,7 +54,7 @@ export default function SurveyResults() {
       const nResponses = data.length;
       let calculatedKr20 = null;
       
-      if (nResponses > 1) {
+      if (nResponses >= 5) {
         let sumPq = 0;
         Object.keys(QUESTIONS_MAP).forEach((key) => {
           const p = data.filter((row) => row[key] === true).length / nResponses;
@@ -152,7 +152,7 @@ export default function SurveyResults() {
           })}
           
           {/* Confiabilidad KR-20 */}
-          {kr20 !== null && (
+          {kr20 !== null ? (
             <div className="mt-8 pt-4 border-t border-gray-700 print:border-gray-300">
               <h4 className="text-sm font-semibold text-gray-300 print:text-gray-800 mb-2">Confiabilidad del Instrumento (KR-20)</h4>
               <div className="bg-black/30 print:bg-gray-100 p-3 rounded-md border border-gray-800 print:border-gray-300 flex items-center justify-between">
@@ -166,6 +166,11 @@ export default function SurveyResults() {
                   <p>Métrica de consistencia interna para dicotómicas.</p>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="mt-8 pt-4 border-t border-gray-700 print:border-gray-300">
+               <h4 className="text-sm font-semibold text-gray-300 print:text-gray-800 mb-2">Confiabilidad del Instrumento (KR-20)</h4>
+               <p className="text-xs text-gray-400 print:text-gray-500 italic">Se necesitan mínimo 5 respuestas del personal para calcular la confiabilidad del instrumento (KR-20).</p>
             </div>
           )}
         </div>

@@ -42,3 +42,8 @@ next-env.d.ts
 
 # antigravity skills
 /skills
+
+# user assets and unneeded binaries
+*.zip
+*.docx
+*.doc
