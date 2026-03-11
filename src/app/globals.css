@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-military-bg: #0f172a;
+  --color-military-surface: #1e293b;
+  --color-military-green: #10b981;
+  --color-military-amber: #f59e0b;
+  --color-military-text: #f8fafc;
+  --color-military-muted: #94a3b8;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-military-bg);
+    color: var(--color-military-text);
+  }
+}
+
+/* Modificadores de impresión para Anexos de Tesis */
+@media print {
+  @page {
+    margin: 2cm;
+    size: auto;
+  }
+  
+  body {
+    background-color: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ocultar barra lateral, topbar y elementos no esenciales por defecto */
+  .print-hidden {
+    display: none !important;
+  }
+  
+  .print-full-width {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Ocultar Next.js Dev Tools permanentemente para presentación */
+[data-nextjs-toast], nextjs-portal, #nextjs-build-indicator {
+  display: none !important;
+}
