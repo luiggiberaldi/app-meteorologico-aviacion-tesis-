@@ -5,6 +5,8 @@ import "./globals.css";
 export const metadata = {
   title: "SERMETAVIA - Base Aérea Logística Baragua",
   description: "Plataforma de pronóstico meteorológico para el control de aeronaves",
+  manifest: "/manifest.json",
+  themeColor: "#1e293b",
 };
 
 export default function RootLayout({
