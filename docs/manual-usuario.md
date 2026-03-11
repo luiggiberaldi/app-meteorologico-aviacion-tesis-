@@ -12,6 +12,18 @@ El presente manual tiene como propósito orientar al personal de meteorología d
 La dirección de acceso al sistema es: https://sermetavia-baragua.vercel.app
 Para ingresar al sistema, únicamente necesita abrir el enlace web en su navegador. La plataforma está diseñada de forma inmediata (sin pantallas de inicio de sesión complejas por ahora) para permitir una rápida consulta operativa 24/7. 
 
+### 3.1 Instalación como Aplicación (Opcional)
+
+Si desea tener acceso más rápido al sistema sin abrir el navegador cada vez:
+
+1. Abra la URL https://sermetavia-baragua.vercel.app en Chrome, Edge o Safari.
+2. Busque el ícono de "Instalar" o "Agregar a inicio" en la barra de direcciones del navegador (generalmente un símbolo de + o de descarga).
+3. Haga clic en "Instalar" y confirme.
+4. La aplicación aparecerá en su escritorio o menú de inicio como cualquier programa instalado.
+5. A partir de ese momento, podrá abrirla directamente desde el ícono sin necesidad de abrir el navegador primero.
+
+**Nota:** Esta instalación no requiere descargar archivos grandes ni ocupar mucho espacio. Es solo un acceso directo mejorado que funciona como aplicación nativa.
+
 Una vez dentro, observará el Panel Principal, diseñado en tonos oscuros (modo nocturno) para reducir la fatiga visual durante las jornadas nocturnas y resaltar indicadores críticos de colores (Alertas).
 
 ## 4. Descripción de la Pantalla Principal

@@ -9,6 +9,16 @@ El proyecto sigue una arquitectura sin servidor (Serverless) separada en Fronten
 - **Capa Cliente (Frontend):** Se basa en **Next.js 14+ (App Router)** usando componentes interactivos de `React` etiquetados con la directiva `"use client"`, utilizando **Tailwind CSS** para un diseño `UI Dark Mode` eficiente.
 - **Capa de Datos y Autenticación (Backend):** Utiliza **Supabase**, que expone interfaces API y WebSockets encima de un motor subyacente de base de datos **PostgreSQL**.
 
+### Capacidades PWA (Progressive Web App)
+
+El sistema está configurado como PWA instalable, permitiendo:
+- Instalación directa en escritorio y dispositivos móviles sin pasar por tiendas de aplicaciones.
+- Funcionamiento offline parcial mediante Service Workers (los módulos METAR/TAF/GAMET y alertas mantienen la última sesión cargada).
+- Acceso rápido desde íconos nativos en el escritorio o pantalla de inicio del dispositivo.
+- Rendimiento optimizado con caché de recursos estáticos.
+
+**Instalación para usuarios:** Al acceder desde Chrome, Edge o Safari, aparecerá un botón "Instalar" en la barra de direcciones que permite agregar la app al sistema operativo.
+
 ### Diagrama de Arquitectura (Esquema General)
 
 [Usuario / Navegador]
