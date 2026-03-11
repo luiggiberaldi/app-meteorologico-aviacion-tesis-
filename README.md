@@ -1,4 +1,5 @@
 # Plataforma Meteorológica SERMETAVIA - Base Aérea Logística BARAGUA
+[![Deploy en Vercel](https://vercel.com/button)](https://app-meteorologico-aviacion-tesis.vercel.app)
 
 ## Descripción General
 Esta aplicación web es el resultado de un proyecto de tesis enfocado en el diseño de una plataforma de pronóstico meteorológico para apoyar el control de las aeronaves por parte del Servicio de Meteorología de la Aviación (SERMETAVIA) en la Base Aérea Logística BARAGUA, ubicada en Maracay, estado Aragua. 
@@ -26,8 +27,8 @@ Para desplegar y ejecutar este proyecto, necesitas:
 ### 1. Clonar el repositorio
 Abre una terminal y ejecuta:
 ```bash
-git clone <URL_DEL_REPOSITORIO>
-cd "app meteorologica aeronaves"
+git clone https://github.com/luiggiberaldi/app-meteorologico-aviacion-tesis-
+cd app-meteorologico-aviacion-tesis-
 ```
 
 ### 2. Instalar dependencias

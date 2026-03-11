@@ -9,6 +9,20 @@ El proyecto sigue una arquitectura sin servidor (Serverless) separada en Fronten
 - **Capa Cliente (Frontend):** Se basa en **Next.js 14+ (App Router)** usando componentes interactivos de `React` etiquetados con la directiva `"use client"`, utilizando **Tailwind CSS** para un diseño `UI Dark Mode` eficiente.
 - **Capa de Datos y Autenticación (Backend):** Utiliza **Supabase**, que expone interfaces API y WebSockets encima de un motor subyacente de base de datos **PostgreSQL**.
 
+### Diagrama de Arquitectura (Esquema General)
+
+[Usuario / Navegador]
+        ↓
+[Next.js + React — Vercel (Frontend)]
+        ↕
+[Supabase / PostgreSQL (BaaS — Base de Datos + Realtime)]
+        ↕
+[Open-Meteo API (Datos meteorológicos externos)]
+
+- **Frontend:** Renderiza la interfaz, consume datos y gestiona el estado del cliente.
+- **Supabase:** Gestiona persistencia, canal Realtime (WebSocket) y autenticación.
+- **Open-Meteo:** Provee datos meteorológicos globales vía REST API sin autenticación.
+
 ## 3. Flujo de Datos (Next.js ↔ Supabase)
 El ciclo de vida de los datos se maneja vía peticiones asíncronas REST API o suscripciones a canal WebSocket.
 1. Cuando se instancia la UI (e.g. `CurrentForecast.tsx`), se realiza primero un POST Request `fetch()` a `Open-Meteo API`.
@@ -41,7 +55,7 @@ Módulo estadístico reactivo.
 
 ## 6. Consideraciones de Seguridad
 Para acelerar la implementación piloto y como requerimiento académico funcional, las políticas RLS *(Row Level Security)* de PostgreSQL están en modo transparente, haciendo un bypass de credenciales e insertando datos por medio del token `anon`.
-- **Producción Definitiva:** En ambiente de operaciones reales fuera de tesis, este modelo es vulnerable. **DEBES** configurar roles (Roles Supabase Auth), iniciar sesión en frontend (`supabase.auth.signIn()`) y activar RLS requiriendo autenticación autenticada por Bearer Tokens para mutar (INSERT/DELETE) tablas. Las de consulta pueden ser de esquema público.
+- **Producción Definitiva:** En ambiente de operaciones reales fuera de tesis, Esta configuración representa una limitación deliberada del prototipo académico, justificada por el alcance del proyecto de tesis. Es adecuada para el entorno piloto de validación y no representa un riesgo operacional en el contexto de uso controlado de la investigación.. **DEBES** configurar roles (Roles Supabase Auth), iniciar sesión en frontend (`supabase.auth.signIn()`) y activar RLS requiriendo autenticación autenticada por Bearer Tokens para mutar (INSERT/DELETE) tablas. Las de consulta pueden ser de esquema público.
 
 ## 7. Despliegue en Producción
 Se recomienda el uso exclusivo de servidor PaaS en la nube, especialmente **Vercel** o **Render**, dado su matrimonio estrecho con el framework de enrutamiento Server-Side de Next.js.

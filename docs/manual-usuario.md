@@ -1,7 +1,7 @@
 # Manual de Usuario - Plataforma SERMETAVIA Baragua
 
 ## 1. Introducción
-Bienvenido(a) a la Plataforma Web de Meteorología Aeronáutica, diseñada específicamente para apoyar a la Base Aérea Logística BARAGUA del estado Aragua. Este manual tiene como objetivo guiar al personal de meteorología en el uso correcto y eficiente de todas las herramientas integradas en el sistema, desde la consulta del clima hasta el registro de instrumentos estadísticos.
+El presente manual tiene como propósito orientar al personal de meteorología de la Base Aérea Logística BARAGUA en el uso correcto y eficiente de la Plataforma Web de Meteorología Aeronáutica. A continuación se describen los módulos disponibles y los procedimientos para su operación.
 
 ## 2. Requisitos para el Usuario
 - Una computadora, tablet o teléfono inteligente con conexión a internet estable.
@@ -9,6 +9,7 @@ Bienvenido(a) a la Plataforma Web de Meteorología Aeronáutica, diseñada espec
 - El enlace de acceso a la plataforma proporcionado por la Base.
 
 ## 3. Acceso al Sistema
+La dirección de acceso al sistema es: https://app-meteorologico-aviacion-tesis.vercel.app
 Para ingresar al sistema, únicamente necesita abrir el enlace web en su navegador. La plataforma está diseñada de forma inmediata (sin pantallas de inicio de sesión complejas por ahora) para permitir una rápida consulta operativa 24/7. 
 
 Una vez dentro, observará el Panel Principal, diseñado en tonos oscuros (modo nocturno) para reducir la fatiga visual durante las jornadas nocturnas y resaltar indicadores críticos de colores (Alertas).
@@ -61,3 +62,17 @@ Si presiona este botón, la interfaz cambiará mágicamente de oscuro a blanco y
 ---
 
 *Desarrollado y pensado exclusivamente para las necesidades operativas de la Base Aérea Logística BARAGUA.*
+
+## 6. Solución de Problemas Frecuentes
+
+**P: La página no carga o aparece en blanco.**
+R: Verifique que su dispositivo tenga conexión a internet activa. Intente recargar la página presionando F5. Si el problema persiste, intente desde otro navegador.
+
+**P: Aparece un error al enviar la encuesta.**
+R: Asegúrese de haber respondido las 7 preguntas antes de presionar "Enviar Respuestas". Si el error persiste, cierre la pestaña, vuelva a abrir el sistema e intente de nuevo.
+
+**P: El sistema indica que el código de empleado ya fue registrado.**
+R: Cada código solo puede usarse una vez. Si usted no ha respondido antes y recibe este mensaje, comuníquese con el administrador del sistema.
+
+**P: El pronóstico no muestra datos actualizados.**
+R: Los datos se actualizan de forma automática y periódica. Espere unos minutos y recargue la página. Si continúa, notifique al responsable técnico de la base.
