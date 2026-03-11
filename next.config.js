@@ -8,4 +8,5 @@ const withPWA = require('next-pwa')({
 
 module.exports = withPWA({
   // Aquí van las configuraciones existentes de Next.js si las hay
+  turbopack: {}
 });

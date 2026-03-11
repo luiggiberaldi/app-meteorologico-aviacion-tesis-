@@ -16,9 +16,10 @@ interface ParsedData {
 export default function MetarTafGamet() {
   const [metar, setMetar] = useState("");
   const [taf, setTaf] = useState("");
+  const [gamet, setGamet] = useState("");
   const [parsed, setParsed] = useState<ParsedData | null>(null);
 
-  const parseCode = (code: string, type: "METAR" | "TAF") => {
+  const parseCode = (code: string, type: "METAR" | "TAF" | "GAMET") => {
     if (!code.trim()) return;
 
     const windMatch = code.match(/(\d{3}|VRB)(\d{2,3})(?:G(\d{2,3}))?(KT|KMH|MPS)/);
@@ -86,7 +87,7 @@ export default function MetarTafGamet() {
       </div>
 
       <div className="flex-1 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-2">
             <label className="text-xs font-medium text-gray-400">Código METAR</label>
             <textarea 
@@ -118,6 +119,23 @@ export default function MetarTafGamet() {
             >
               <Search size={14} />
               <span>Traducir TAF</span>
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-gray-400">Código GAMET</label>
+            <textarea 
+              value={gamet}
+              onChange={(e) => setGamet(e.target.value)}
+              placeholder="Pegue el código GAMET aquí..."
+              className="w-full min-h-[96px] bg-gray-900 border border-gray-700 rounded-md p-3 text-sm text-gray-200 focus:outline-none focus:border-[#10b981] font-mono resize-none transition-colors"
+            />
+            <button 
+              onClick={() => parseCode(gamet, "GAMET")}
+              className="w-full flex items-center justify-center space-x-2 bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-md transition-colors text-sm border border-gray-600"
+            >
+              <Search size={14} />
+              <span>Traducir GAMET</span>
             </button>
           </div>
         </div>
