@@ -28,7 +28,7 @@ export default function Sidebar() {
           <li>
             <Link href="#metar" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
               <CloudSun size={20} />
-              <span className="font-medium text-sm">METAR / TAF</span>
+              <span className="font-medium text-sm">METAR / TAF / GAMET</span>
             </Link>
           </li>
           <li>
