@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, RotateCcw } from "lucide-react";
 
 const QUESTIONS = [
   { id: "q1_forecast_current", text: "¿El servicio de pronóstico actual le permite obtener la información meteorológica de forma rápida?" },
@@ -55,6 +55,19 @@ export default function SurveyBaragua() {
     setLoading(true);
 
     try {
+      // Verificar si el código ya respondió la encuesta
+      const { data: existing } = await supabase
+        .from("survey_responses")
+        .select("id")
+        .eq("respondent_code", respondentCode.trim())
+        .maybeSingle();
+
+      if (existing) {
+        setError("Este código de encuestado ya registró una respuesta. No se permiten respuestas duplicadas.");
+        setLoading(false);
+        return;
+      }
+
       // NOTA ACADÉMICA (Seguridad): La tabla `survey_responses` en producción 
       // debería tener RLS activado permitiendo *sólo INSERTS* con anon_key, 
       // mientras se reserva el permiso de lectura (SELECT) únicamente 
@@ -92,6 +105,26 @@ export default function SurveyBaragua() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReset = () => {
+    const confirmed = window.confirm(
+      "¿Está seguro que desea reiniciar el formulario? Esta acción solo limpia la pantalla, los datos ya enviados permanecen guardados."
+    );
+    if (!confirmed) return;
+
+    setRespondentCode("");
+    setAnswers({
+      q1_forecast_current: null,
+      q2_records_kept: null,
+      q3_operations_control: null,
+      q4_effectiveness: null,
+      q5_design_steps: null,
+      q6_techniques: null,
+      q7_results_impact: null,
+    });
+    setError(null);
+    setSuccess(false);
   };
 
   return (
@@ -205,6 +238,14 @@ export default function SurveyBaragua() {
                   <span>Enviar Respuestas</span>
                 </>
               )}
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="w-full mt-2 flex items-center justify-center space-x-2 bg-transparent hover:bg-red-900/20 text-gray-500 hover:text-red-400 border border-gray-700 hover:border-red-700/50 py-2 rounded-md transition-colors text-sm"
+            >
+              <RotateCcw size={14} />
+              <span>Reiniciar Formulario</span>
             </button>
           </div>
           
