@@ -1,12 +1,13 @@
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata = {
   title: "SERMETAVIA - Base Aérea Logística Baragua",
   description: "Plataforma de pronóstico meteorológico para el control de aeronaves",
   manifest: "/manifest.json",
-  themeColor: "#1e293b",
+  themeColor: "#10b981",
 };
 
 export default function RootLayout({
@@ -16,6 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="dark scroll-smooth">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className="flex h-screen overflow-hidden bg-military-bg text-military-text font-sans antialiased">
         {/* Sidebar */}
         <div className="print-hidden h-full">
@@ -36,6 +40,16 @@ export default function RootLayout({
             </div>
           </main>
         </div>
+
+        <Script id="register-sw" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/sw.js')
+                .then((reg) => console.log('SW registrado'))
+                .catch((err) => console.log('SW error:', err));
+            }
+          `}
+        </Script>
       </body>
     </html>
   );
