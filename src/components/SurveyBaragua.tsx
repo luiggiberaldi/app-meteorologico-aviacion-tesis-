@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Send, CheckCircle, AlertCircle, Trash2 } from "lucide-react";
 
@@ -34,7 +34,18 @@ export default function SurveyBaragua() {
   const [resetStep, setResetStep] = useState<1 | 2 | 3 | 4>(1);
   const [resetConfirmText, setResetConfirmText] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [hasResults, setHasResults] = useState(false);
   const CONFIRM_WORD = "ELIMINAR";
+
+  useEffect(() => {
+    const checkResults = async () => {
+      const { count } = await supabase
+        .from("survey_responses")
+        .select("*", { count: "exact", head: true });
+      setHasResults(!!count && count > 0);
+    };
+    checkResults();
+  }, []);
 
   const handleRadioChange = (questionId: string, value: boolean) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -94,6 +105,7 @@ export default function SurveyBaragua() {
       if (dbError) throw dbError;
 
       setSuccess(true);
+      setHasResults(true);
       // Limpiar formulario tras el éxito
       setRespondentCode("");
       setAnswers({
@@ -140,6 +152,7 @@ export default function SurveyBaragua() {
       });
       setError(null);
       setSuccess(false);
+      setHasResults(false);
       
       // Mostrar paso final de éxito
       setResetStep(4);
@@ -266,18 +279,20 @@ export default function SurveyBaragua() {
             </button>
           </div>
           
-          <button
-            type="button"
-            onClick={() => {
-              setResetStep(1);
-              setResetConfirmText("");
-              setShowResetModal(true);
-            }}
-            className="w-full mt-4 flex items-center justify-center space-x-2 bg-transparent hover:bg-red-900/20 text-red-600/50 hover:text-red-400 border border-red-900/30 hover:border-red-700/50 py-2 rounded-md transition-colors text-xs"
-          >
-            <Trash2 size={12} />
-            <span>Reiniciar todos los resultados (Admin)</span>
-          </button>
+          {hasResults && (
+            <button
+              type="button"
+              onClick={() => {
+                setResetStep(1);
+                setResetConfirmText("");
+                setShowResetModal(true);
+              }}
+              className="w-full mt-4 flex items-center justify-center space-x-2 bg-transparent hover:bg-red-900/20 text-red-600/50 hover:text-red-400 border border-red-900/30 hover:border-red-700/50 py-2 rounded-md transition-colors text-xs"
+            >
+              <Trash2 size={12} />
+              <span>Reiniciar todos los resultados (Admin)</span>
+            </button>
+          )}
           
         </form>
       )}
