@@ -88,7 +88,31 @@ export default function SurveyResults() {
   };
 
   useEffect(() => {
+    // Carga inicial de resultados
     fetchSurveyResults();
+
+    // Suscripción en tiempo real: recarga automática al insertar o eliminar respuestas
+    const channel = supabase
+      .channel("realtime_survey_responses")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "survey_responses" },
+        () => {
+          fetchSurveyResults();
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "survey_responses" },
+        () => {
+          fetchSurveyResults();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
