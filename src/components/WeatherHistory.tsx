@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { AlertCircle, RefreshCw, CalendarDays, Wind, Eye, Thermometer, Cloud, Gauge } from "lucide-react";
+import { useBaseContext } from "@/context/BaseContext";
 
 interface WeatherLog {
   id: string;
@@ -16,6 +17,7 @@ interface WeatherLog {
 }
 
 export default function WeatherHistory() {
+  const { selectedBase } = useBaseContext();
   const [logs, setLogs] = useState<WeatherLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,11 +46,11 @@ export default function WeatherHistory() {
   }, []);
 
   return (
-    <div className="bg-[#1e293b] rounded-xl border border-gray-700 p-5 print:bg-white print:border-gray-300 print:shadow-none print:text-black">
+    <div className="bg-[#1e293b] rounded-xl border border-gray-700 p-5 print:bg-white print:border-gray-300 print:shadow-none print:text-black print:p-0">
       <div className="flex items-center justify-between mb-4 border-b border-gray-700 print:border-gray-300 pb-3">
         <h3 className="text-md font-semibold text-white print:text-black flex items-center">
           <CalendarDays size={18} className="mr-2 text-[#10b981] print:text-gray-800" />
-          Historial Meteorológico (BARAGUA)
+          Historial Meteorológico ({selectedBase ? selectedBase.nombre : 'Nacional'})
         </h3>
         <button 
           onClick={fetchHistory}

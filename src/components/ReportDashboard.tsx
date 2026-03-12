@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Printer } from "lucide-react";
+import { Printer, MapPin } from "lucide-react";
 import WeatherHistory from "./WeatherHistory";
+import { useBaseContext } from "@/context/BaseContext";
 
 export default function ReportDashboard() {
+  const { selectedBase } = useBaseContext();
   const [printDate, setPrintDate] = useState<string>("");
 
   useEffect(() => {
@@ -13,7 +15,6 @@ export default function ReportDashboard() {
 
   const handlePrint = () => {
     setPrintDate(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`);
-    // Pequeño timeout para permitir que React renderice la nueva fecha antes de imprimir
     setTimeout(() => {
       window.print();
     }, 100);
@@ -26,10 +27,10 @@ export default function ReportDashboard() {
       <div className="bg-[#1e293b] print:bg-white p-5 border-b border-gray-700 print:border-b-2 print:border-black flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-xl font-bold text-white print:text-black">
-            Reportes y Exportación
+            Reporte de Condiciones Meteorológicas
           </h3>
           <p className="text-sm text-gray-400 print:text-gray-600 mt-1">
-            Histórico de Condiciones Meteorológicas.
+            {selectedBase ? `Documento Operacional - ${selectedBase.nombre}` : 'Red Nacional (Promediado)'}
           </p>
         </div>
         
@@ -42,23 +43,35 @@ export default function ReportDashboard() {
         </button>
       </div>
 
+      {/* Info Header de Impresión Solo Visible al imprimir */}
+      {selectedBase && (
+        <div className="hidden print:flex justify-between items-center py-4 border-b border-gray-300 mb-4">
+           <div>
+             <p className="font-bold text-lg">{selectedBase.nombre}</p>
+             <p className="text-sm text-gray-700">{selectedBase.ciudad}, {selectedBase.estado} - Venezuela</p>
+           </div>
+           <div className="text-right text-sm">
+             <p><strong>OACI:</strong> {selectedBase.codigo}</p>
+             <p><strong>Coordenadas:</strong> {selectedBase.latitud.toFixed(4)}N, {Math.abs(selectedBase.longitud).toFixed(4)}W</p>
+           </div>
+        </div>
+      )}
+
       {/* Contenido */}
-      <div className="p-5 print:p-0 print:py-5">
-        
-        {/* Historial Meteorológico -> Ancho Completo */}
+      <div className="p-5 print:p-0 print:py-2">
         <div className="space-y-4">
           <div className="print:hidden">
             <p className="text-sm text-gray-400 mb-2">Registro de las últimas lecturas almacenadas en Base de Datos.</p>
           </div>
           <WeatherHistory />
         </div>
-
       </div>
 
       {/* Footer solo para versión de impresión */}
       <div className="hidden print:block text-center pt-8 border-t-2 border-black mt-8 text-xs text-gray-500">
-        <p>Generado automáticamente - Sistema Meteorológico BARAGUA</p>
-        <p>Fecha de Impresión: {printDate}</p>
+        <p>Generado automáticamente - Sistema Meteorológico SERMETAVIA</p>
+        <p>Fecha de Impresión: {printDate} UTC-4</p>
+        <p className="mt-1">DOCUMENTO USO OFICIAL</p>
       </div>
 
     </section>
