@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Plane, Menu, X, LayoutDashboard, BarChart3, FileText, ChevronDown, 
-  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings 
+  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings, LogOut 
 } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
+import { useAuth } from "@/context/AuthContext";
 
 const mainNav = [
   { href: "/", label: "Centro de Mando", icon: LayoutDashboard },
@@ -30,6 +31,7 @@ export default function Topbar() {
   const [timeUTC, setTimeUTC] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { selectedBase, setSelectedBase, bases } = useBaseContext();
+  const { user, signOut } = useAuth();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -99,6 +101,22 @@ export default function Topbar() {
             <span className="hidden sm:inline-block text-xs text-gray-400 font-mono">HORA ZULU</span>
             <span className="text-xs sm:text-sm font-bold text-[#f59e0b] font-mono tracking-widest">{timeUTC || "00:00:00 UTC"}</span>
           </div>
+
+          {/* User & Logout */}
+          {user && (
+            <div className="hidden md:flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-emerald-900/50 border border-emerald-600/40 flex items-center justify-center text-emerald-300 text-[10px] font-bold">
+                {(user.user_metadata?.full_name || user.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                title="Cerrar Sesión"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
