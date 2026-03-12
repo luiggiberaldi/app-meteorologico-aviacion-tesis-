@@ -1,80 +1,34 @@
 "use client";
 
-import { useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { useBaseContext } from '@/context/BaseContext';
 
 export default function PresionFrentes() {
-  const [opacidad, setOpacidad] = useState(80);
   const { selectedBase } = useBaseContext();
-  const mapCenter: [number, number] = selectedBase ? [selectedBase.latitud, selectedBase.longitud] : [8.0, -66.0];
 
-  const API_KEY = process.env.NEXT_PUBLIC_OWM_API_KEY || 'b6907d289e10d714a6e88b30761fae22';
+  const lat = selectedBase ? selectedBase.latitud : 8.0;
+  const lon = selectedBase ? selectedBase.longitud : -66.0;
+  const zoom = selectedBase ? 7 : 6;
+
+  // URL del iframe de Windy configurado para Presión Atmosférica MSL
+  const windyUrl = `https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km/h&zoom=${zoom}&overlay=pressure&product=ecmwf&level=surface&lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&marker=true&message=true`;
 
   return (
-    <div className="relative h-[600px] w-full bg-[#252d3d] overflow-hidden">
-      <MapContainer
-        key={selectedBase ? selectedBase.id : 'nacional'}
-        center={mapCenter}
-        zoom={selectedBase ? 9 : 6}
-        className="h-full w-full z-0"
-        zoomControl={true}
-        scrollWheelZoom={false}
-      >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; OSM contributors &copy; CARTO'
-        />
-        
-        {/* Capa de Presión */}
-        <TileLayer
-          key="presion"
-          url={`https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${API_KEY}`}
-          opacity={opacidad / 100}
-          zIndex={10}
-          attribution='Map data &copy; OpenWeatherMap'
-        />
-      </MapContainer>
+    <div className="relative h-[600px] w-full bg-[#252d3d] overflow-hidden rounded-xl border border-[#364156]">
+      <iframe 
+        className="w-full h-full border-none"
+        src={windyUrl}
+        title="Windy Presión Atmosférica"
+        loading="lazy"
+        allow="fullscreen"
+      ></iframe>
 
-      {/* Panel de Controles Flotante */}
-      <div className="absolute top-4 right-4 z-[400] bg-[#1a1f2e]/90 backdrop-blur-md p-4 rounded-xl border border-[#364156] shadow-2xl w-64">
-        <h3 className="text-white font-bold mb-4">Presión Atmosférica</h3>
-
-        {/* Opacidad */}
-        <div>
-          <label className="text-sm text-gray-400 flex justify-between mb-1">
-            <span>Opacidad Isobaras</span>
-            <span className="text-[#00d4aa]">{opacidad}%</span>
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={opacidad}
-            onChange={(e) => setOpacidad(Number(e.target.value))}
-            className="w-full h-1.5 bg-[#252d3d] rounded-lg appearance-none cursor-pointer accent-[#00d4aa]"
-          />
-        </div>
-      </div>
-
-      {/* Leyenda */}
-      <div className="absolute bottom-6 mx-auto left-0 right-0 w-[450px] z-[400] bg-[#1a1f2e]/90 backdrop-blur-md p-3 rounded-xl border border-[#364156] shadow-2xl flex flex-col items-center">
-        <h3 className="text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">Presión Atmosférica (hPa)</h3>
-        <div className="w-full flex h-3 rounded overflow-hidden">
-          <div className="flex-1 bg-[#00008B]" title="< 980 hPa (Baja presión)"></div>
-          <div className="flex-1 bg-[#ADD8E6]" title="980-1000 hPa"></div>
-          <div className="flex-1 bg-[#808080]" title="1000-1020 hPa (Normal)"></div>
-          <div className="flex-1 bg-[#FFA500]" title="1020-1040 hPa"></div>
-          <div className="flex-1 bg-[#FF0000]" title="> 1040 hPa (Alta presión)"></div>
-        </div>
-        <div className="w-full flex justify-between text-[10px] text-gray-400 mt-1 px-1">
-          <span>{`<980`}</span>
-          <span>1000</span>
-          <span>1020</span>
-          <span>1040</span>
-          <span>{`>1040`}</span>
-        </div>
+      {/* Indicador de Capa */}
+      <div className="absolute top-4 left-4 z-10 bg-[#1a1f2e]/90 backdrop-blur-md px-4 py-2 rounded-lg border border-[#364156] shadow-lg pointer-events-none flex flex-col">
+        <h3 className="text-white font-bold text-sm flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+          Presión Atmosférica Superficial (MSL)
+        </h3>
+        <span className="text-xs text-gray-400 mt-1 ml-4">Isobaras globales para identificación de frentes</span>
       </div>
     </div>
   );
