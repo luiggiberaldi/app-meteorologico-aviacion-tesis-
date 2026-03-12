@@ -67,7 +67,7 @@ const getStatusDot = (status: string) => {
   }
 };
 
-// Sub-componente para datos meteorológicos en vivo por estación
+// Sub-componente enriquecido para datos meteorológicos en vivo
 function LiveWeatherPopup({ lat, lon }: { lat: number, lon: number }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -76,7 +76,7 @@ function LiveWeatherPopup({ lat, lon }: { lat: number, lon: number }) {
     let mounted = true;
     async function fetchData() {
       try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,cloud_cover&wind_speed_unit=kn`);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,cloud_cover,visibility,relative_humidity_2m&wind_speed_unit=kn`);
         if (!res.ok) throw new Error("API Error");
         const json = await res.json();
         if (mounted) {
@@ -91,19 +91,53 @@ function LiveWeatherPopup({ lat, lon }: { lat: number, lon: number }) {
     return () => { mounted = false; };
   }, [lat, lon]);
 
-  if (loading) return <div className="text-center py-2 text-xs text-blue-500 animate-pulse">Consultando sensores...</div>;
-  if (!data) return <div className="text-center py-2 text-xs text-red-500">Sin datos del sensor</div>;
+  if (loading) return <div className="text-center py-3 text-xs text-blue-500 animate-pulse">⏳ Consultando sensores...</div>;
+  if (!data) return <div className="text-center py-2 text-xs text-red-500">⚠️ Sin datos del sensor</div>;
+
+  const visKm = (data.visibility ?? 10000) / 1000;
+  const windKt = Math.round(data.wind_speed_10m ?? 0);
+  const cloudPct = data.cloud_cover ?? 0;
+
+  // Determinar condición de vuelo
+  const getFlightCat = () => {
+    if (visKm > 8 && cloudPct < 50) return { label: 'VFR', color: 'bg-green-500', text: 'text-green-700' };
+    if (visKm > 5) return { label: 'MVFR', color: 'bg-yellow-500', text: 'text-yellow-700' };
+    if (visKm > 1.6) return { label: 'IFR', color: 'bg-red-500', text: 'text-red-700' };
+    return { label: 'LIFR', color: 'bg-purple-600', text: 'text-purple-700' };
+  };
+
+  // Dirección del viento como brújula
+  const getWindDir = (deg: number) => {
+    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    return dirs[Math.round(deg / 22.5) % 16];
+  };
+
+  const fc = getFlightCat();
 
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
-        <Thermometer className="w-3.5 h-3.5 text-red-500 shrink-0" /> {data.temperature_2m}°C
+    <div className="mt-2 space-y-1.5">
+      {/* Badge VFR/IFR */}
+      <div className="flex items-center justify-between">
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${fc.color}`}>
+          ✈ {fc.label}
+        </span>
+        <span className="text-[10px] text-gray-400">Vis: {visKm.toFixed(1)} km</span>
       </div>
-      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
-        <Wind className="w-3.5 h-3.5 text-blue-500 shrink-0" /> {Math.round(data.wind_speed_10m)} KT / {Math.round(data.wind_direction_10m)}°
-      </div>
-      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700 col-span-2">
-        <Cloud className="w-3.5 h-3.5 text-gray-400 shrink-0" /> Nubosidad: {data.cloud_cover}%
+
+      {/* Grid de métricas */}
+      <div className="grid grid-cols-2 gap-x-3 gap-y-1 bg-slate-50 p-2 rounded-lg border border-slate-200">
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+          <Thermometer className="w-3 h-3 text-red-500 shrink-0" /> {data.temperature_2m}°C
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+          <Wind className="w-3 h-3 text-blue-500 shrink-0" /> {windKt} KT {getWindDir(data.wind_direction_10m ?? 0)}
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+          <Cloud className="w-3 h-3 text-gray-400 shrink-0" /> {cloudPct}% nub.
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+          💧 {data.relative_humidity_2m ?? '--'}% hum.
+        </div>
       </div>
     </div>
   );
@@ -115,14 +149,13 @@ export default function MapContent() {
   const [showCivil, setShowCivil] = useState(true);
   const [capaBase, setCapaBase] = useState<'osm' | 'satelite'>('osm');
 
-  const handleVerMetar = (base: typeof bases[0]) => {
-    // Buscar la base equivalente en el contexto global
+  const handleMonitorear = (base: typeof bases[0]) => {
     const match = basesAereasDisponibles.find(b =>
       Math.abs(b.latitud - base.lat) < 0.1 && Math.abs(b.longitud - base.lon) < 0.1
     );
     if (match) setSelectedBase(match);
-    // Scroll a la sección METAR/TAF
-    document.getElementById('metar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Scroll al inicio del dashboard donde está la Situación General
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const militaryCount = bases.filter(b => b.type === 'militar').length;
@@ -164,29 +197,32 @@ export default function MapContent() {
               position={[base.lat, base.lon]}
               icon={base.type === 'militar' ? militaryIcon : civilIcon}
             >
-              <Popup className="custom-popup" maxWidth={280} autoPan={true} autoPanPadding={[40, 80]} keepInView={true}>
-                <div className="p-1 min-w-[230px]">
+              <Popup className="custom-popup" maxWidth={290} autoPan={true} autoPanPadding={[40, 80]} keepInView={true}>
+                <div className="p-1.5 min-w-[250px]">
+                  {/* Header de la estación */}
                   <div className="flex items-start gap-2 mb-2">
                     <span className={`mt-1 w-2.5 h-2.5 rounded-full shrink-0 ${getStatusDot(base.status)}`}></span>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-bold text-gray-800 text-[13px] leading-tight">{base.name}</h3>
-                      <span className="text-[10px] text-gray-500">{base.city} — {base.lat.toFixed(2)}N, {Math.abs(base.lon).toFixed(2)}W</span>
+                      <div className="flex items-center justify-between mt-0.5">
+                        <span className="text-[10px] text-gray-500">{base.city}</span>
+                        <span className={`text-[10px] font-bold ${getStatusColor(base.status)}`}>{base.status}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[11px] font-medium text-gray-600">Estado:</span>
-                    <span className={`text-[12px] font-bold ${getStatusColor(base.status)}`}>{base.status}</span>
-                  </div>
+                  {/* Coordenadas */}
+                  <div className="text-[9px] text-gray-400 mb-1 font-mono">{base.lat.toFixed(4)}N, {Math.abs(base.lon).toFixed(4)}W</div>
 
-                  {/* Datos Meteorológicos en Vivo */}
+                  {/* Datos Meteorológicos en Vivo (con VFR/IFR) */}
                   <LiveWeatherPopup lat={base.lat} lon={base.lon} />
 
+                  {/* Botón: Monitorear esta Estación */}
                   <button
-                    onClick={() => handleVerMetar(base)}
-                    className="w-full mt-2.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md transition text-[11px] font-semibold tracking-wide"
+                    onClick={() => handleMonitorear(base)}
+                    className="w-full mt-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-3 py-2 rounded-lg transition text-[11px] font-bold tracking-wide shadow-sm flex items-center justify-center gap-1.5"
                   >
-                    Ver METAR / TAF Completo
+                    📡 Monitorear esta Estación
                   </button>
                 </div>
               </Popup>
