@@ -151,17 +151,60 @@ export default function AIPredictionModule() {
            )}
 
            {predictionResult && !analyzing && (
-               <div className="flex flex-col items-start gap-3 w-full text-left bg-indigo-950/40 p-3 rounded-lg border border-indigo-500/20 max-h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-transparent">
-                  <div className="flex items-center gap-2 text-indigo-300 mb-1 border-b border-indigo-500/30 pb-2 w-full">
-                      <Bot size={16} /> 
-                      <span className="text-[10px] font-bold uppercase tracking-widest">Consejo Táctico (LLaMA-3)</span>
+               <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in duration-300">
+                  <div className="flex items-center justify-between border-b border-indigo-500/30 pb-2 mb-1 w-full relative">
+                      <div className="flex items-center gap-2 text-indigo-300">
+                          <Bot size={16} /> 
+                          <span className="text-[10px] font-bold uppercase tracking-widest">IA Dashboard Táctico (LLaMA)</span>
+                      </div>
+                      <ShieldCheck size={18} className="text-green-500 absolute top-0 right-0" />
                   </div>
-                  <p className="text-xs text-indigo-100 leading-relaxed italic border-l-2 border-indigo-400 pl-2">
-                    "{predictionResult}"
-                  </p>
                   
-                  <button onClick={startAnalysis} className="text-[10px] text-gray-400 hover:text-white underline mt-2 self-center">
-                      Recalcular Situación
+                  {/* JSON Barras de Riesgo UI */}
+                  <div className="space-y-3 w-full">
+                      {/* Riesgo de Engelamiento (Ice) */}
+                      <div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-1">
+                              <span className="text-blue-300">Engelamiento / Hielo</span>
+                              <span className={(predictionResult as any).ice > 50 ? 'text-red-400' : 'text-blue-200'}>{(predictionResult as any).ice}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
+                              <div className={`h-full rounded-full transition-all duration-1000 ${(predictionResult as any).ice > 60 ? 'bg-red-500' : (predictionResult as any).ice > 30 ? 'bg-yellow-500' : 'bg-blue-500'}`} style={{ width: `${(predictionResult as any).ice}%` }}></div>
+                          </div>
+                      </div>
+
+                      {/* Riesgo de Turbulencia */}
+                      <div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-1">
+                              <span className="text-orange-300">Turbulencia Severa</span>
+                              <span className={(predictionResult as any).turbulence > 50 ? 'text-red-400' : 'text-orange-200'}>{(predictionResult as any).turbulence}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
+                              <div className={`h-full rounded-full transition-all duration-1000 ${(predictionResult as any).turbulence > 60 ? 'bg-red-500' : (predictionResult as any).turbulence > 30 ? 'bg-orange-500' : 'bg-green-500'}`} style={{ width: `${(predictionResult as any).turbulence}%` }}></div>
+                          </div>
+                      </div>
+
+                      {/* Pérdida de Visibilidad */}
+                      <div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-1">
+                              <span className="text-gray-300">Riesgo Visibilidad Cero</span>
+                              <span className={(predictionResult as any).visibility > 50 ? 'text-red-400' : 'text-gray-300'}>{(predictionResult as any).visibility}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden mb-2">
+                              <div className={`h-full rounded-full transition-all duration-1000 ${(predictionResult as any).visibility > 60 ? 'bg-red-500' : (predictionResult as any).visibility > 30 ? 'bg-yellow-500' : 'bg-green-500'}`} style={{ width: `${(predictionResult as any).visibility}%` }}></div>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Veredicto de Recomendación */}
+                  <div className="mt-2 text-left bg-indigo-950/50 p-3 flex-1 rounded-lg border border-indigo-400/20 max-h-[100px] overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-transparent shadow-inner">
+                    <p className="text-xs text-indigo-100 leading-snug italic">
+                      {(predictionResult as any).recommendation}
+                    </p>
+                  </div>
+                  
+                  <button onClick={startAnalysis} className="text-[10px] text-gray-500 hover:text-white underline mt-1 self-center transition-colors">
+                      Escanear Nuevamente
                   </button>
                </div>
            )}

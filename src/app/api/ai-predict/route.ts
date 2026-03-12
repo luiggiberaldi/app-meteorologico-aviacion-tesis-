@@ -13,21 +13,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No se encontró la clave API de Groq configurada en el servidor." }, { status: 500 });
     }
 
-    // Prompt estandarizado y profesional para que la IA actúe como un Meteorólogo de la Aviación
-    const systemPrompt = `Eres SERMETAVIA-AI, el asistente predictivo avanzado de la plataforma del Servicio Meteorológico de la Aviación Militar Venezolana.
-    Tu tarea es analizar los datos actuales y emitir un pronóstico y recomendación operativa de máximo 3 o 4 oraciones.
-    Actúa con tono militar, analítico, conciso y profesional.
-    No des explicaciones largas. Solo el análisis y la recomendación (Ej. "Operaciones VFR suspendidas").`;
+    // Prompt estandarizado y profesional para que la IA actúe como un Meteorólogo de la Aviación exportando JSON
+    const systemPrompt = `Eres SERMETAVIA-AI, el motor analítico del Servicio Meteorológico de la Aviación Militar Venezolana.
+    Tu tarea es procesar datos crudos y devolver EXCLUSIVAMENTE un objeto JSON válido, sin Markdown, sin backticks y sin texto adicional.
+    El JSON DEBE cumplir estrictamente con esta estructura exacta:
+    {
+      "ice": <numero de 0 a 100>, // Porcentaje de riesgo de engelamiento calculado en base a temperatura y humedad/nubes
+      "turbulence": <numero de 0 a 100>, // Porcentaje de riesgo de turbulencia en base al viento y presión
+      "visibility": <numero de 0 a 100>, // Porcentaje de impacto negativo en visibilidad (si visibilidad es 10km, impacto=0%. Si es 1km, impacto=100%)
+      "recommendation": "<Texto de máximo 3 oraciones con consejo táctico y decisivo>"
+    }
+    No agregues introducciones ni des explicaciones, solo devuelve el JSON puro.`;
 
-    const userPrompt = `Analiza la siguiente situación para la base: ${baseName}.
-    Datos climáticos actuales medidos por sensores/Open-Meteo:
+    const userPrompt = `Analiza la base: ${baseName}.
+    Datos climáticos:
     - Visibilidad: ${weatherData.visKm} km
-    - Cobertura de Nubes: ${weatherData.clouds}%
-    - Velocidad del Viento: ${weatherData.wind} km/h
+    - Cobertura Nubes: ${weatherData.clouds}%
+    - Viento: ${weatherData.wind} km/h
     - Temperatura: ${weatherData.temp}°C
     - Precipitaciones: ${weatherData.precip} mm
     
-    ¿Cuál es la predicción probabilística de riesgo a corto plazo (12-24h) y tu recomendación operativa para aeronaves militares/civiles?`;
+    Genera la matriz de riesgo JSON solicitada para esta operación aeronáutica táctica.`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -60,9 +66,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "El modelo respondió pero con una estructura vacía o inválida." }, { status: 500 });
     }
 
-    const resultText = data.choices[0].message.content;
+    let resultText = data.choices[0].message.content;
+    
+    // Limpieza de Markdown si la IA se equivocó y mandó ```json ... ```
+    resultText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
 
-    return NextResponse.json({ prediction: resultText });
+    try {
+        const jsonParsed = JSON.parse(resultText);
+        return NextResponse.json({ prediction: jsonParsed });
+    } catch (parseError) {
+        console.error("Error parseando respuesta del LLM a JSON:", resultText);
+        return NextResponse.json({ error: "La IA no respetó el formato JSON de salida requerido." }, { status: 500 });
+    }
 
   } catch (error: any) {
     console.error("[NEXTJS ENDPOINT ERROR] Fallo Crítico:", error.message || error);
