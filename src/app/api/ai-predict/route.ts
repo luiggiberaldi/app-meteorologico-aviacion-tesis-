@@ -13,27 +13,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No se encontró la clave API de Groq configurada en el servidor." }, { status: 500 });
     }
 
-    // Prompt estandarizado y profesional para que la IA actúe como un Meteorólogo de la Aviación exportando JSON
+    // Prompt calibrado con reglas de cálculo meteorológico aeronáutico reales
     const systemPrompt = `Eres SERMETAVIA-AI, el motor analítico del Servicio Meteorológico de la Aviación Militar Venezolana.
-    Tu tarea es procesar datos crudos y devolver EXCLUSIVAMENTE un objeto JSON válido, sin Markdown, sin backticks y sin texto adicional.
-    El JSON DEBE cumplir estrictamente con esta estructura exacta:
-    {
-      "ice": <numero de 0 a 100>, // Porcentaje de riesgo de engelamiento calculado en base a temperatura y humedad/nubes
-      "turbulence": <numero de 0 a 100>, // Porcentaje de riesgo de turbulencia en base al viento y presión
-      "visibility": <numero de 0 a 100>, // Porcentaje de impacto negativo en visibilidad (si visibilidad es 10km, impacto=0%. Si es 1km, impacto=100%)
-      "recommendation": "<Texto de máximo 3 oraciones con consejo táctico y decisivo>"
-    }
-    No agregues introducciones ni des explicaciones, solo devuelve el JSON puro.`;
+    Tu tarea es procesar datos meteorológicos y calcular riesgos operativos devolviendo EXCLUSIVAMENTE un objeto JSON válido.
 
-    const userPrompt = `Analiza la base: ${baseName}.
-    Datos climáticos:
-    - Visibilidad: ${weatherData.visKm} km
-    - Cobertura Nubes: ${weatherData.clouds}%
-    - Viento: ${weatherData.wind} km/h
-    - Temperatura: ${weatherData.temp}°C
-    - Precipitaciones: ${weatherData.precip} mm
+    REGLAS DE CÁLCULO OBLIGATORIAS (úsalas estrictamente):
+
+    1. ENGELAMIENTO (ice): Calcula así:
+       - Si temp <= 0°C: riesgo base 80-95%
+       - Si temp entre 1-5°C con nubes > 60%: riesgo 40-70%
+       - Si temp entre 5-10°C con nubes > 80%: riesgo 20-40%
+       - Si temp entre 10-20°C: riesgo 5-15%
+       - Si temp > 20°C: riesgo 2-8% (nunca 0, siempre hay riesgo residual en altitud)
+       - Si hay precipitaciones > 0mm, suma +10% al resultado
+
+    2. TURBULENCIA (turbulence): Calcula así:
+       - Si viento > 50 km/h: riesgo 75-95%
+       - Si viento 30-50 km/h: riesgo 45-70%
+       - Si viento 15-30 km/h: riesgo 20-40%
+       - Si viento 5-15 km/h: riesgo 8-18%
+       - Si viento < 5 km/h: riesgo 3-8%
+       - Si precipitaciones > 2mm, suma +15%
+
+    3. VISIBILIDAD (visibility = impacto negativo):
+       - Fórmula: max(5, 100 - (visibilidadKm * 10))
+       - Si nubes > 80%, suma +10%
+       - Si precipitaciones > 0mm, suma +15%
+       - Nunca devuelvas 0%, mínimo 5%
+
+    IMPORTANTE: Los valores NUNCA deben ser todos 0%. Siempre existe riesgo residual. Valores mínimos: ice>=3, turbulence>=3, visibility>=5.
+
+    FORMATO DE SALIDA (solo esto, nada más):
+    {"ice": <int>, "turbulence": <int>, "visibility": <int>, "recommendation": "<máx 3 oraciones, tono militar táctico>"}
     
-    Genera la matriz de riesgo JSON solicitada para esta operación aeronáutica táctica.`;
+    Sin Markdown, sin backticks, sin texto adicional. Solo el JSON.`;
+
+    const userPrompt = `DATOS DE SENSORES para base ${baseName}:
+    VIS=${weatherData.visKm}km | NUBES=${weatherData.clouds}% | VIENTO=${weatherData.wind}km/h | TEMP=${weatherData.temp}°C | PRECIP=${weatherData.precip}mm
+    
+    Aplica las reglas de cálculo y genera la matriz de riesgo JSON.`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
