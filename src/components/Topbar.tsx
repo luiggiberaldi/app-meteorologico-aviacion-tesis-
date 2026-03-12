@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plane, Menu, X, LayoutDashboard, CloudSun, AlertTriangle, BarChart3, FileText, ChevronDown } from "lucide-react";
+import { Plane, Menu, X, LayoutDashboard, CloudSun, AlertTriangle, BarChart3, FileText, ChevronDown, Map, Navigation, Satellite } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
 
 export default function Topbar() {
@@ -95,31 +95,61 @@ export default function Topbar() {
              <nav className="flex-1 overflow-y-auto py-4">
                <ul className="space-y-1 px-3">
                  <li>
-                   <Link href="#pronostico" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                   <Link href="/#pronostico" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
                      <LayoutDashboard size={20} />
                      <span className="font-medium text-sm">Pronóstico Actual</span>
                    </Link>
                  </li>
                  <li>
-                   <Link href="#metar" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                   <Link href="/#mapa" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                     <Map size={20} />
+                     <span className="font-medium text-sm">Mapa Nacional</span>
+                   </Link>
+                 </li>
+                 <li>
+                   <Link href="/imagenes-satelitales" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                     <Satellite size={20} />
+                     <span className="font-medium text-sm">Imágenes Satelitales</span>
+                   </Link>
+                 </li>
+                 <li>
+                   <Link href="/#mapa" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                     <Map size={20} />
+                     <span className="font-medium text-sm">Mapa Nacional</span>
+                   </Link>
+                 </li>
+                 <li>
+                   <Link href="/#planificacion" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                     <Navigation size={20} />
+                     <span className="font-medium text-sm">Planificación de Vuelos</span>
+                   </Link>
+                 </li>
+                 <li>
+                   <Link href="/#metar" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
                      <CloudSun size={20} />
                      <span className="font-medium text-sm">METAR / TAF / GAMET</span>
                    </Link>
                  </li>
                  <li>
-                   <Link href="#alertas" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                   <Link href="/#alertas" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
                      <AlertTriangle size={20} />
                      <span className="font-medium text-sm">Alertas Operacionales</span>
                    </Link>
                  </li>
                  <li>
-                   <Link href="#efectividad" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                   <Link href="/#efectividad" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
                      <BarChart3 size={20} />
                      <span className="font-medium text-sm">Efectividad Operacional</span>
                    </Link>
                  </li>
                  <li>
-                   <Link href="#reportes" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                   <Link href="/#operaciones" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                     <Plane size={20} />
+                     <span className="font-medium text-sm">Gestión de Operaciones</span>
+                   </Link>
+                 </li>
+                 <li>
+                   <Link href="/#reportes" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
                      <FileText size={20} />
                      <span className="font-medium text-sm">Reportes</span>
                    </Link>

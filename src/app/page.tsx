@@ -1,14 +1,28 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import CurrentForecast from "@/components/CurrentForecast";
-import VenezuelaWeatherMap from "@/components/VenezuelaWeatherMap";
-import OperationalEffectiveness from "@/components/OperationalEffectiveness";
-import ReportDashboard from "@/components/ReportDashboard";
 import MetarTafGamet from "@/components/MetarTafGamet";
 import OperationalAlerts from "@/components/OperationalAlerts";
 import GeneralSituation from "@/components/GeneralSituation";
-import CompareBases from "@/components/CompareBases";
 import OperationsManagement from "@/components/OperationsManagement";
 import FlightPlanning from "@/components/FlightPlanning";
 import AIPredictionPlaceholder from "@/components/AIPredictionPlaceholder";
+
+// Lazy loading para componentes pesados (mapas, gráficos, comparativas)
+const VenezuelaWeatherMap = dynamic(() => import("@/components/VenezuelaWeatherMap"), { 
+  ssr: false, 
+  loading: () => <div className="h-96 bg-[#1e293b] rounded-xl border border-gray-700 animate-pulse flex items-center justify-center"><p className="text-gray-500">Cargando mapa interactivo...</p></div> 
+});
+const CompareBases = dynamic(() => import("@/components/CompareBases"), {
+  loading: () => <div className="h-64 bg-[#1e293b] rounded-xl border border-gray-700 animate-pulse flex items-center justify-center"><p className="text-gray-500">Cargando comparativa nacional...</p></div>
+});
+const OperationalEffectiveness = dynamic(() => import("@/components/OperationalEffectiveness"), {
+  loading: () => <div className="h-64 bg-[#1e293b] rounded-xl border border-gray-700 animate-pulse flex items-center justify-center"><p className="text-gray-500">Cargando efectividad operacional...</p></div>
+});
+const ReportDashboard = dynamic(() => import("@/components/ReportDashboard"), {
+  loading: () => <div className="h-64 bg-[#1e293b] rounded-xl border border-gray-700 animate-pulse flex items-center justify-center"><p className="text-gray-500">Cargando panel de reportes...</p></div>
+});
 
 export default function DashboardPage() {
   return (

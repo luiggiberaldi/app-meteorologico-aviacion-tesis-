@@ -1,5 +1,6 @@
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
+import OfflineIndicator from "@/components/OfflineIndicator";
 import { BaseProvider } from "@/context/BaseContext";
 import Script from "next/script";
 import "./globals.css";
@@ -22,8 +23,13 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="flex h-screen overflow-hidden bg-military-bg text-military-text font-sans antialiased">
+        {/* Banner de Conexión Offline */}
+        <div className="absolute top-0 left-0 w-full z-[100] print-hidden">
+          <OfflineIndicator />
+        </div>
+
         {/* Sidebar */}
-        <div className="print-hidden h-full">
+        <div className="print-hidden h-full pt-0">
           <Sidebar />
         </div>
 

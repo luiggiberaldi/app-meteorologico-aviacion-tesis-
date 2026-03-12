@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CloudSun, Search, Info } from "lucide-react";
+import HelpTooltip from "@/components/HelpTooltip";
 
 interface ParsedData {
   tipo: string;
@@ -89,7 +90,12 @@ export default function MetarTafGamet() {
       <div className="flex-1 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <label className="text-xs font-medium text-gray-400">Código METAR</label>
+            <label className="text-xs font-medium text-gray-400">
+              <HelpTooltip 
+                term="Código METAR" 
+                definition="Meteorological Terminal Air Report: Reporte meteorológico regular y actual de un aeródromo, típicamente emitido cada hora." 
+              />
+            </label>
             <textarea 
               value={metar}
               onChange={(e) => setMetar(e.target.value)}
@@ -106,7 +112,12 @@ export default function MetarTafGamet() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium text-gray-400">Código TAF</label>
+            <label className="text-xs font-medium text-gray-400">
+              <HelpTooltip 
+                term="Código TAF" 
+                definition="Terminal Aerodrome Forecast: Pronóstico del tiempo para un aeródromo, válido generalmente por 24 o 30 horas." 
+              />
+            </label>
             <textarea 
               value={taf}
               onChange={(e) => setTaf(e.target.value)}
@@ -123,7 +134,12 @@ export default function MetarTafGamet() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium text-gray-400">Código GAMET</label>
+            <label className="text-xs font-medium text-gray-400">
+              <HelpTooltip 
+                term="Código GAMET" 
+                definition="Pronóstico de área para vuelos a baja altura, provee advertencias en ruta para la aviación general y militar." 
+              />
+            </label>
             <textarea 
               value={gamet}
               onChange={(e) => setGamet(e.target.value)}

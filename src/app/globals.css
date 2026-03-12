@@ -46,3 +46,12 @@
 [data-nextjs-toast], nextjs-portal, #nextjs-build-indicator {
   display: none !important;
 }
+
+/* Optimización móvil para mapa táctil (PWA) */
+@media (pointer: coarse) {
+  .leaflet-touch .leaflet-control-zoom a {
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+  }
+}

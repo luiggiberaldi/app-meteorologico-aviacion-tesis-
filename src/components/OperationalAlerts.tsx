@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle, ShieldAlert, Flag, CloudLightning, Wind } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
+import HelpTooltip from "@/components/HelpTooltip";
 
 interface AlertState {
   level: "GREEN" | "YELLOW" | "RED" | "CRITICAL" | "UNKNOWN";
   title: string;
   message: string;
-  recommendation: string;
+  recommendation: React.ReactNode;
   triggerValues: string;
 }
 
@@ -60,7 +61,11 @@ export default function OperationalAlerts() {
       if (visKm < 5) {
         isRed = true;
         triggers.push(`Visibilidad ${visKm.toFixed(1)} km (< 5km)`);
-        recs.push("Solo operaciones IFR");
+        recs.push(
+          <span key="ifr-rec">
+            Solo operaciones <HelpTooltip term="IFR" definition="Instrument Flight Rules: Reglas de Vuelo por Instrumentos." />
+          </span>
+        );
       }
       
       if (windKt > 25) {
@@ -79,8 +84,8 @@ export default function OperationalAlerts() {
          setAlert({
            level: "RED",
            title: "RESTRICCIÓN OPERACIONAL",
-           message: "Condiciones meteorológicas impiden VFR",
-           recommendation: recs.join(". "),
+           message: "Condiciones meteorológicas impiden vuelo visual (VFR)",
+           recommendation: recs.map((r, i) => <span key={i}>{r}{i < recs.length - 1 ? ". " : ""}</span>),
            triggerValues: triggers.join(" | ")
          });
       } else if (isYellow) {
@@ -88,7 +93,7 @@ export default function OperationalAlerts() {
            level: "YELLOW",
            title: "PRECAUCIÓN",
            message: "Operaciones marginales",
-           recommendation: recs.length > 0 ? recs.join(". ") : "Mantener monitoreo continuo por degradación",
+           recommendation: recs.length > 0 ? recs.map((r, i) => <span key={i}>{r}{i < recs.length - 1 ? ". " : ""}</span>) : "Mantener monitoreo continuo por degradación",
            triggerValues: triggers.length > 0 ? triggers.join(" | ") : `Visibilidad: ${visKm.toFixed(1)} km | Nubes: ${clouds}%`
          });
       } else {
