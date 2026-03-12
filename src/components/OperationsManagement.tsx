@@ -31,23 +31,34 @@ export default function OperationsManagement() {
   const [loadingWeather, setLoadingWeather] = useState(false);
 
   // 1. Filtrar flota y misiones usando TODA la data simulada + comodines
-  // Si un elemento tiene baseCode coincidente con selectedBase.codigo, se muestra.
-  // También añadimos algunos elementos fijos/comodines para que nunca se vea vacío (demo).
-  const baseCode = selectedBase?.codigo || 'SVMI';
+  // Si no hay selectedBase (Nacional), se muestra TODO el parque aeronáutico.
+  const isNational = !selectedBase;
+  const baseCode = selectedBase?.codigo || '';
   
-  const filteredFleet = ALL_FLEET_DATA.filter(f => f.baseCode === baseCode || f.baseCode === '');
-  const baseFleet = filteredFleet.length > 0 ? filteredFleet : ALL_FLEET_DATA.slice(0, 3);
+  const baseFleet = isNational 
+    ? ALL_FLEET_DATA 
+    : ALL_FLEET_DATA.filter(f => f.baseCode === baseCode || f.baseCode === '');
 
-  const filteredMissions = ALL_MISSIONS.filter(m => m.baseCode === baseCode);
-  const baseMissions = filteredMissions.length > 0 ? filteredMissions : [
-    { id: `M-${Math.floor(Math.random() * 900) + 100}`, title: 'Operación Local Standard', dest: 'Entrenamiento Local', time: '12:00 HLV', originalStatus: 'ON_TIME' as const }
-  ];
+  const baseMissions = isNational 
+    ? ALL_MISSIONS 
+    : ALL_MISSIONS.filter(m => m.baseCode === baseCode);
+
+  // Si filtró pero está vacío localmente, generamos uno de prueba para que no se vea vacío el demo local de base
+  const finalMissions = (!isNational && baseMissions.length === 0) ? [
+    { id: `M-${Math.floor(Math.random() * 900) + 100}`, title: 'Operación Local Standard', dest: 'Local', time: '12:00 HLV', baseCode, originalStatus: 'ON_TIME' as const }
+  ] : baseMissions;
 
   // 2. Efecto para consultar el clima real (Open-Meteo) y determinar restricciones (Cierre/Retraso METEO)
   useEffect(() => {
     let mounted = true;
     async function checkWeatherRestrictions() {
-      if (!selectedBase) return;
+      // Si estamos a nivel nacional, apagamos alertas locales
+      if (!selectedBase) {
+        setWeatherRestricted(false);
+        setLoadingWeather(false);
+        return;
+      }
+
       setLoadingWeather(true);
       try {
         const res = await fetch(
@@ -75,8 +86,8 @@ export default function OperationsManagement() {
   }, [selectedBase]);
 
   // 3. Aplicar dinámicamente el clima a las misiones
-  const dynamicMissions = baseMissions.map(m => {
-    if (weatherRestricted && (m.originalStatus === 'ON_TIME' || m.originalStatus === 'SCHEDULED')) {
+  const dynamicMissions = finalMissions.map(m => {
+    if (weatherRestricted && !isNational && (m.originalStatus === 'ON_TIME' || m.originalStatus === 'SCHEDULED')) {
       return { ...m, currentStatus: 'DELAYED' as const };
     }
     return { ...m, currentStatus: m.originalStatus };
