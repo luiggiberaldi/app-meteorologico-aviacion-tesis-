@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const usuariosData = [
   { id: 1, nombre: "Cnel. Marcos Rodríguez", rol: "Administrador", rolColor: "bg-red-500/20 text-red-400 border-red-500/30", estado: "Activo", estadoColor: "text-green-400", ultimaConexion: "12 Mar 2026, 10:45 UTC", email: "m.rodriguez@amb.mil.ve" },
-  { id: 2, nombre: "Tte. Luis Beraldi", rol: "Operador", rolColor: "bg-blue-500/20 text-blue-400 border-blue-500/30", estado: "Activo", estadoColor: "text-green-400", ultimaConexion: "12 Mar 2026, 11:30 UTC", email: "l.beraldi@amb.mil.ve" },
+  { id: 2, nombre: "Tte. Luis Castillo", rol: "Operador", rolColor: "bg-blue-500/20 text-blue-400 border-blue-500/30", estado: "Activo", estadoColor: "text-green-400", ultimaConexion: "12 Mar 2026, 11:30 UTC", email: "l.castillo@amb.mil.ve" },
   { id: 3, nombre: "Cap. Andrea Méndez", rol: "Operador", rolColor: "bg-blue-500/20 text-blue-400 border-blue-500/30", estado: "Activo", estadoColor: "text-green-400", ultimaConexion: "11 Mar 2026, 18:20 UTC", email: "a.mendez@amb.mil.ve" },
   { id: 4, nombre: "Tte. Carlos Pérez", rol: "Observador", rolColor: "bg-gray-500/20 text-gray-400 border-gray-500/30", estado: "Activo", estadoColor: "text-green-400", ultimaConexion: "11 Mar 2026, 15:00 UTC", email: "c.perez@amb.mil.ve" },
   { id: 5, nombre: "Sgto. María López", rol: "Observador", rolColor: "bg-gray-500/20 text-gray-400 border-gray-500/30", estado: "Inactivo", estadoColor: "text-red-400", ultimaConexion: "05 Mar 2026, 09:10 UTC", email: "m.lopez@amb.mil.ve" },
