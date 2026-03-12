@@ -1,22 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, LayersControl, LayerGroup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// OWM key can be configured via Env, fallback to placeholder if needed for demonstration
-const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OWM_API_KEY || "demo";
+import Link from "next/link";
+import { Satellite, Wind, Thermometer, Cloud } from "lucide-react";
 
 const bases = [
+  // BASES MILITARES (5 Principales solicitadas)
   { id: 1, name: 'Base Aérea Logística Baragua', lat: 10.2475, lon: -67.5953, type: 'militar', status: 'Abierto', city: 'Maracay, Aragua' },
   { id: 2, name: 'Base Aérea Libertador', lat: 10.1833, lon: -67.5500, type: 'militar', status: 'Abierto', city: 'Palo Negro, Aragua' },
   { id: 3, name: 'Base Aérea Gral. Francisco de Miranda', lat: 10.4833, lon: -66.8500, type: 'militar', status: 'Abierto', city: 'Caracas, Miranda' },
   { id: 4, name: 'Base Aérea Mayor Gral. Rafael Urdaneta', lat: 10.5500, lon: -71.7333, type: 'militar', status: 'Precaución', city: 'Maracaibo, Zulia' },
   { id: 5, name: 'Base Aérea Mariscal Sucre', lat: 10.1167, lon: -64.6833, type: 'militar', status: 'Abierto', city: 'Barcelona, Anzoátegui' },
-  // Civiles principales para contexto
-  { id: 6, name: 'Aeropuerto Simón Bolívar (Maiquetía)', lat: 10.6000, lon: -66.9900, type: 'civil', status: 'Abierto', city: 'Maiquetía, La Guaira' },
-  { id: 7, name: 'Aeropuerto Arturo Michelena', lat: 10.1500, lon: -67.9300, type: 'civil', status: 'Abierto', city: 'Valencia, Carabobo' }
+  
+  // AEROPUERTOS CIVILES PRINCIPALES DE VENEZUELA
+  { id: 6, name: 'Aeropuerto Intl. Simón Bolívar (Maiquetía)', lat: 10.6031, lon: -66.9904, type: 'civil', status: 'Abierto', city: 'Maiquetía, La Guaira' },
+  { id: 7, name: 'Aeropuerto Intl. Arturo Michelena', lat: 10.1500, lon: -67.9283, type: 'civil', status: 'Abierto', city: 'Valencia, Carabobo' },
+  { id: 8, name: 'Aeropuerto Intl. La Chinita', lat: 10.5561, lon: -71.7280, type: 'civil', status: 'Abierto', city: 'Maracaibo, Zulia' },
+  { id: 9, name: 'Aeropuerto Intl. General José Antonio Anzoátegui', lat: 10.1130, lon: -64.6852, type: 'civil', status: 'Abierto', city: 'Barcelona, Anzoátegui' },
+  { id: 10, name: 'Aeropuerto Intl. Santiago Mariño', lat: 10.9130, lon: -63.9669, type: 'civil', status: 'Abierto', city: 'Porlamar, Nueva Esparta' },
+  { id: 11, name: 'Aeropuerto Intl. Jacinto Lara', lat: 9.0435, lon: -69.3586, type: 'civil', status: 'Abierto', city: 'Barquisimeto, Lara' },
+  { id: 12, name: 'Aeropuerto Intl. Manuel Carlos Piar', lat: 8.2882, lon: -62.7705, type: 'civil', status: 'Abierto', city: 'Ciudad Guayana, Bolívar' },
+  { id: 13, name: 'Aeropuerto Intl. Mayor Buenaventura Vivas', lat: 7.5658, lon: -72.0353, type: 'civil', status: 'Abierto', city: 'Santo Domingo, Táchira' },
+  { id: 14, name: 'Aeropuerto Intl. Juan Pablo Pérez Alfonzo', lat: 8.6256, lon: -71.6775, type: 'civil', status: 'Abierto', city: 'El Vigía, Mérida' },
+  { id: 15, name: 'Aeropuerto Intl. Antonio José de Sucre', lat: 10.4503, lon: -64.1308, type: 'civil', status: 'Abierto', city: 'Cumaná, Sucre' },
+  { id: 16, name: 'Aeropuerto Nacional Los Roques', lat: 11.9472, lon: -66.6738, type: 'civil', status: 'Precaución', city: 'Los Roques, Dep. Federales' },
+  { id: 17, name: 'Aeropuerto Nacional Cacique Aramare', lat: 5.6033, lon: -67.5938, type: 'civil', status: 'Abierto', city: 'Puerto Ayacucho, Amazonas' },
+  { id: 18, name: 'Aeropuerto Nacional Las Flecheras', lat: 7.8504, lon: -67.4566, type: 'civil', status: 'Abierto', city: 'San Fernando de Apure, Apure' },
+  { id: 19, name: 'Aeropuerto Intl. Josefa Camejo', lat: 11.7766, lon: -70.1506, type: 'civil', status: 'Abierto', city: 'Las Piedras, Falcón' },
+  { id: 20, name: 'Aeropuerto Nacional de San Antonio del Táchira', lat: 7.8306, lon: -72.4363, type: 'civil', status: 'Cerrado', city: 'San Antonio, Táchira' },
 ];
 
 const militaryIcon = L.divIcon({
@@ -42,6 +57,48 @@ const getStatusColor = (status: string) => {
     default: return 'text-gray-500';
   }
 };
+
+// Componente hijo encargado de buscar e inyectar datos del clima al clickear un pop-up en el mapa
+function LiveWeatherPopup({ lat, lon }: { lat: number, lon: number }) {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchData() {
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,cloud_cover&wind_speed_unit=kn`);
+        if (!res.ok) throw new Error("API Error");
+        const json = await res.json();
+        if (mounted) {
+          setData(json.current);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (mounted) setLoading(false);
+      }
+    }
+    fetchData();
+    return () => { mounted = false; };
+  }, [lat, lon]);
+
+  if (loading) return <div className="text-center py-2 text-xs text-blue-500 animate-pulse">Analizando Sensores...</div>;
+  if (!data) return <div className="text-center py-2 text-xs text-red-500">Error en Sensor</div>;
+
+  return (
+    <div className="grid grid-cols-2 gap-2 mt-2 bg-gray-50 p-2 rounded border">
+      <div className="flex items-center gap-1 text-[11px] font-medium text-gray-700">
+        <Thermometer className="w-3 h-3 text-red-500" /> {data.temperature_2m}°C
+      </div>
+      <div className="flex items-center gap-1 text-[11px] font-medium text-gray-700">
+        <Wind className="w-3 h-3 text-blue-500" /> {Math.round(data.wind_speed_10m)} KT
+      </div>
+      <div className="flex items-center gap-1 text-[11px] font-medium text-gray-700 col-span-2">
+        <Cloud className="w-3 h-3 text-gray-400" /> Nubosidad {data.cloud_cover}%
+      </div>
+    </div>
+  );
+}
 
 export default function MapContent() {
   const [showMilitary, setShowMilitary] = useState(true);
@@ -75,28 +132,6 @@ export default function MapContent() {
             />
           </LayersControl.BaseLayer>
 
-          {/* Capas OWM */}
-          <LayersControl.Overlay name="🌦️ Precipitación (OWM)">
-             <TileLayer
-               url={`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OPENWEATHER_API_KEY}`}
-               opacity={0.6}
-             />
-          </LayersControl.Overlay>
-          
-          <LayersControl.Overlay name="☁️ Nubes (OWM)">
-             <TileLayer
-               url={`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OPENWEATHER_API_KEY}`}
-               opacity={0.5}
-             />
-          </LayersControl.Overlay>
-
-          <LayersControl.Overlay name="🌡️ Temperatura (OWM)">
-             <TileLayer
-               url={`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${OPENWEATHER_API_KEY}`}
-               opacity={0.4}
-             />
-          </LayersControl.Overlay>
-
           <LayersControl.Overlay checked name="Bases y Aeropuertos">
             <LayerGroup>
               {filteredBases.map((base, index) => (
@@ -115,12 +150,15 @@ export default function MapContent() {
                         <span className="block mt-1">{base.lat.toFixed(2)}N, {Math.abs(base.lon).toFixed(2)}W</span>
                       </div>
                       
-                      <div className="mb-3">
+                      <div className="mb-2">
                         <p className="text-xs font-semibold mb-1">Estado Operacional:</p>
-                        <p className={`text-sm font-bold ${getStatusColor(base.status)}`}>{base.status}</p>
+                        <p className={`text-[13px] font-bold ${getStatusColor(base.status)}`}>{base.status}</p>
                       </div>
 
-                      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition text-xs font-medium">
+                      {/* Inyector de Datos Satelitales Locales (Open-Meteo) */}
+                      <LiveWeatherPopup lat={base.lat} lon={base.lon} />
+
+                      <button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition text-xs font-medium">
                         Ver METAR / TAF Completo
                       </button>
                     </div>
@@ -157,10 +195,18 @@ export default function MapContent() {
             />
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-full bg-[#3b82f6]"></span>
-              Aeropuertos Civiles
+              Aeropuertos Civiles (Contexto)
             </span>
           </label>
         </div>
+      </div>
+
+      {/* Acceso Directo a Satélites */}
+      <div className="absolute top-4 right-4 z-[1000]">
+        <Link href="/imagenes-satelitales" className="flex items-center gap-2 bg-[#1a1f2e]/90 hover:bg-[#252d3d] text-white px-4 py-2.5 rounded-xl border border-[#364156] shadow-[0_0_15px_rgba(0,212,170,0.3)] transition-all transform hover:scale-105 group backdrop-blur-md">
+          <Satellite className="w-5 h-5 text-[#00d4aa] group-hover:animate-pulse" />
+          <span className="text-sm font-bold tracking-wide">Abrir Centro Satelital</span>
+        </Link>
       </div>
     </div>
   );
