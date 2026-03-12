@@ -71,18 +71,22 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Módulo 4 y 5: Efectividad y Operaciones (Misma Fila Gráfica) */}
+      <div id="estadisticas-operativas" className="scroll-mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Módulo 4: Efectividad Operacional (Nacional) */}
-        <div id="efectividad" className="lg:col-span-2 scroll-mt-6">
+        <div className="lg:col-span-2">
           <OperationalEffectiveness />
         </div>
 
         {/* Nuevo Módulo: Gestión de Operaciones */}
-        <div id="operaciones" className="lg:col-span-1 scroll-mt-6">
+        <div className="lg:col-span-1">
           <OperationsManagement />
         </div>
 
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Módulo 5: Reportes y Exportación */}
         <div id="reportes" className="lg:col-span-3 scroll-mt-6">
           <ReportDashboard />

@@ -60,13 +60,13 @@ export default function Sidebar() {
             </Link>
           </li>
           <li>
-            <Link href="/#efectividad" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+            <Link href="/#estadisticas-operativas" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
               <BarChart3 size={20} />
               <span className="font-medium text-sm">Efectividad Operacional</span>
             </Link>
           </li>
           <li>
-            <Link href="/#operaciones" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+            <Link href="/#estadisticas-operativas" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
               <Plane size={20} />
               <span className="font-medium text-sm">Gestión de Operaciones</span>
             </Link>
