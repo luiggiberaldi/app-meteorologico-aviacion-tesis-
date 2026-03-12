@@ -88,18 +88,18 @@ export default function OperationsManagement() {
   const standbyCount = baseFleet.filter(f => f.status === 'STANDBY').length;
   
   return (
-    <section className="bg-[#0f172a] rounded-xl border border-gray-700 overflow-hidden flex flex-col h-full shadow-lg relative">
+    <section className="bg-[#0f172a] rounded-xl border border-gray-700 flex flex-col h-full shadow-lg relative overflow-hidden">
       
       {/* Banner de restricción meteorológica (dinámico) */}
       {weatherRestricted && (
-        <div className="absolute top-0 left-0 right-0 bg-red-600/90 text-white text-xs font-bold py-1.5 px-4 z-10 flex items-center justify-center gap-2 animate-pulse">
+        <div className="bg-red-600/90 text-white text-xs font-bold py-1.5 px-4 z-10 flex items-center justify-center gap-2 animate-pulse shrink-0">
           <CloudFog size={14} /> 
           RESTRICCIÓN OPERATIVA POR CONDICIONES METEOROLÓGICAS (IFR CERRADO)
         </div>
       )}
 
       {/* Header */}
-      <div className={`bg-[#1e293b] p-5 border-b border-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${weatherRestricted ? 'pt-8' : ''}`}>
+      <div className="bg-[#1e293b] p-5 border-b border-gray-700 flex flex-col gap-4 shrink-0">
         <div>
           <h3 className="text-xl font-bold text-white flex items-center gap-2">
             <Plane className="text-[#3b82f6]" />
@@ -110,68 +110,68 @@ export default function OperationsManagement() {
           </p>
         </div>
         
-        {/* Pestañas (Tabs) */}
-        <div className="bg-gray-800 p-1 rounded-lg flex gap-1 self-stretch sm:self-auto shrink-0">
+        {/* Pestañas (Tabs) ajustadas al 100% de ancho */}
+        <div className="bg-gray-800/80 p-1 rounded-lg flex w-full">
           <button 
             onClick={() => setActiveTab('FLEET')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'FLEET' ? 'bg-[#3b82f6] text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'FLEET' ? 'bg-[#3b82f6] text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
           >
             Estado de Flota
           </button>
           <button 
             onClick={() => setActiveTab('MISSIONS')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'MISSIONS' ? 'bg-[#3b82f6] text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'MISSIONS' ? 'bg-[#3b82f6] text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
           >
             Misiones
           </button>
         </div>
       </div>
 
-      <div className="p-5 flex-1 flex flex-col gap-6">
+      <div className="p-5 flex-1 flex flex-col gap-6 overflow-hidden">
         
-        {/* KPIs (Métricas Rápidas) */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-[#1e293b] rounded-lg p-3 border border-gray-700/50 flex flex-col items-center justify-center text-center">
-             <div className="bg-blue-500/20 text-blue-400 p-2 rounded-full mb-2"><Activity size={20} /></div>
-             <p className="text-2xl font-bold text-white">{activeCount}</p>
-             <p className="text-[10px] uppercase text-gray-400 font-medium">EN VUELO / ACTIVAS</p>
+        {/* KPIs (Métricas Rápidas) shrink-0 asegura que no se encojan */}
+        <div className="grid grid-cols-3 gap-3 shrink-0">
+          <div className="bg-[#1e293b] rounded-xl p-3 border border-gray-700 flex flex-col items-center justify-center text-center shadow-inner">
+             <div className="bg-blue-500/10 text-blue-400 p-2 rounded-full mb-1"><Activity size={18} /></div>
+             <p className="text-2xl font-bold text-white leading-none">{activeCount}</p>
+             <p className="text-[9px] sm:text-[10px] uppercase text-gray-400 font-bold mt-1 tracking-wider">EN VUELO</p>
           </div>
-          <div className="bg-[#1e293b] rounded-lg p-3 border border-gray-700/50 flex flex-col items-center justify-center text-center">
-             <div className="bg-gray-700/50 text-gray-300 p-2 rounded-full mb-2"><CheckCircle2 size={20} /></div>
-             <p className="text-2xl font-bold text-white">{standbyCount}</p>
-             <p className="text-[10px] uppercase text-gray-400 font-medium">DISPONIBLES</p>
+          <div className="bg-[#1e293b] rounded-xl p-3 border border-gray-700 flex flex-col items-center justify-center text-center shadow-inner">
+             <div className="bg-green-500/10 text-green-400 p-2 rounded-full mb-1"><CheckCircle2 size={18} /></div>
+             <p className="text-2xl font-bold text-white leading-none">{standbyCount}</p>
+             <p className="text-[9px] sm:text-[10px] uppercase text-gray-400 font-bold mt-1 tracking-wider">DISPONIBLES</p>
           </div>
-          <div className="bg-[#1e293b] rounded-lg p-3 border border-gray-700/50 flex flex-col items-center justify-center text-center">
-             <div className="bg-orange-500/20 text-orange-400 p-2 rounded-full mb-2"><Wrench size={20} /></div>
-             <p className="text-2xl font-bold text-white">{maintCount}</p>
-             <p className="text-[10px] uppercase text-gray-400 font-medium">MANTENIMIENTO</p>
+          <div className="bg-[#1e293b] rounded-xl p-3 border border-gray-700 flex flex-col items-center justify-center text-center shadow-inner">
+             <div className="bg-orange-500/10 text-orange-400 p-2 rounded-full mb-1"><Wrench size={18} /></div>
+             <p className="text-2xl font-bold text-white leading-none">{maintCount}</p>
+             <p className="text-[9px] sm:text-[10px] uppercase text-gray-400 font-bold mt-1 tracking-wider">TALLER</p>
           </div>
         </div>
 
-        {/* Contenido Dinámico por Pestaña */}
-        <div className="flex-1 bg-[#1e293b]/50 rounded-lg border border-gray-700/30 overflow-hidden flex flex-col">
+        {/* Contenido Dinámico por Pestaña (Este contenedor CRECE y SCROLLEA) */}
+        <div className="flex-1 bg-[#1e293b]/30 rounded-xl border border-gray-700/50 flex flex-col overflow-hidden">
           
           {activeTab === 'FLEET' && (
-            <div className="p-4 overflow-y-auto" style={{ maxHeight: '250px' }}>
-              <h4 className="text-sm font-bold text-gray-300 uppercase mb-4 flex items-center gap-2">
-                <Settings size={16}/> Estatus por Aeronave
+            <div className="p-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Settings size={14}/> Estatus por Aeronave
               </h4>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {baseFleet.map((aircraft) => (
-                  <div key={aircraft.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-md bg-[#1e293b] border border-gray-700 hover:border-gray-600 transition-colors">
+                  <div key={aircraft.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-lg bg-[#1e293b] border border-gray-700/80 hover:border-gray-500 transition-colors shadow-sm">
                     <div>
-                      <p className="text-white font-bold">{aircraft.id}</p>
-                      <p className="text-[11px] text-gray-400">{aircraft.type}</p>
+                      <p className="text-white font-bold text-sm tracking-wide">{aircraft.id}</p>
+                      <p className="text-[11px] text-blue-300 font-medium">{aircraft.type}</p>
                     </div>
-                    <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                      <div className="text-right">
-                        <p className="text-[10px] text-gray-500 uppercase">Prox. Mantenimiento</p>
+                    <div className="flex items-center gap-4 mt-3 sm:mt-0">
+                      <div className="text-right hidden sm:block">
+                        <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">Prox. Mante.</p>
                         <p className="text-xs font-mono text-gray-300">{aircraft.nextMaint}</p>
                       </div>
-                      <span className={`px-2.5 py-1 rounded text-[10px] font-bold ${
-                        aircraft.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' :
-                        aircraft.status === 'MAINTENANCE' ? 'bg-orange-500/20 text-orange-400' :
-                        'bg-gray-700 text-gray-300'
+                      <span className={`px-3 py-1.5 rounded-md text-[10px] font-bold tracking-wider border ${
+                        aircraft.status === 'ACTIVE' ? 'bg-green-500/10 text-green-400 border-green-500/30' :
+                        aircraft.status === 'MAINTENANCE' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
+                        'bg-gray-800 text-gray-300 border-gray-600'
                       }`}>
                         {aircraft.status === 'ACTIVE' ? 'ACTIVA' : aircraft.status === 'MAINTENANCE' ? 'TALLER' : 'STANDBY'}
                       </span>
@@ -183,39 +183,42 @@ export default function OperationsManagement() {
           )}
 
           {activeTab === 'MISSIONS' && (
-            <div className="p-4 overflow-y-auto" style={{ maxHeight: '250px' }}>
+            <div className="p-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
-                  <CalendarClock size={16}/> Programación de Vuelos
-                  {loadingWeather && <span className="ml-2 text-[10px] text-blue-400 animate-pulse">(Validando METEO...)</span>}
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                  <CalendarClock size={14}/> Programación de Vuelos
+                  {loadingWeather && <span className="ml-2 text-[10px] text-blue-400 animate-pulse normal-case font-normal">(Validando METEO...)</span>}
                 </h4>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {dynamicMissions.map((mission) => (
-                  <div key={mission.id} className="flex flex-col sm:flex-row justify-between p-3 rounded-md bg-[#1e293b] border border-gray-700 border-l-4" style={{
+                  <div key={mission.id} className="flex flex-col sm:flex-row justify-between p-3.5 rounded-lg bg-[#1e293b] border border-gray-700/80 border-l-4 shadow-sm" style={{
                     borderLeftColor: mission.currentStatus === 'ON_TIME' ? '#10b981' : mission.currentStatus === 'DELAYED' ? '#ef4444' : '#6b7280'
                   }}>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-white font-bold text-sm">{mission.id}</p>
-                        <span className="text-[10px] text-gray-400 px-1.5 py-0.5 bg-gray-800 rounded font-mono">{mission.time}</span>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-white font-bold text-sm tracking-wide">{mission.id}</p>
+                        <span className="text-[10px] text-gray-300 px-2 py-0.5 bg-[#0f172a] rounded font-mono border border-gray-700">{mission.time}</span>
                       </div>
-                      <p className="text-xs font-medium text-blue-400 mt-0.5">{mission.title}</p>
-                      <p className="text-[10px] text-gray-400 flex items-center mt-1">
-                        <ChevronRight size={12} className="mr-0.5"/> Dest: {mission.dest}
+                      <p className="text-xs font-semibold text-blue-400">{mission.title}</p>
+                      <p className="text-[11px] text-gray-400 flex items-center mt-1.5">
+                        <ChevronRight size={14} className="mr-0.5 text-gray-500"/> Destino: <span className="text-gray-300 ml-1">{mission.dest}</span>
                       </p>
                     </div>
                     <div className="mt-3 sm:mt-0 flex items-center shrink-0">
-                      {mission.currentStatus === 'ON_TIME' && <span className="flex items-center gap-1 text-[10px] font-bold text-green-400 bg-green-900/20 px-2 py-1 rounded"><CheckCircle2 size={12}/> A TIEMPO</span>}
-                      {mission.currentStatus === 'DELAYED' && <span className="flex items-center gap-1 text-[10px] font-bold text-red-500 bg-red-900/20 px-2 py-1 rounded"><ShieldAlert size={12}/> CANCELADA / METEO</span>}
-                      {mission.currentStatus === 'SCHEDULED' && <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400 bg-gray-800 px-2 py-1 rounded">PROGRAMADA</span>}
+                      {mission.currentStatus === 'ON_TIME' && <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-green-400 bg-green-500/10 border border-green-500/20 px-2.5 py-1.5 rounded-md"><CheckCircle2 size={14}/> A TIEMPO</span>}
+                      {mission.currentStatus === 'DELAYED' && <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-red-500 bg-red-500/10 border border-red-500/20 px-2.5 py-1.5 rounded-md"><ShieldAlert size={14}/> CERRADO / METEO</span>}
+                      {mission.currentStatus === 'SCHEDULED' && <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-gray-400 bg-gray-800 border border-gray-700 px-2.5 py-1.5 rounded-md">PROGRAMADA</span>}
                     </div>
                   </div>
                 ))}
                 
                 {dynamicMissions.length === 0 && (
-                  <div className="text-center py-6 text-gray-500 text-xs">No hay misiones programadas para esta base.</div>
+                  <div className="text-center py-10 bg-gray-800/20 rounded-lg border border-gray-700 border-dashed">
+                    <Plane size={24} className="mx-auto text-gray-600 mb-2"/>
+                    <p className="text-gray-400 text-xs font-medium">No hay misiones programadas para esta base.</p>
+                  </div>
                 )}
               </div>
             </div>
