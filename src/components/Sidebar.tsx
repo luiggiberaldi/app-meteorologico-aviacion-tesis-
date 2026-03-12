@@ -5,8 +5,9 @@ import {
   LayoutDashboard, 
   CloudSun, 
   AlertTriangle, 
-  ClipboardCheck, 
-  FileText 
+  BarChart3, 
+  FileText,
+  Map 
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -14,7 +15,7 @@ export default function Sidebar() {
     <aside className="hidden md:flex flex-col w-64 bg-[#0f172a] border-r border-gray-800 h-full shrink-0">
       <div className="p-4 py-6 border-b border-gray-800">
         <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Panel de Control</p>
-        <p className="text-xl font-bold text-white mt-1">METEO<span className="text-[#10b981]">BARAGUA</span></p>
+        <p className="text-xl font-bold text-white mt-1">SERMETAVIA</p>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4">
@@ -23,6 +24,12 @@ export default function Sidebar() {
             <Link href="#pronostico" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-[#1e293b] text-white border-l-4 border-[#10b981] transition-colors hover:bg-gray-800">
               <LayoutDashboard size={20} className="text-[#10b981]" />
               <span className="font-medium text-sm">Pronóstico Actual</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="#mapa" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+              <Map size={20} />
+              <span className="font-medium text-sm">Mapa Nacional</span>
             </Link>
           </li>
           <li>
@@ -38,9 +45,9 @@ export default function Sidebar() {
             </Link>
           </li>
           <li>
-            <Link href="#cuestionario" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
-              <ClipboardCheck size={20} />
-              <span className="font-medium text-sm">Cuestionario</span>
+            <Link href="#efectividad" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+              <BarChart3 size={20} />
+              <span className="font-medium text-sm">Efectividad Operacional</span>
             </Link>
           </li>
           <li>

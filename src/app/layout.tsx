@@ -1,11 +1,12 @@
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
+import { BaseProvider } from "@/context/BaseContext";
 import Script from "next/script";
 import "./globals.css";
 
 export const metadata = {
-  title: "SERMETAVIA - Base Aérea Logística Baragua",
-  description: "Plataforma de pronóstico meteorológico para el control de aeronaves",
+  title: "SERMETAVIA - Red Meteorológica Nacional",
+  description: "Plataforma de pronóstico meteorológico para aviación militar",
   manifest: "/manifest.json",
   themeColor: "#10b981",
 };
@@ -27,19 +28,21 @@ export default function RootLayout({
         </div>
 
         {/* Contenido Principal */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-          {/* Topbar */}
-          <div className="print-hidden">
-            <Topbar />
-          </div>
-
-          {/* Área Escroleable */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 print:overflow-visible print:p-0">
-            <div className="mx-auto max-w-7xl print:max-w-none print:w-full">
-              {children}
+        <BaseProvider>
+          <div className="flex flex-col flex-1 overflow-hidden">
+            {/* Topbar */}
+            <div className="print-hidden">
+              <Topbar />
             </div>
-          </main>
-        </div>
+
+            {/* Área Escroleable */}
+            <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 print:overflow-visible print:p-0">
+              <div className="mx-auto max-w-7xl print:max-w-none print:w-full">
+                {children}
+              </div>
+            </main>
+          </div>
+        </BaseProvider>
 
         <Script id="register-sw" strategy="afterInteractive">
           {`

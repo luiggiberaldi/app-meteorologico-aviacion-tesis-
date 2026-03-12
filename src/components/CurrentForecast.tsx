@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { Wind, Eye, Gauge, Cloud, Thermometer, RefreshCw, Droplets } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import WindBarb from "./WindBarb";
+import { useBaseContext } from "@/context/BaseContext";
 
 interface WeatherData {
   windSpeed: number | null;
@@ -15,6 +17,7 @@ interface WeatherData {
 }
 
 export default function CurrentForecast() {
+  const { selectedBase } = useBaseContext();
   const [data, setData] = useState<WeatherData>({
     windSpeed: null,
     windDirection: null,
@@ -45,7 +48,10 @@ export default function CurrentForecast() {
       // Cooldown timer de 30 segundos manual
       setCooldown(30);
 
-      const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=10.24&longitude=-67.59&current=temperature_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,relative_humidity_2m");
+      const lat = selectedBase ? selectedBase.latitud : 10.2475; // Por defecto Baragua
+      const lon = selectedBase ? selectedBase.longitud : -67.5953;
+
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,relative_humidity_2m`);
       if (!res.ok) throw new Error("Error al consultar API meteorológica");
       
       const json = await res.json();
@@ -84,7 +90,7 @@ export default function CurrentForecast() {
 
         if (!isDuplicate) {
           await supabase.from("weather_logs").insert([{
-            location: "BARAGUA",
+            location: selectedBase ? selectedBase.codigo : "NACIONAL",
             wind_speed: newWeather.windSpeed,
             wind_direction: newWeather.windDirection,
             visibility: newWeather.visibility, // Ya está en metros consistentemente
@@ -103,7 +109,7 @@ export default function CurrentForecast() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedBase]);
 
   useEffect(() => {
     fetchWeather();
@@ -117,7 +123,7 @@ export default function CurrentForecast() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
         <h3 className="text-lg font-semibold text-white flex items-center">
           <span className="w-1.5 h-5 bg-[#10b981] rounded mr-2"></span>
-          Pronóstico Actual
+          Pronóstico Actual {selectedBase ? `- ${selectedBase.nombre}` : '- Nacional'}
         </h3>
         
         <div className="flex items-center space-x-3">
@@ -153,7 +159,13 @@ export default function CurrentForecast() {
           value={data.windSpeed !== null ? `${data.windSpeed} km/h` : "--"} 
           desc={data.windDirection !== null ? `Dir: ${data.windDirection}°` : "Dir: ---°"} 
           loading={loading && !data.windSpeed}
-        />
+        >
+          {data.windSpeed !== null && data.windDirection !== null && (
+            <div className="ml-2 bg-gray-200 rounded-full p-1 self-end shadow-inner">
+              <WindBarb speed={data.windSpeed / 1.852} direction={data.windDirection} size={30} />
+            </div>
+          )}
+        </Widget>
         <Widget 
           title="Visibilidad" 
           icon={Eye} 
@@ -194,20 +206,23 @@ export default function CurrentForecast() {
   );
 }
 
-function Widget({ title, icon: Icon, value, desc, loading }: { title: string, icon: any, value: string, desc: string, loading?: boolean }) {
+function Widget({ title, icon: Icon, value, desc, loading, children }: { title: string, icon: any, value: string, desc: string, loading?: boolean, children?: React.ReactNode }) {
   return (
     <div className="bg-[#1e293b] p-4 rounded-xl border border-gray-700 flex flex-col relative overflow-hidden">
       <div className="flex items-center justify-between mb-3 text-gray-400">
         <span className="text-xs font-medium uppercase tracking-wider">{title}</span>
         <Icon size={16} />
       </div>
-      <div className="mt-auto">
-        {loading ? (
-           <div className="h-8 w-20 bg-gray-700 rounded animate-pulse mb-1"></div>
-        ) : (
-          <span className="block text-2xl font-bold text-white mb-1">{value}</span>
-        )}
-        <span className="text-[10px] text-gray-500 bg-black/30 px-2 py-1 rounded inline-block">{desc}</span>
+      <div className="mt-auto flex justify-between items-end">
+        <div>
+          {loading ? (
+             <div className="h-8 w-20 bg-gray-700 rounded animate-pulse mb-1"></div>
+          ) : (
+            <span className="block text-2xl font-bold text-white mb-1">{value}</span>
+          )}
+          <span className="text-[10px] text-gray-500 bg-black/30 px-2 py-1 rounded inline-block">{desc}</span>
+        </div>
+        {children}
       </div>
     </div>
   );

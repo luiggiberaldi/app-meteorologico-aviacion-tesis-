@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plane, Menu, X, LayoutDashboard, CloudSun, AlertTriangle, ClipboardCheck, FileText } from "lucide-react";
+import { Plane, Menu, X, LayoutDashboard, CloudSun, AlertTriangle, BarChart3, FileText, ChevronDown } from "lucide-react";
+import { useBaseContext } from "@/context/BaseContext";
 
 export default function Topbar() {
   const [timeUTC, setTimeUTC] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { selectedBase, setSelectedBase, bases } = useBaseContext();
 
   useEffect(() => {
     const updateClock = () => {
@@ -39,15 +41,36 @@ export default function Topbar() {
           </div>
           <div>
             <h1 className="text-base font-bold text-white tracking-wide">
-              SERMETAVIA <span className="hidden md:inline-block font-normal text-gray-400 mx-1">|</span> <span className="hidden md:inline-block text-gray-300 font-medium tracking-normal text-sm">Base Aérea Logística BARAGUA</span>
+              SERMETAVIA <span className="hidden md:inline-block font-normal text-gray-400 mx-1">|</span> <span className="hidden md:inline-block text-gray-300 font-medium tracking-normal text-sm">Red Meteorológica Nacional</span>
             </h1>
           </div>
         </div>
 
-        {/* Reloj UTC */}
-        <div className="flex items-center space-x-2 bg-black/30 px-2 sm:px-3 py-1.5 rounded border border-gray-600">
-          <span className="hidden sm:inline-block text-xs text-gray-400 font-mono">HORA ZULU</span>
-          <span className="text-xs sm:text-sm font-bold text-[#f59e0b] font-mono tracking-widest">{timeUTC || "00:00:00 UTC"}</span>
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Base Selector */}
+          <div className="relative hidden sm:block">
+            <select 
+              className="appearance-none bg-[#0f172a] text-white text-xs sm:text-sm font-medium border border-gray-600 rounded-lg px-2 sm:px-3 py-1.5 pr-8 focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+              value={selectedBase?.id || ""}
+              onChange={(e) => {
+                const id = e.target.value;
+                if (!id) setSelectedBase(null);
+                else setSelectedBase(bases.find(b => b.id.toString() === id) || null);
+              }}
+            >
+              <option value="">Todas las Bases (Nacional)</option>
+              {bases.map(b => (
+                <option key={b.id} value={b.id}>{b.nombre}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+
+          {/* Reloj UTC */}
+          <div className="flex items-center space-x-2 bg-black/30 px-2 sm:px-3 py-1.5 rounded border border-gray-600">
+            <span className="hidden sm:inline-block text-xs text-gray-400 font-mono">HORA ZULU</span>
+            <span className="text-xs sm:text-sm font-bold text-[#f59e0b] font-mono tracking-widest">{timeUTC || "00:00:00 UTC"}</span>
+          </div>
         </div>
       </header>
 
@@ -62,7 +85,7 @@ export default function Topbar() {
              <div className="p-4 py-6 border-b border-gray-800 flex justify-between items-center">
                <div>
                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Panel</p>
-                 <p className="text-xl font-bold text-white mt-1">METEO<span className="text-[#10b981]">BARAGUA</span></p>
+                 <p className="text-xl font-bold text-white mt-1">SERMETAVIA</p>
                </div>
                <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white p-1 bg-gray-800 rounded">
                  <X size={20} />
@@ -90,9 +113,9 @@ export default function Topbar() {
                    </Link>
                  </li>
                  <li>
-                   <Link href="#cuestionario" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
-                     <ClipboardCheck size={20} />
-                     <span className="font-medium text-sm">Cuestionario</span>
+                   <Link href="#efectividad" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+                     <BarChart3 size={20} />
+                     <span className="font-medium text-sm">Efectividad Operacional</span>
                    </Link>
                  </li>
                  <li>
