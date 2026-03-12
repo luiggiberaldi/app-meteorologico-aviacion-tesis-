@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Printer } from "lucide-react";
 import WeatherHistory from "./WeatherHistory";
-import SurveyResults from "./SurveyResults";
 
 export default function ReportDashboard() {
   const [printDate, setPrintDate] = useState<string>("");
@@ -30,7 +29,7 @@ export default function ReportDashboard() {
             Reportes y Exportación
           </h3>
           <p className="text-sm text-gray-400 print:text-gray-600 mt-1">
-            Histórico de Condiciones Meteorológicas y Resultados de la Encuesta.
+            Histórico de Condiciones Meteorológicas.
           </p>
         </div>
         
@@ -43,23 +42,15 @@ export default function ReportDashboard() {
         </button>
       </div>
 
-      {/* Contenido (Alineado en cuadrícula) */}
-      <div className="p-5 print:p-0 print:py-5 grid grid-cols-1 xl:grid-cols-3 gap-6">
+      {/* Contenido */}
+      <div className="p-5 print:p-0 print:py-5">
         
-        {/* Historial Meteorológico -> Ocupa 2 espacios en pantallas grandes */}
-        <div className="xl:col-span-2 space-y-4">
+        {/* Historial Meteorológico -> Ancho Completo */}
+        <div className="space-y-4">
           <div className="print:hidden">
             <p className="text-sm text-gray-400 mb-2">Registro de las últimas lecturas almacenadas en Base de Datos.</p>
           </div>
           <WeatherHistory />
-        </div>
-
-        {/* Resultados Encuesta -> Ocupa 1 espacio */}
-        <div className="xl:col-span-1 space-y-4 print:mt-8 xl:print:mt-0">
-          <div className="print:hidden">
-            <p className="text-sm text-gray-400 mb-2">Conteo de las métricas dicotómicas recolectadas (Sí/No).</p>
-          </div>
-          <SurveyResults />
         </div>
 
       </div>
