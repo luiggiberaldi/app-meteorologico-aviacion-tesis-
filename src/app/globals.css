@@ -55,3 +55,25 @@
     line-height: 44px !important;
   }
 }
+
+/* Aislar el scroll del mapa para que los popups no peleen con el scroll de la página */
+.leaflet-container {
+  isolation: isolate;
+}
+
+/* Asegurar que los popups de Leaflet no se corten */
+.leaflet-popup {
+  z-index: 800 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px !important;
+  font-size: 13px !important;
+}

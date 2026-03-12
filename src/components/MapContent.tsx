@@ -152,7 +152,7 @@ export default function MapContent() {
               position={[base.lat, base.lon]}
               icon={base.type === 'militar' ? militaryIcon : civilIcon}
             >
-              <Popup className="custom-popup" maxWidth={280}>
+              <Popup className="custom-popup" maxWidth={280} autoPan={true} autoPanPadding={[40, 80]} keepInView={true}>
                 <div className="p-1 min-w-[230px]">
                   <div className="flex items-start gap-2 mb-2">
                     <span className={`mt-1 w-2.5 h-2.5 rounded-full shrink-0 ${getStatusDot(base.status)}`}></span>
