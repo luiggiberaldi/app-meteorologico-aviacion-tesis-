@@ -154,8 +154,10 @@ export default function MapContent() {
       Math.abs(b.latitud - base.lat) < 0.1 && Math.abs(b.longitud - base.lon) < 0.1
     );
     if (match) setSelectedBase(match);
-    // Scroll al inicio del dashboard donde está la Situación General
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll a Situación General (el contenedor scrollable es <main>, no window)
+    setTimeout(() => {
+      document.getElementById('general')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const militaryCount = bases.filter(b => b.type === 'militar').length;

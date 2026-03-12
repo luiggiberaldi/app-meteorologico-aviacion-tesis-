@@ -20,6 +20,7 @@ export default function GeneralSituation() {
     windSpeed: null, windDirection: null, visibility: null,
     temperature: null, cloudCover: null, pressure: null, humidity: null,
   });
+  const [realTrend, setRealTrend] = useState<'stable' | 'improving' | 'deteriorating'>('stable');
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
@@ -38,6 +39,20 @@ export default function GeneralSituation() {
         const json = await res.json();
         const c = json.current;
 
+        // Datos pasados (1 hora atrás)
+        const resPast = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&past_hours=1&hourly=visibility,cloud_cover&forecast_hours=1`
+        );
+        let pastVis = null;
+        let pastCloud = null;
+        if (resPast.ok) {
+          const jsonPast = await resPast.json();
+          if (jsonPast.hourly && jsonPast.hourly.visibility?.length > 0) {
+            pastVis = jsonPast.hourly.visibility[0];
+            pastCloud = jsonPast.hourly.cloud_cover[0];
+          }
+        }
+
         if (mounted) {
           setWeatherData({
             windSpeed: c.wind_speed_10m,
@@ -48,6 +63,21 @@ export default function GeneralSituation() {
             pressure: c.surface_pressure,
             humidity: c.relative_humidity_2m,
           });
+
+          // Calcular tendencia real comparando hace 1 hora con ahora
+          let baseTrend: 'stable' | 'improving' | 'deteriorating' = 'stable';
+          // Open-meteo visibility es en metros, cloud en %
+          if (pastVis !== null && pastCloud !== null) {
+            const visImprov = c.visibility - pastVis;
+            const cloudImprov = pastCloud - c.cloud_cover; // menos nubes = mejor
+            
+            // Si visibilidad mejora por > 2km o nubes bajan > 20%
+            if (visImprov > 2000 || cloudImprov > 20) baseTrend = 'improving';
+            // Si visibilidad cae por > 2km o nubes suben > 20%
+            else if (visImprov < -2000 || cloudImprov < -20) baseTrend = 'deteriorating';
+          }
+
+          setRealTrend(baseTrend);
           setLastUpdated(new Date());
           setLoading(false);
         }
@@ -67,11 +97,11 @@ export default function GeneralSituation() {
   // Calcular estado general basado en datos reales
   const getOverallStatus = () => {
     if (visibilityKm > 8 && windSpeedKmph < 20 && cloudCoverPct < 50) {
-      return { status: 'ÓPTIMO', color: 'green', icon: CheckCircle2, trend: 'stable' as const };
+      return { status: 'ÓPTIMO', color: 'green', icon: CheckCircle2 };
     } else if (visibilityKm > 5 && windSpeedKmph < 30) {
-      return { status: 'ACEPTABLE', color: 'yellow', icon: AlertCircle, trend: 'stable' as const };
+      return { status: 'ACEPTABLE', color: 'yellow', icon: AlertCircle };
     } else {
-      return { status: 'PRECAUCIÓN', color: 'red', icon: AlertTriangle, trend: 'deteriorating' as const };
+      return { status: 'PRECAUCIÓN', color: 'red', icon: AlertTriangle };
     }
   };
 
@@ -79,8 +109,9 @@ export default function GeneralSituation() {
   const StatusIcon = situation.icon;
 
   const getTrendIcon = () => {
-    if (situation.trend === 'deteriorating') return <TrendingDown className="text-red-500" size={20} />;
-    return <Minus className="text-gray-400" size={20} />;
+    if (realTrend === 'improving') return <span title="Mejorando respecto a hace 1 hora"><TrendingUp className="text-green-500" size={20} /></span>;
+    if (realTrend === 'deteriorating') return <span title="Deteriorando respecto a hace 1 hora"><TrendingDown className="text-red-500" size={20} /></span>;
+    return <span title="Estable"><Minus className="text-gray-400" size={20} /></span>;
   };
 
   const colorMap: Record<string, { border: string; bg: string; icon: string; badge: string }> = {
