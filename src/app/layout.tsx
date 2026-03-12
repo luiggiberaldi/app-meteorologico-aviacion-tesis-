@@ -24,8 +24,10 @@ export default function RootLayout({
     <html lang="es" className="dark scroll-smooth">
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body className="flex h-screen overflow-hidden bg-military-bg text-military-text font-sans antialiased">
+      <body className="flex h-screen overflow-hidden print:h-auto print:overflow-visible bg-military-bg text-military-text font-sans antialiased">
         {/* Banner de Conexión Offline */}
         <div className="absolute top-0 left-0 w-full z-[100] print-hidden">
           <OfflineIndicator />
@@ -38,7 +40,7 @@ export default function RootLayout({
 
         {/* Contenido Principal */}
         <BaseProvider>
-          <div className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex flex-col flex-1 overflow-hidden print:overflow-visible">
             {/* Topbar */}
             <div className="print-hidden">
               <Topbar />

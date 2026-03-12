@@ -6,10 +6,14 @@ import { Route, Navigation, Timer, Fuel, Wind, TrendingUp, Sun, CloudRain, Plane
 
 // Aeronaves disponibles con sus velocidades de crucero típicas en nudos (kt) y consumo aprox lbs/h
 const AIRCRAFT_DB = [
-  { id: 'C208', name: 'Cessna 208 Caravan', speedKt: 180, fuelLbsH: 350 },
-  { id: 'C130', name: 'Lockheed C-130 Hercules', speedKt: 290, fuelLbsH: 5000 },
-  { id: 'MI17', name: 'Mil Mi-17 (Helicóptero)', speedKt: 130, fuelLbsH: 1400 },
-  { id: 'F16', name: 'F-16 Fighting Falcon', speedKt: 500, fuelLbsH: 8000 }
+  { id: 'C208', name: 'Cessna 208B Grand Caravan', speedKt: 186, fuelLbsH: 350 },
+  { id: 'SU30', name: 'Sukhoi Su-30MK2 Flanker-G', speedKt: 730, fuelLbsH: 9000 },
+  { id: 'F16', name: 'F-16A/B Block 15 Fighting Falcon', speedKt: 500, fuelLbsH: 3500 },
+  { id: 'K8W', name: 'K-8W Karakorum', speedKt: 430, fuelLbsH: 1200 },
+  { id: 'C130', name: 'Lockheed C-130H Hercules', speedKt: 290, fuelLbsH: 5000 },
+  { id: 'Y8F', name: 'Shaanxi Y-8F-200W', speedKt: 296, fuelLbsH: 4200 },
+  { id: 'MI17', name: 'Mil Mi-17V-5 (Helicóptero)', speedKt: 135, fuelLbsH: 1400 },
+  { id: 'AS532', name: 'AS-532AC Cougar (Helicóptero)', speedKt: 140, fuelLbsH: 1200 }
 ];
 
 // Fórmula de Haversine para distancia en Millas Náuticas (NM)

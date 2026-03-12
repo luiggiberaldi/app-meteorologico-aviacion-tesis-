@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Plane, Menu, X, LayoutDashboard, BarChart3, FileText, ChevronDown, 
-  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users 
+  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings 
 } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
 
@@ -23,6 +23,7 @@ const systemNav = [
   { href: "/manual", label: "Manual de Usuario", icon: BookOpen },
   { href: "/seguridad", label: "Seguridad Cibernética", icon: ShieldCheck },
   { href: "/usuarios", label: "Usuarios", icon: Users },
+  { href: "/configuracion", label: "Configuración", icon: Settings },
 ];
 
 export default function Topbar() {
@@ -63,12 +64,12 @@ export default function Topbar() {
             <Menu size={24} />
           </button>
           
-          <div className="hidden md:flex bg-[#10b981] p-2 rounded-md">
-            <Plane className="w-5 h-5 text-white" />
+          <div className="hidden md:flex items-center">
+            <img src="/2.png" alt="Sermetavia Logo" className="h-[42px] w-auto object-contain mr-3" />
           </div>
           <div>
             <h1 className="text-base font-bold text-white tracking-wide">
-              SERMETAVIA <span className="hidden md:inline-block font-normal text-gray-400 mx-1">|</span> <span className="hidden md:inline-block text-gray-300 font-medium tracking-normal text-sm">Red Meteorológica Nacional</span>
+              <span className="hidden md:inline-block text-gray-300 font-medium tracking-normal text-sm">Red Meteorológica Nacional</span>
             </h1>
           </div>
         </div>
@@ -107,12 +108,11 @@ export default function Topbar() {
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
           
           <div className="relative w-64 bg-[#0f172a] h-full flex flex-col border-r border-gray-800 shadow-xl animate-in slide-in-from-left-full duration-200">
-             <div className="p-4 py-6 border-b border-gray-800 flex justify-between items-center">
-               <div>
-                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Panel</p>
-                 <p className="text-xl font-bold text-white mt-1">SERMETAVIA</p>
+             <div className="p-4 py-6 border-b border-gray-800 flex justify-between items-start">
+               <div className="flex flex-col">
+                 <img src="/1.png" alt="Sermetavia Logo" className="h-[72px] w-auto object-contain mb-2 self-start" />
                </div>
-               <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white p-1 bg-gray-800 rounded">
+               <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white p-1 bg-gray-800 rounded self-start">
                  <X size={20} />
                </button>
              </div>

@@ -6,12 +6,17 @@ import { useBaseContext } from '@/context/BaseContext';
 
 // Catálogo maestro de aviones simulados
 const ALL_FLEET_DATA = [
-  { id: 'YV-0101', type: 'Cessna 208 Caravan', baseCode: 'SVFM', status: 'ACTIVE', nextMaint: '15 días' },
-  { id: 'YV-0102', type: 'Cessna 208 Caravan', baseCode: 'SVMI', status: 'MAINTENANCE', nextMaint: 'En curso' },
-  { id: 'FAV-0245', type: 'C-130 Hercules', baseCode: 'SVBL', status: 'ACTIVE', nextMaint: '45 días' },
-  { id: 'FAV-0246', type: 'C-130 Hercules', baseCode: 'SVMI', status: 'STANDBY', nextMaint: '12 días' },
-  { id: 'YV-0305', type: 'Diamond DA42', baseCode: 'SVCS', status: 'ACTIVE', nextMaint: '60 días' },
-  { id: 'FAV-3101', type: 'Su-30MK2', baseCode: 'SVBM', status: 'ACTIVE', nextMaint: '90 días' },
+  { id: 'FAV-0245', type: 'Lockheed C-130H Hercules', baseCode: 'SVBL', status: 'ACTIVE', nextMaint: '45 días' },
+  { id: 'FAV-0246', type: 'Lockheed C-130H Hercules', baseCode: 'SVMI', status: 'STANDBY', nextMaint: '12 días' },
+  { id: 'FAV-3101', type: 'Sukhoi Su-30MK2 Flanker-G', baseCode: 'SVBM', status: 'ACTIVE', nextMaint: '90 días' },
+  { id: 'FAV-3105', type: 'Sukhoi Su-30MK2 Flanker-G', baseCode: 'SVBL', status: 'MAINTENANCE', nextMaint: 'En curso' },
+  { id: 'FAV-2101', type: 'F-16A Block 15 Fighting Falcon', baseCode: 'SVBL', status: 'ACTIVE', nextMaint: '30 días' },
+  { id: 'FAV-1401', type: 'K-8W Karakorum', baseCode: 'SVFM', status: 'ACTIVE', nextMaint: '15 días' },
+  { id: 'FAV-1405', type: 'K-8W Karakorum', baseCode: 'SVMG', status: 'STANDBY', nextMaint: '60 días' },
+  { id: 'FAV-5101', type: 'Shaanxi Y-8F-200W', baseCode: 'SVMI', status: 'ACTIVE', nextMaint: '120 días' },
+  { id: 'FAV-8101', type: 'Mil Mi-17V-5', baseCode: 'SVFM', status: 'ACTIVE', nextMaint: '25 días' },
+  { id: 'FAV-8201', type: 'AS-532AC Cougar', baseCode: 'SVMI', status: 'STANDBY', nextMaint: '40 días' },
+  { id: 'FAV-0101', type: 'Cessna 208B Grand Caravan', baseCode: 'SVCS', status: 'ACTIVE', nextMaint: '10 días' },
   { id: 'YV-9011', type: 'Cessna 182', baseCode: '', status: 'STANDBY', nextMaint: '25 días' }, // Base vacía para comodín
 ];
 

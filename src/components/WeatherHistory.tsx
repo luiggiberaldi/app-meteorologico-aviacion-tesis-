@@ -77,7 +77,7 @@ export default function WeatherHistory() {
         <div className="space-y-4">
           
           {/* Tarjetas de Tendencias */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 print:hidden">
             <div className="bg-[#0f172a] p-3 rounded-lg border border-gray-700 print:bg-gray-100 print:border-gray-300">
               <p className="text-xs text-gray-400 font-bold uppercase mb-1">Tendencia Temp</p>
               <div className="flex items-end gap-2">
@@ -121,25 +121,25 @@ export default function WeatherHistory() {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-md border border-gray-700 print:border-gray-300">
-          <table className="w-full min-w-[600px] text-sm text-left">
-            <thead className="bg-[#0f172a] print:bg-gray-100 text-gray-300 print:text-gray-700 text-xs uppercase font-semibold">
+          <div className="overflow-x-auto rounded-md border border-gray-700 print:border-none print:overflow-visible">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-[#0f172a] print:bg-gray-200 text-gray-300 print:text-black text-xs uppercase font-bold">
               <tr>
-                <th className="px-4 py-3 border-b border-gray-700 print:border-gray-300">Fecha / Hora</th>
-                <th className="px-4 py-3 border-b border-gray-700 print:border-gray-300">
-                  <div className="flex items-center space-x-1"><Wind size={14}/><span>Viento</span></div>
+                <th className="px-4 py-3 border-b border-gray-700 print:border-black">Fecha / Hora</th>
+                <th className="px-4 py-3 border-b border-gray-700 print:border-black">
+                  <div className="flex items-center space-x-1"><Wind size={14} className="print:hidden"/><span>Viento</span></div>
                 </th>
-                <th className="px-4 py-3 border-b border-gray-700 print:border-gray-300">
-                  <div className="flex items-center space-x-1"><Eye size={14}/><span>Visibilidad</span></div>
+                <th className="px-4 py-3 border-b border-gray-700 print:border-black">
+                  <div className="flex items-center space-x-1"><Eye size={14} className="print:hidden"/><span>Visibilidad</span></div>
                 </th>
-                <th className="px-4 py-3 border-b border-gray-700 print:border-gray-300">
-                  <div className="flex items-center space-x-1"><Thermometer size={14}/><span>Temp.</span></div>
+                <th className="px-4 py-3 border-b border-gray-700 print:border-black">
+                  <div className="flex items-center space-x-1"><Thermometer size={14} className="print:hidden"/><span>Temp.</span></div>
                 </th>
-                <th className="px-4 py-3 border-b border-gray-700 print:border-gray-300">
-                  <div className="flex items-center space-x-1"><Gauge size={14}/><span>QNH</span></div>
+                <th className="px-4 py-3 border-b border-gray-700 print:border-black">
+                  <div className="flex items-center space-x-1"><Gauge size={14} className="print:hidden"/><span>QNH</span></div>
                 </th>
-                <th className="px-4 py-3 border-b border-gray-700 print:border-gray-300">
-                  <div className="flex items-center space-x-1"><Cloud size={14}/><span>Nubes</span></div>
+                <th className="px-4 py-3 border-b border-gray-700 print:border-black">
+                  <div className="flex items-center space-x-1"><Cloud size={14} className="print:hidden"/><span>Nubes</span></div>
                 </th>
               </tr>
             </thead>

@@ -15,7 +15,8 @@ import {
   Newspaper,
   BookOpen,
   ShieldCheck,
-  Users
+  Users,
+  Settings
 } from "lucide-react";
 
 const mainNav = [
@@ -32,6 +33,7 @@ const systemNav = [
   { href: "/manual", label: "Manual de Usuario", icon: BookOpen },
   { href: "/seguridad", label: "Seguridad Cibernética", icon: ShieldCheck },
   { href: "/usuarios", label: "Usuarios", icon: Users },
+  { href: "/configuracion", label: "Configuración", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -48,9 +50,8 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-[#0f172a] border-r border-gray-800 h-full shrink-0">
-      <div className="p-4 py-6 border-b border-gray-800">
-        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Panel de Control</p>
-        <p className="text-xl font-bold text-white mt-1">SERMETAVIA</p>
+      <div className="p-4 py-6 border-b border-gray-800 flex justify-center items-center">
+        <img src="/1.png" alt="Sermetavia Logo" className="h-[72px] w-auto object-contain" />
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4">
