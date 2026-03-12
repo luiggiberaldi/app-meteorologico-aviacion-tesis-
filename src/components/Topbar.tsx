@@ -106,7 +106,7 @@ export default function Topbar() {
           {user && (
             <div className="hidden md:flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-emerald-900/50 border border-emerald-600/40 flex items-center justify-center text-emerald-300 text-[10px] font-bold">
-                {(user.user_metadata?.full_name || user.email || 'U').charAt(0).toUpperCase()}
+                {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
               </div>
               <button
                 onClick={() => signOut()}

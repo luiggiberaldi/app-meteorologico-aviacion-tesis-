@@ -9,8 +9,9 @@ import {
   RefreshCw, Zap, Shield, Server,
   Check, ChevronRight, ToggleLeft, ToggleRight,
   Gauge, Wind, Eye, Plane, Radio,
-  Save, RotateCcw
+  Save, RotateCcw, UserCog, AlertCircle
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 // ─── Tipos ───
 interface AppSettings {
@@ -91,6 +92,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 // ─── Tabs ───
 const TABS = [
+  { id: 'account', label: 'Mi Cuenta', icon: UserCog },
   { id: 'general', label: 'General', icon: Settings },
   { id: 'units', label: 'Unidades', icon: Gauge },
   { id: 'appearance', label: 'Apariencia', icon: Monitor },
@@ -180,10 +182,26 @@ function Divider() {
 
 // ─── Componente Principal ───
 export default function ConfiguracionPage() {
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState('account');
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [saved, setSaved] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const { user, updateCredentials } = useAuth();
+  // Estado del formulario de cuenta
+  const [accUsername, setAccUsername] = useState('');
+  const [accPassword, setAccPassword] = useState('');
+  const [accDisplayName, setAccDisplayName] = useState('');
+  const [accError, setAccError] = useState<string | null>(null);
+  const [accSuccess, setAccSuccess] = useState<string | null>(null);
+
+  // Sincronizar campos de cuenta con el usuario actual
+  useEffect(() => {
+    if (user) {
+      setAccUsername(user.username);
+      setAccPassword(user.password);
+      setAccDisplayName(user.displayName);
+    }
+  }, [user]);
 
   // Cargar config de localStorage
   useEffect(() => {
@@ -217,8 +235,64 @@ export default function ConfiguracionPage() {
   };
 
   // ─── Render de cada tab ───
+  const handleSaveAccount = () => {
+    setAccError(null);
+    setAccSuccess(null);
+    if (!accUsername.trim()) { setAccError('El usuario no puede estar vacío'); return; }
+    if (accPassword.length < 6) { setAccError('La contraseña debe tener al menos 6 caracteres'); return; }
+    if (!accDisplayName.trim()) { setAccError('El nombre no puede estar vacío'); return; }
+    const result = updateCredentials(accUsername.trim(), accPassword, accDisplayName.trim());
+    if (result.error) { setAccError(result.error); }
+    else { setAccSuccess('Credenciales actualizadas correctamente'); setTimeout(() => setAccSuccess(null), 4000); }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
+      case 'account':
+        return (
+          <div className="space-y-1">
+            <SectionTitle icon={UserCog} title="Credenciales de Acceso" />
+            {accError && (
+              <div className="flex items-center gap-2 bg-red-900/30 border border-red-500/40 rounded-lg p-3 mb-3">
+                <AlertCircle size={16} className="text-red-400 shrink-0" />
+                <p className="text-sm text-red-300">{accError}</p>
+              </div>
+            )}
+            {accSuccess && (
+              <div className="flex items-center gap-2 bg-emerald-900/30 border border-emerald-500/40 rounded-lg p-3 mb-3">
+                <Check size={16} className="text-emerald-400 shrink-0" />
+                <p className="text-sm text-emerald-300">{accSuccess}</p>
+              </div>
+            )}
+            <div className="py-3">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Nombre para Mostrar</label>
+              <input type="text" value={accDisplayName} onChange={e => setAccDisplayName(e.target.value)}
+                className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+              <p className="text-[11px] text-gray-500 mt-1">Nombre que se muestra en el sistema y reportes</p>
+            </div>
+            <Divider />
+            <div className="py-3">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Usuario</label>
+              <input type="text" value={accUsername} onChange={e => setAccUsername(e.target.value)}
+                className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+              <p className="text-[11px] text-gray-500 mt-1">Nombre de usuario para iniciar sesión</p>
+            </div>
+            <Divider />
+            <div className="py-3">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Contraseña</label>
+              <input type="password" value={accPassword} onChange={e => setAccPassword(e.target.value)}
+                className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+              <p className="text-[11px] text-gray-500 mt-1">Mínimo 6 caracteres</p>
+            </div>
+            <div className="pt-4">
+              <button onClick={handleSaveAccount}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-lg transition-colors text-sm font-medium shadow-lg shadow-emerald-900/30">
+                <Save size={16} /> Guardar Cambios de Cuenta
+              </button>
+            </div>
+          </div>
+        );
+
       case 'general':
         return (
           <div className="space-y-1">
@@ -711,8 +785,8 @@ export default function ConfiguracionPage() {
             {renderContent()}
           </div>
 
-          {/* Botones de acción (excepto en 'about') */}
-          {activeTab !== 'about' && (
+          {/* Botones de acción (excepto en 'about' y 'account') */}
+          {activeTab !== 'about' && activeTab !== 'account' && (
             <div className="mt-4 flex items-center justify-between bg-[#1e293b] rounded-xl border border-gray-700 px-6 py-4">
               <div className="flex items-center gap-2">
                 {saved && (

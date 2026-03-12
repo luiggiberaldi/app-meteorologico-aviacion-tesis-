@@ -12,13 +12,13 @@ export default function UsuariosPage() {
   const usuariosData = [
     {
       id: "real-user",
-      nombre: user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario Actual",
+      nombre: user?.displayName || user?.username || "Usuario Actual",
       rol: "Administrador",
       rolColor: "bg-red-500/20 text-red-400 border-red-500/30",
       estado: "Activo",
       estadoColor: "text-green-400",
       ultimaConexion: new Date().toLocaleString("es-VE", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) + " UTC",
-      email: user?.email || "sin-email",
+      email: user?.username || "sin-usuario",
     },
     { id: "2", nombre: "Tte. Luis Castillo", rol: "Operador", rolColor: "bg-blue-500/20 text-blue-400 border-blue-500/30", estado: "Activo", estadoColor: "text-green-400", ultimaConexion: "12 Mar 2026, 11:30 UTC", email: "l.castillo@amb.mil.ve" },
     { id: "3", nombre: "Cap. Andrea Méndez", rol: "Operador", rolColor: "bg-blue-500/20 text-blue-400 border-blue-500/30", estado: "Activo", estadoColor: "text-green-400", ultimaConexion: "11 Mar 2026, 18:20 UTC", email: "a.mendez@amb.mil.ve" },
@@ -44,13 +44,13 @@ export default function UsuariosPage() {
       {user && (
         <div className="bg-emerald-900/20 border border-emerald-600/30 rounded-xl p-4 flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center text-emerald-300 text-sm font-bold">
-            {(user.user_metadata?.full_name || user.email || 'U').charAt(0).toUpperCase()}
+            {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">
-              Sesión activa: <span className="text-emerald-300">{user.user_metadata?.full_name || user.email}</span>
+              Sesión activa: <span className="text-emerald-300">{user.displayName || user.username}</span>
             </p>
-            <p className="text-xs text-gray-400">{user.email} · Último acceso: {new Date(user.last_sign_in_at || '').toLocaleString('es-VE')}</p>
+            <p className="text-xs text-gray-400">@{user.username}</p>
           </div>
           <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
