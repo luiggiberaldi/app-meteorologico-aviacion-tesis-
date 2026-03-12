@@ -9,6 +9,9 @@ export const metadata = {
   title: "SERMETAVIA - Red Meteorológica Nacional",
   description: "Plataforma de pronóstico meteorológico para aviación militar",
   manifest: "/manifest.json",
+};
+
+export const viewport = {
   themeColor: "#10b981",
 };
 
