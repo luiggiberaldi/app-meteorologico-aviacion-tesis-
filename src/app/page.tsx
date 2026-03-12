@@ -36,7 +36,7 @@ export default function DashboardPage() {
 
       {/* Módulo General Situation */}
       <div id="general" className="scroll-mt-6">
-        <GeneralSituation weatherData={{ windSpeed: 25, visibility: 6000, temperature: 28, cloudCover: 40 }} />
+        <GeneralSituation />
       </div>
 
       {/* Módulo 1: Pronóstico Actual (Conectado a API y DB) */}
