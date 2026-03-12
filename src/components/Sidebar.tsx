@@ -50,7 +50,8 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-[#0f172a] border-r border-gray-800 h-full shrink-0">
-      <div className="p-4 py-6 border-b border-gray-800 flex justify-center items-center">
+      <div className="p-4 py-6 border-b border-gray-800 flex flex-col items-center justify-center">
+        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2">Panel de Control</p>
         <img src="/1.png" alt="Sermetavia Logo" className="h-[72px] w-auto object-contain" />
       </div>
 
