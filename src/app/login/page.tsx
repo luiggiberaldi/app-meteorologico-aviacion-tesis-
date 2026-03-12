@@ -30,204 +30,228 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setSuccess(null);
-
     if (isRegister) {
       if (!fullName.trim()) { setError('Ingrese su nombre completo'); setLoading(false); return; }
       if (password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); setLoading(false); return; }
       const result = await signUp(email, password, fullName);
-      if (result.error) { setError(result.error); }
-      else { setSuccess('Cuenta creada exitosamente. Puede iniciar sesión.'); setIsRegister(false); setPassword(''); }
+      if (result.error) { setError(result.error); } else { setSuccess('Cuenta creada. Puede iniciar sesión.'); setIsRegister(false); setPassword(''); }
     } else {
       const result = await signIn(email, password);
-      if (result.error) { setError(result.error); }
-      else { router.push('/'); }
+      if (result.error) { setError(result.error); } else { router.push('/'); }
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex flex-col lg:flex-row">
+    <div style={{ minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', background: '#0f172a', overflow: 'auto' }}>
 
-      {/* ─── Panel Izquierdo: Hero (desktop) ─── */}
-      <div className="hidden lg:flex lg:w-[48%] xl:w-[50%] relative overflow-hidden flex-col items-center justify-center p-10 xl:p-16">
-        {/* Fondo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/40 via-[#0f172a] to-blue-950/30" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-emerald-500/8 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px]" />
+      {/* ─── DESKTOP: 2 columnas ─── */}
+      <div className="hidden lg:flex" style={{ flex: 1, minHeight: '100vh' }}>
 
-        <div className="relative z-10 max-w-lg text-center">
-          {/* Logo + Título */}
-          <img src="/1.png" alt="SERMETAVIA" className="h-28 w-auto object-contain mx-auto mb-6" />
-          <h1 className="text-3xl xl:text-4xl font-bold text-white leading-tight mb-3">
-            Sistema Meteorológico<br/>
-            <span className="text-emerald-400">Aviación Militar Bolivariana</span>
-          </h1>
-          <p className="text-gray-400 text-sm max-w-sm mx-auto leading-relaxed mb-10">
-            Vigilancia meteorológica operacional para las bases aéreas de la Fuerza Armada Nacional Bolivariana.
-          </p>
+        {/* IZQUIERDA */}
+        <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          {/* Fondos */}
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 50%, rgba(16,185,129,0.08) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.05) 0%, transparent 60%)' }} />
 
-          {/* Features en grilla 2x2 */}
-          <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mb-10">
-            {[
-              { icon: Cloud, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', title: 'Pronóstico en Vivo', desc: 'Open-Meteo API cada 5 min' },
-              { icon: Plane, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', title: 'Planificación', desc: 'ETE, combustible, Haversine' },
-              { icon: Satellite, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20', title: 'GOES-16', desc: 'Imágenes cada 10 minutos' },
-              { icon: Radio, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20', title: 'Red Nacional', desc: '7 bases aéreas 24/7' },
-            ].map(f => (
-              <div key={f.title} className={`${f.bg} border rounded-xl px-4 py-3 text-left`}>
-                <f.icon size={20} className={`${f.color} mb-1.5`} />
-                <p className="text-white text-xs font-semibold">{f.title}</p>
-                <p className="text-gray-500 text-[10px] mt-0.5">{f.desc}</p>
-              </div>
-            ))}
-          </div>
+          <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '3rem', maxWidth: '480px' }}>
+            <img src="/1.png" alt="SERMETAVIA" style={{ height: '120px', width: 'auto', objectFit: 'contain', margin: '0 auto 1.5rem' }} />
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', lineHeight: 1.2, marginBottom: '0.75rem' }}>
+              Sistema Meteorológico<br/>
+              <span style={{ color: '#34d399' }}>Aviación Militar Bolivariana</span>
+            </h1>
+            <p style={{ color: '#9ca3af', fontSize: '0.875rem', maxWidth: '380px', margin: '0 auto 2.5rem', lineHeight: 1.6 }}>
+              Vigilancia meteorológica operacional para las bases aéreas de la Fuerza Armada Nacional Bolivariana.
+            </p>
 
-          {/* Status bar */}
-          <div className="flex items-center justify-center gap-4 text-[11px] text-gray-500">
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Sistema Operativo
-            </span>
-            <span>•</span>
-            <span className="font-mono text-amber-400/70">{clock}</span>
-            <span>•</span>
-            <span>v2.0.0</span>
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <p className="absolute bottom-6 text-gray-700 text-[10px]">© 2026 SERMETAVIA · Todos los derechos reservados</p>
-      </div>
-
-      {/* ─── Panel Derecho: Formulario ─── */}
-      <div className="w-full lg:w-[52%] xl:w-[50%] flex flex-col items-center justify-center p-4 sm:p-8 relative">
-        {/* Fondo sutil */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/3 right-0 w-[500px] h-[500px] bg-emerald-500/3 rounded-full blur-[100px]" />
-        </div>
-
-        {/* Separador vertical desktop */}
-        <div className="hidden lg:block absolute left-0 top-[15%] bottom-[15%] w-px bg-gradient-to-b from-transparent via-gray-700 to-transparent" />
-
-        <div className="relative w-full max-w-[420px]">
-          {/* Logo mobile */}
-          <div className="text-center mb-8 lg:hidden">
-            <img src="/2.png" alt="SERMETAVIA" className="h-16 w-auto mx-auto mb-3 object-contain" />
-            <h1 className="text-xl font-bold text-white">SERMETAVIA</h1>
-            <p className="text-gray-400 text-xs mt-1">Servicio Meteorológico — Aviación Militar Bolivariana</p>
-          </div>
-
-          {/* Header desktop */}
-          <div className="hidden lg:flex flex-col items-center mb-6">
-            <img src="/2.png" alt="SERMETAVIA" className="h-16 w-auto mb-3 object-contain" />
-            <h2 className="text-lg font-bold text-white">Acceso al Sistema</h2>
-            <p className="text-gray-500 text-xs mt-1">Ingrese sus credenciales institucionales</p>
-          </div>
-
-          {/* Card */}
-          <div className="bg-[#1e293b]/80 backdrop-blur-sm rounded-2xl border border-gray-700/80 shadow-2xl shadow-black/40 overflow-hidden">
-            {/* Tabs */}
-            <div className="flex border-b border-gray-700/80">
-              <button
-                onClick={() => { setIsRegister(false); setError(null); setSuccess(null); }}
-                className={`flex-1 py-3.5 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                  !isRegister
-                    ? 'text-white bg-[#0f172a]/60 border-b-2 border-emerald-500'
-                    : 'text-gray-500 hover:text-white'
-                }`}
-              >
-                <LogIn size={15} /> Iniciar Sesión
-              </button>
-              <button
-                onClick={() => { setIsRegister(true); setError(null); setSuccess(null); }}
-                className={`flex-1 py-3.5 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                  isRegister
-                    ? 'text-white bg-[#0f172a]/60 border-b-2 border-emerald-500'
-                    : 'text-gray-500 hover:text-white'
-                }`}
-              >
-                <UserPlus size={15} /> Crear Cuenta
-              </button>
+            {/* Features */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '2rem' }}>
+              {[
+                { Icon: Cloud, color: '#34d399', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)', title: 'Pronóstico en Vivo', desc: 'Open-Meteo cada 5 min' },
+                { Icon: Plane, color: '#60a5fa', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.2)', title: 'Planificación', desc: 'ETE, combustible, rutas' },
+                { Icon: Satellite, color: '#a78bfa', bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.2)', title: 'GOES-16', desc: 'Imágenes cada 10 min' },
+                { Icon: Radio, color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.2)', title: 'Red Nacional', desc: '7 bases aéreas 24/7' },
+              ].map(f => (
+                <div key={f.title} style={{ background: f.bg, border: `1px solid ${f.border}`, borderRadius: '12px', padding: '14px 16px', textAlign: 'left' }}>
+                  <f.Icon size={20} style={{ color: f.color, marginBottom: '6px' }} />
+                  <p style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 600 }}>{f.title}</p>
+                  <p style={{ color: '#6b7280', fontSize: '0.625rem', marginTop: '2px' }}>{f.desc}</p>
+                </div>
+              ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 lg:p-7 space-y-5">
-              {error && (
-                <div className="flex items-center gap-2 bg-red-900/30 border border-red-500/40 rounded-lg p-3">
-                  <AlertCircle size={16} className="text-red-400 shrink-0" />
-                  <p className="text-sm text-red-300">{error}</p>
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 bg-emerald-900/30 border border-emerald-500/40 rounded-lg p-3">
-                  <Check size={16} className="text-emerald-400 shrink-0" />
-                  <p className="text-sm text-emerald-300">{success}</p>
-                </div>
-              )}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', color: '#6b7280', fontSize: '0.6875rem' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />
+                Sistema Operativo
+              </span>
+              <span>•</span>
+              <span style={{ fontFamily: 'monospace', color: 'rgba(251,191,36,0.6)' }}>{clock}</span>
+              <span>•</span>
+              <span>v2.0.0</span>
+            </div>
+          </div>
+        </div>
 
-              {isRegister && (
+        {/* Separador vertical */}
+        <div style={{ width: '1px', background: 'linear-gradient(to bottom, transparent 10%, #374151 50%, transparent 90%)' }} />
+
+        {/* DERECHA */}
+        <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          <div style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <img src="/2.png" alt="SERMETAVIA" style={{ height: '56px', width: 'auto', objectFit: 'contain', margin: '0 auto 0.75rem' }} />
+              <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>Acceso al Sistema</h2>
+              <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '4px' }}>Ingrese sus credenciales institucionales</p>
+            </div>
+
+            {renderFormCard(isRegister, setIsRegister, error, setError, success, setSuccess, fullName, setFullName, email, setEmail, password, setPassword, showPassword, setShowPassword, loading, handleSubmit)}
+
+            {/* Status */}
+            <div style={{ marginTop: '1.25rem', background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(55,65,81,0.4)', borderRadius: '12px', padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <Activity size={16} style={{ color: '#10b981', marginTop: '1px', flexShrink: 0 }} />
                 <div>
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-1.5 block">Nombre Completo</label>
-                  <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Tte. Juan Pérez"
-                    className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-500/40 transition-all" required />
-                </div>
-              )}
-
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-1.5 block">Correo Electrónico</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="usuario@amb.mil.ve"
-                  className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-500/40 transition-all" required />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-1.5 block">Contraseña</label>
-                <div className="relative">
-                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
-                    className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-3 pr-11 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-500/40 transition-all" required minLength={6} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {isRegister && <p className="text-[10px] text-gray-600 mt-1.5">Mínimo 6 caracteres</p>}
-              </div>
-
-              <button type="submit" disabled={loading}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 text-sm mt-2">
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : isRegister ? (
-                  <><UserPlus size={18} /> Crear Cuenta</>
-                ) : (
-                  <><LogIn size={18} /> Ingresar al Sistema</>
-                )}
-              </button>
-            </form>
-          </div>
-
-          {/* Info extra debajo del card */}
-          <div className="mt-6 bg-[#1e293b]/40 border border-gray-700/40 rounded-xl p-4 hidden lg:block">
-            <div className="flex items-start gap-3">
-              <Activity size={18} className="text-emerald-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-medium text-gray-300">Estado de la plataforma</p>
-                <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-500">
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> API Meteo</span>
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Base de Datos</span>
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Auth Service</span>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 500, color: '#d1d5db' }}>Estado de la plataforma</p>
+                  <div style={{ display: 'flex', gap: '14px', marginTop: '6px', fontSize: '0.6875rem', color: '#6b7280' }}>
+                    {['API Meteo', 'Base de Datos', 'Auth Service'].map(s => (
+                      <span key={s} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />{s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Footer */}
-          <div className="text-center mt-5">
-            <div className="flex items-center justify-center gap-2 text-gray-600 text-[11px]">
-              <Shield size={13} />
-              <span>Conexión segura · HTTPS/TLS · Cifrado E2E</span>
+            <div style={{ textAlign: 'center', marginTop: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#4b5563', fontSize: '0.6875rem' }}>
+                <Shield size={12} />
+                <span>Conexión segura · HTTPS/TLS</span>
+              </div>
             </div>
-            <p className="text-[10px] text-gray-700 mt-2 lg:hidden">© 2026 SERMETAVIA — Acceso Restringido</p>
           </div>
         </div>
       </div>
+
+      {/* ─── MOBILE: Layout centrado ─── */}
+      <div className="flex lg:hidden" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', minHeight: '100vh' }}>
+        <div style={{ width: '100%', maxWidth: '380px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <img src="/2.png" alt="SERMETAVIA" style={{ height: '56px', width: 'auto', objectFit: 'contain', margin: '0 auto 0.75rem' }} />
+            <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff' }}>SERMETAVIA</h1>
+            <p style={{ color: '#9ca3af', fontSize: '0.6875rem', marginTop: '4px' }}>Servicio Meteorológico — Aviación Militar Bolivariana</p>
+          </div>
+
+          {renderFormCard(isRegister, setIsRegister, error, setError, success, setSuccess, fullName, setFullName, email, setEmail, password, setPassword, showPassword, setShowPassword, loading, handleSubmit)}
+
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#4b5563', fontSize: '0.6875rem' }}>
+              <Shield size={12} />
+              <span>Conexión segura · HTTPS/TLS</span>
+            </div>
+            <p style={{ fontSize: '0.625rem', color: '#374151', marginTop: '0.5rem' }}>© 2026 SERMETAVIA — Acceso Restringido</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Form Card reutilizable ─── */
+function renderFormCard(
+  isRegister: boolean, setIsRegister: (v: boolean) => void,
+  error: string | null, setError: (v: string | null) => void,
+  success: string | null, setSuccess: (v: string | null) => void,
+  fullName: string, setFullName: (v: string) => void,
+  email: string, setEmail: (v: string) => void,
+  password: string, setPassword: (v: string) => void,
+  showPassword: boolean, setShowPassword: (v: boolean) => void,
+  loading: boolean, handleSubmit: (e: React.FormEvent) => void,
+) {
+  return (
+    <div style={{ background: 'rgba(30,41,59,0.85)', borderRadius: '16px', border: '1px solid rgba(55,65,81,0.7)', boxShadow: '0 25px 50px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
+      {/* Tabs */}
+      <div style={{ display: 'flex', borderBottom: '1px solid rgba(55,65,81,0.7)' }}>
+        {[
+          { reg: false, icon: <LogIn size={14} />, label: 'Iniciar Sesión' },
+          { reg: true, icon: <UserPlus size={14} />, label: 'Crear Cuenta' },
+        ].map(t => (
+          <button key={String(t.reg)}
+            onClick={() => { setIsRegister(t.reg); setError(null); setSuccess(null); }}
+            style={{
+              flex: 1, padding: '14px 0', fontSize: '0.8125rem', fontWeight: isRegister === t.reg ? 600 : 400,
+              color: isRegister === t.reg ? '#fff' : '#6b7280',
+              background: isRegister === t.reg ? 'rgba(15,23,42,0.6)' : 'transparent',
+              borderBottom: isRegister === t.reg ? '2px solid #10b981' : '2px solid transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+              cursor: 'pointer', border: 'none', transition: 'all 0.15s',
+            }}
+          >
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+          {error && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(127,29,29,0.3)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', padding: '10px 12px' }}>
+              <AlertCircle size={15} style={{ color: '#f87171', flexShrink: 0 }} />
+              <p style={{ fontSize: '0.8125rem', color: '#fca5a5' }}>{error}</p>
+            </div>
+          )}
+          {success && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(6,78,59,0.3)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '8px', padding: '10px 12px' }}>
+              <Check size={15} style={{ color: '#34d399', flexShrink: 0 }} />
+              <p style={{ fontSize: '0.8125rem', color: '#6ee7b7' }}>{success}</p>
+            </div>
+          )}
+
+          {isRegister && (
+            <div>
+              <label style={{ display: 'block', fontSize: '0.625rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>Nombre Completo</label>
+              <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Tte. Juan Pérez" required
+                style={{ width: '100%', background: '#0f172a', border: '1px solid #4b5563', borderRadius: '8px', padding: '11px 14px', fontSize: '0.875rem', color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+          )}
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.625rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>Correo Electrónico</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="usuario@amb.mil.ve" required
+              style={{ width: '100%', background: '#0f172a', border: '1px solid #4b5563', borderRadius: '8px', padding: '11px 14px', fontSize: '0.875rem', color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.625rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>Contraseña</label>
+            <div style={{ position: 'relative' }}>
+              <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6}
+                style={{ width: '100%', background: '#0f172a', border: '1px solid #4b5563', borderRadius: '8px', padding: '11px 14px', paddingRight: '44px', fontSize: '0.875rem', color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 0 }}>
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            {isRegister && <p style={{ fontSize: '0.625rem', color: '#4b5563', marginTop: '4px' }}>Mínimo 6 caracteres</p>}
+          </div>
+
+          <button type="submit" disabled={loading}
+            style={{
+              width: '100%', background: loading ? '#065f46' : '#059669', color: '#fff', fontWeight: 600,
+              padding: '12px', borderRadius: '8px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.875rem',
+              boxShadow: '0 8px 20px rgba(5,150,105,0.25)', transition: 'all 0.15s', marginTop: '4px',
+            }}>
+            {loading ? (
+              <div style={{ width: 20, height: 20, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
+            ) : isRegister ? (
+              <><UserPlus size={17} /> Crear Cuenta</>
+            ) : (
+              <><LogIn size={17} /> Ingresar al Sistema</>
+            )}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
