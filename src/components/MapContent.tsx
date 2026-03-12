@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, LayerGroup } from "react-leafle
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Wind, Thermometer, Cloud, Map, Globe } from "lucide-react";
+import { useBaseContext, basesAereasDisponibles } from "@/context/BaseContext";
 
 const bases = [
   // BASES MILITARES (5 Principales)
@@ -109,9 +110,20 @@ function LiveWeatherPopup({ lat, lon }: { lat: number, lon: number }) {
 }
 
 export default function MapContent() {
+  const { setSelectedBase } = useBaseContext();
   const [showMilitary, setShowMilitary] = useState(true);
   const [showCivil, setShowCivil] = useState(true);
   const [capaBase, setCapaBase] = useState<'osm' | 'satelite'>('osm');
+
+  const handleVerMetar = (base: typeof bases[0]) => {
+    // Buscar la base equivalente en el contexto global
+    const match = basesAereasDisponibles.find(b =>
+      Math.abs(b.latitud - base.lat) < 0.1 && Math.abs(b.longitud - base.lon) < 0.1
+    );
+    if (match) setSelectedBase(match);
+    // Scroll a la sección METAR/TAF
+    document.getElementById('metar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const militaryCount = bases.filter(b => b.type === 'militar').length;
   const civilCount = bases.filter(b => b.type === 'civil').length;
@@ -170,7 +182,10 @@ export default function MapContent() {
                   {/* Datos Meteorológicos en Vivo */}
                   <LiveWeatherPopup lat={base.lat} lon={base.lon} />
 
-                  <button className="w-full mt-2.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md transition text-[11px] font-semibold tracking-wide">
+                  <button
+                    onClick={() => handleVerMetar(base)}
+                    className="w-full mt-2.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md transition text-[11px] font-semibold tracking-wide"
+                  >
                     Ver METAR / TAF Completo
                   </button>
                 </div>
