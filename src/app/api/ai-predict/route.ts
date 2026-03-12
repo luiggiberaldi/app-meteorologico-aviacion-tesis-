@@ -42,13 +42,14 @@ export async function POST(req: Request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192", // Modelo extremadamente rápido y menos propenso a Rate Limits
+        model: "llama-3.1-8b-instant", // Modelo actualizado y soportado
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 250
+        max_tokens: 250,
+        response_format: { type: "json_object" }
       })
     });
 
