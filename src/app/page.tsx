@@ -20,6 +20,9 @@ const CompareBases = dynamic(() => import("@/components/CompareBases"), {
 const OperationalEffectiveness = dynamic(() => import("@/components/OperationalEffectiveness"), {
   loading: () => <div className="h-64 bg-[#1e293b] rounded-xl border border-gray-700 animate-pulse flex items-center justify-center"><p className="text-gray-500">Cargando efectividad operacional...</p></div>
 });
+const HistoricalData = dynamic(() => import("@/components/HistoricalData"), {
+  loading: () => <div className="h-64 bg-[#1e293b] rounded-xl border border-gray-700 animate-pulse flex items-center justify-center"><p className="text-gray-500">Cargando datos históricos...</p></div>
+});
 const ReportDashboard = dynamic(() => import("@/components/ReportDashboard"), {
   loading: () => <div className="h-64 bg-[#1e293b] rounded-xl border border-gray-700 animate-pulse flex items-center justify-center"><p className="text-gray-500">Cargando panel de reportes...</p></div>
 });
@@ -87,6 +90,11 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Análisis Histórico de Clima y Tendencias */}
+        <div id="historico" className="lg:col-span-3 scroll-mt-6">
+          <HistoricalData />
+        </div>
+
         {/* Módulo 5: Reportes y Exportación */}
         <div id="reportes" className="lg:col-span-3 scroll-mt-6">
           <ReportDashboard />
