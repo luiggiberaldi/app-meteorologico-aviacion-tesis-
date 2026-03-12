@@ -36,28 +36,36 @@ export async function POST(req: Request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile", // Modelo rápido y capaz
+        model: "llama3-8b-8192", // Modelo extremadamente rápido y menos propenso a Rate Limits
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 300
+        max_tokens: 250
       })
     });
 
     if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`Error de Groq: ${err}`);
+      // Log más descriptivo para vercel
+      const errText = await response.text();
+      console.error(`[GROQ API ERROR] Status: ${response.status}`, errText);
+      return NextResponse.json({ error: `Groq rechazó la solicitud (Cod: ${response.status}). Intente de nuevo.` }, { status: response.status });
     }
 
     const data = await response.json();
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error("[GROQ PARSE ERROR] Estructura inesperada:", data);
+      return NextResponse.json({ error: "El modelo respondió pero con una estructura vacía o inválida." }, { status: 500 });
+    }
+
     const resultText = data.choices[0].message.content;
 
     return NextResponse.json({ prediction: resultText });
 
   } catch (error: any) {
-    console.error("AI Error:", error);
-    return NextResponse.json({ error: "Fallo al generar el pronóstico predictivo." }, { status: 500 });
+    console.error("[NEXTJS ENDPOINT ERROR] Fallo Crítico:", error.message || error);
+    return NextResponse.json({ error: error.message || "Fallo crítico al generar el pronóstico predictivo." }, { status: 500 });
   }
 }

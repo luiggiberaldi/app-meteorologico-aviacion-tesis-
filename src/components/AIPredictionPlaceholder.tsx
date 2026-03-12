@@ -57,15 +57,22 @@ export default function AIPredictionModule() {
             })
         });
 
-        if (!groqReq.ok) {
-           throw new Error("El modelo de IA no pudo procesar la solicitud (Revise API Key / Límites).");
+        // Intentamos parsear todo como JSON primero para atrapar errores servidos elegantemente
+        let groqRes;
+        try {
+           groqRes = await groqReq.json();
+        } catch (e) {
+           throw new Error("El servidor no devolvió una respuesta válida (falla interna / timeout).");
         }
 
-        const groqRes = await groqReq.json();
+        if (!groqReq.ok) {
+           throw new Error(groqRes.error || "El modelo de IA no pudo procesar la solicitud (Falla silenciosa).");
+        }
+
         setPredictionResult(groqRes.prediction);
 
     } catch (err: any) {
-        setErrorDesc(err.message || "Error desconocido");
+        setErrorDesc(err.message || "Error desconocido atrapado en el cliente.");
     } finally {
         setAnalyzing(false);
     }
