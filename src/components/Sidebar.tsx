@@ -7,7 +7,9 @@ import {
   AlertTriangle, 
   BarChart3, 
   FileText,
-  Map 
+  Map,
+  Plane,
+  Navigation
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -33,6 +35,12 @@ export default function Sidebar() {
             </Link>
           </li>
           <li>
+            <Link href="#planificacion" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+              <Navigation size={20} />
+              <span className="font-medium text-sm">Planificación de Vuelos</span>
+            </Link>
+          </li>
+          <li>
             <Link href="#metar" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
               <CloudSun size={20} />
               <span className="font-medium text-sm">METAR / TAF / GAMET</span>
@@ -48,6 +56,12 @@ export default function Sidebar() {
             <Link href="#efectividad" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
               <BarChart3 size={20} />
               <span className="font-medium text-sm">Efectividad Operacional</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="#operaciones" className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1e293b] hover:text-white transition-colors">
+              <Plane size={20} />
+              <span className="font-medium text-sm">Gestión de Operaciones</span>
             </Link>
           </li>
           <li>

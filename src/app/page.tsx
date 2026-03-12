@@ -6,6 +6,9 @@ import MetarTafGamet from "@/components/MetarTafGamet";
 import OperationalAlerts from "@/components/OperationalAlerts";
 import GeneralSituation from "@/components/GeneralSituation";
 import CompareBases from "@/components/CompareBases";
+import OperationsManagement from "@/components/OperationsManagement";
+import FlightPlanning from "@/components/FlightPlanning";
+import AIPredictionPlaceholder from "@/components/AIPredictionPlaceholder";
 
 export default function DashboardPage() {
   return (
@@ -37,6 +40,11 @@ export default function DashboardPage() {
         <CompareBases />
       </div>
 
+      {/* Planificación de Vuelos */}
+      <div id="planificacion" className="scroll-mt-6">
+        <FlightPlanning />
+      </div>
+
       <div className="grid grid-cols-1 gap-6">
         {/* Módulo 2: METAR / TAF / GAMET */}
         <div id="metar" className="scroll-mt-6">
@@ -56,11 +64,21 @@ export default function DashboardPage() {
           <OperationalEffectiveness />
         </div>
 
+        {/* Nuevo Módulo: Gestión de Operaciones */}
+        <div id="operaciones" className="lg:col-span-1 scroll-mt-6">
+          <OperationsManagement />
+        </div>
+
         {/* Módulo 5: Reportes y Exportación */}
         <div id="reportes" className="lg:col-span-3 scroll-mt-6">
           <ReportDashboard />
         </div>
 
+      </div>
+
+      {/* Placeholders de Fase 2 Documental (Tesis) */}
+      <div className="mt-8">
+        <AIPredictionPlaceholder />
       </div>
 
     </div>

@@ -72,7 +72,54 @@ export default function WeatherHistory() {
       ) : logs.length === 0 ? (
         <p className="text-center text-sm text-gray-500 py-6">No hay registros meteorológicos almacenados todavía.</p>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-gray-700 print:border-gray-300">
+        <div className="space-y-4">
+          
+          {/* Tarjetas de Tendencias */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="bg-[#0f172a] p-3 rounded-lg border border-gray-700 print:bg-gray-100 print:border-gray-300">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">Tendencia Temp</p>
+              <div className="flex items-end gap-2">
+                <span className="text-xl font-bold text-white print:text-black">
+                  {logs[0]?.temperature || '-'}°C
+                </span>
+                {logs.length > 1 && logs[0].temperature && logs[logs.length-1].temperature && (
+                  <span className={`text-xs font-bold mb-1 ${logs[0].temperature > logs[logs.length-1].temperature! ? 'text-red-400' : 'text-blue-400'}`}>
+                    {logs[0].temperature > logs[logs.length-1].temperature! ? '↑ Sube' : '↓ Baja'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-[#0f172a] p-3 rounded-lg border border-gray-700 print:bg-gray-100 print:border-gray-300">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">Promedio Viento (24h)</p>
+              <div className="flex items-end gap-2">
+                <span className="text-xl font-bold text-white print:text-black">
+                  {Math.round(logs.reduce((acc, curr) => acc + (curr.wind_speed || 0), 0) / logs.length)} KT
+                </span>
+                <span className="text-xs text-gray-500 mb-1">Prom. Histórico</span>
+              </div>
+            </div>
+
+            <div className="bg-[#0f172a] p-3 rounded-lg border border-gray-700 print:bg-gray-100 print:border-gray-300">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">Ráfaga Max</p>
+              <div className="flex items-end gap-2">
+                <span className="text-xl font-bold text-orange-400">
+                  {Math.max(...logs.map(l => l.wind_speed || 0))} KT
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-[#0f172a] p-3 rounded-lg border border-gray-700 print:bg-gray-100 print:border-gray-300">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">Presión QNH Prom.</p>
+              <div className="flex items-end gap-2">
+                <span className="text-xl font-bold text-blue-300">
+                  {Math.round(logs.reduce((acc, curr) => acc + (curr.pressure_qnh || 0), 0) / logs.length)} hPa
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-md border border-gray-700 print:border-gray-300">
           <table className="w-full min-w-[600px] text-sm text-left">
             <thead className="bg-[#0f172a] print:bg-gray-100 text-gray-300 print:text-gray-700 text-xs uppercase font-semibold">
               <tr>
@@ -123,6 +170,7 @@ export default function WeatherHistory() {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
