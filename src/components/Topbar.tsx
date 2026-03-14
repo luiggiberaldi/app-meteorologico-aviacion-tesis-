@@ -10,6 +10,29 @@ import {
 import { useBaseContext } from "@/context/BaseContext";
 import { useAuth } from "@/context/AuthContext";
 
+type Notificacion = {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  tiempo: string;
+  colorBorder: string;
+};
+
+const INITIAL_NOTIFICATIONS: Notificacion[] = [
+  { id: 'n1', titulo: 'Tormenta Severa Detectada', descripcion: 'Alto nivel CAPE en aproximación sureste. Posible cancelación de despegues.', tiempo: 'Hace 2 min', colorBorder: 'border-l-red-500' },
+  { id: 'n2', titulo: 'Descenso de Isoterma', descripcion: 'Nivel de congelamiento (0°C) ha descendido a 2,500m. Precaución por engelamiento.', tiempo: 'Hace 15 min', colorBorder: 'border-l-amber-500' },
+  { id: 'n3', titulo: 'Alerta Evaporativa Agrícola', descripcion: 'Sensores TDA reportan evapotranspiración anómala en llanos centrales.', tiempo: 'Hace 1 hora', colorBorder: 'border-l-blue-500' }
+];
+
+const DYNAMIC_ALERTS_POOL = [
+  { titulo: 'Cizalladura de Viento', descripcion: 'Reporte de windshear en capa baja (LLWS) cerca de umbral de pista.', colorBorder: 'border-l-amber-500' },
+  { titulo: 'Aproximación IFR Requerida', descripcion: 'Techo de nubes descendiendo rápidamente. Obligatorio operaciones por instrumentos.', colorBorder: 'border-l-red-500' },
+  { titulo: 'Anomalía de Presión', descripcion: 'Sensores barométricos indican caída súbita de presión. Posible formación ciclónica.', colorBorder: 'border-l-red-500' },
+  { titulo: 'Restablecimiento de GOES', descripcion: 'Recepción de barrido satelital normalizada en banda infrarroja.', colorBorder: 'border-l-emerald-500' },
+  { titulo: 'Humedad del Suelo Crítica', descripcion: 'Sensores en cabecera de pista detectan saturación 95%. Riesgo moderado de aquaplaning.', colorBorder: 'border-l-blue-500' },
+  { titulo: 'Ráfagas de Viento Fuertes', descripcion: 'Vientos cruzados exceden 25 nudos. Precaución aeronaves ligeras en aproximación.', colorBorder: 'border-l-amber-500' }
+];
+
 const mainNav = [
   { href: "/", label: "Centro de Mando", icon: LayoutDashboard },
   { href: "/planificacion", label: "Planificación de Vuelos", icon: Navigation },
@@ -31,6 +54,11 @@ export default function Topbar() {
   const [timeUTC, setTimeUTC] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>(INITIAL_NOTIFICATIONS);
+  const [unreadCount, setUnreadCount] = useState(3);
+  const [isAnimatingBell, setIsAnimatingBell] = useState(false);
+
   const { selectedBase, setSelectedBase, bases } = useBaseContext();
   const { user, signOut } = useAuth();
   const pathname = usePathname();
@@ -43,6 +71,43 @@ export default function Topbar() {
     updateClock();
     const interval = setInterval(updateClock, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Generador Táctico Dinámico de Notificaciones
+    const tick = () => {
+      const template = DYNAMIC_ALERTS_POOL[Math.floor(Math.random() * DYNAMIC_ALERTS_POOL.length)];
+      const newNotif: Notificacion = {
+        id: Math.random().toString(36).substr(2, 9),
+        titulo: template.titulo,
+        descripcion: template.descripcion,
+        tiempo: 'Justo ahora',
+        colorBorder: template.colorBorder
+      };
+
+      setNotificaciones(prev => {
+        // Envejecer el tiempo artificialmente para darle efecto real
+        const next = [newNotif, ...prev].map(n => {
+           if (n.tiempo === 'Justo ahora') return { ...n, tiempo: 'Hace ' + Math.floor(Math.random() * 5 + 1) + ' min' };
+           return n;
+        });
+        next[0].tiempo = 'Justo ahora';
+        if (next.length > 8) next.pop(); // Max 8 notificaciones en la vista superior
+        return next;
+      });
+
+      setUnreadCount(prev => prev + 1);
+      
+      // Animación de llegada
+      setIsAnimatingBell(true);
+      setTimeout(() => setIsAnimatingBell(false), 2000);
+
+      const nextDelay = 15000 + Math.random() * 25000; // Entre 15 y 40 segundos
+      timeoutId = setTimeout(tick, nextDelay);
+    };
+
+    let timeoutId = setTimeout(tick, 12000);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const linkClass = (href: string) => {
@@ -106,38 +171,58 @@ export default function Topbar() {
           {/* Notificaciones */}
           <div className="relative">
             <button 
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-              className="relative p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800 focus:outline-none"
+              onClick={() => {
+                setIsNotificationsOpen(!isNotificationsOpen);
+                if (!isNotificationsOpen) setUnreadCount(0); // Marcar como leidas al abrir
+              }}
+              className={`relative p-2 transition-colors rounded-full hover:bg-gray-800 focus:outline-none ${isAnimatingBell ? 'text-white' : 'text-gray-400 hover:text-white'}`}
             >
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse border border-[#1e293b]"></span>
+              <Bell size={20} className={isAnimatingBell ? "animate-[bell_0.5s_ease-out_forwards] text-emerald-400" : ""} />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 flex items-center justify-center min-w-[14px] h-[14px] px-1 bg-red-500 rounded-full text-[9px] text-white font-bold border border-[#1e293b] shadow-lg animate-pulse">
+                  {unreadCount}
+                </span>
+              )}
             </button>
+
+            {/* Estilo local para animación customizada de la campana */}
+            <style jsx>{`
+              @keyframes bell {
+                0% { transform: rotate(0deg); }
+                20% { transform: rotate(15deg) scale(1.1); }
+                40% { transform: rotate(-15deg) scale(1.1); }
+                60% { transform: rotate(10deg) scale(1.1); }
+                80% { transform: rotate(-10deg) scale(1.1); }
+                100% { transform: rotate(0deg) scale(1); }
+              }
+            `}</style>
 
             {isNotificationsOpen && (
               <div className="absolute right-0 mt-2 w-80 bg-[#0f172a] border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden text-left">
                 <div className="bg-[#1e293b] px-4 py-3 border-b border-gray-700 flex justify-between items-center">
                   <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">Alertas Activas</span>
-                  <span className="bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-red-500/30">3 NUEVAS</span>
+                  {unreadCount > 0 ? (
+                    <span className="bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-red-500/30">
+                      {unreadCount} NUEVA{unreadCount > 1 ? 'S' : ''}
+                    </span>
+                  ) : (
+                     <span className="text-[10px] text-gray-500 monospace">Al día</span>
+                  )}
                 </div>
                 <div className="max-h-[300px] overflow-y-auto">
-                  {/* Alerta 1 */}
-                  <div className="px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 border-l-red-500">
-                    <p className="text-xs font-bold text-white mb-0.5">Tormenta Severa Detectada</p>
-                    <p className="text-[11px] text-gray-400">Alto nivel CAPE en aproximación sureste. Posible cancelación de despegues.</p>
-                    <p className="text-[9px] text-gray-500 font-mono mt-1">Hace 2 min</p>
-                  </div>
-                  {/* Alerta 2 */}
-                  <div className="px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 border-l-amber-500">
-                    <p className="text-xs font-bold text-white mb-0.5">Descenso de Isoterma</p>
-                    <p className="text-[11px] text-gray-400">Nivel de congelamiento (0°C) ha descendido a 2,500m. Precausión por engelamiento.</p>
-                    <p className="text-[9px] text-gray-500 font-mono mt-1">Hace 15 min</p>
-                  </div>
-                  {/* Alerta 3 */}
-                  <div className="px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 border-l-blue-500">
-                    <p className="text-xs font-bold text-white mb-0.5">Alerta Evaporativa Agrícola</p>
-                    <p className="text-[11px] text-gray-400">Sensores TDA reportan evapotranspiración anómala en llanos centrales.</p>
-                    <p className="text-[9px] text-gray-500 font-mono mt-1">Hace 1 hora</p>
-                  </div>
+                  {notificaciones.map((notif, index) => (
+                    <div 
+                      key={notif.id} 
+                      className={`px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 ${notif.colorBorder} ${index < unreadCount ? 'bg-[#1e293b]/30' : ''}`}
+                    >
+                      <div className="flex justify-between items-start mb-0.5">
+                         <p className="text-xs font-bold text-white">{notif.titulo}</p>
+                         {index < unreadCount && <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 shadow-[0_0_5px_red]"></span>}
+                      </div>
+                      <p className="text-[11px] text-gray-400 leading-relaxed">{notif.descripcion}</p>
+                      <p className="text-[9px] text-gray-500 font-mono mt-1">{notif.tiempo}</p>
+                    </div>
+                  ))}
                 </div>
                 <div className="bg-[#1e293b]/80 px-4 py-2 text-center">
                   <Link href="/alertas" onClick={() => setIsNotificationsOpen(false)} className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold uppercase tracking-widest cursor-pointer">
