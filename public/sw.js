@@ -1,11 +1,11 @@
-const CACHE_NAME = 'sermetavia-cache-v1';
-const API_CACHE_NAME = 'sermetavia-api-cache-v1';
+const CACHE_NAME = 'sermetavia-cache-v2';
+const API_CACHE_NAME = 'sermetavia-api-cache-v2';
 
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
 ];
 
 self.addEventListener('install', (event) => {
