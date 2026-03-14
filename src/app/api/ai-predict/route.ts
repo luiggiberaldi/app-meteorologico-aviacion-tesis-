@@ -13,45 +13,56 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No se encontró la clave API de Groq configurada en el servidor." }, { status: 500 });
     }
 
-    // Prompt calibrado con reglas de cálculo meteorológico aeronáutico reales
-    const systemPrompt = `Eres SERMETAVIA-AI, el motor analítico del Servicio Meteorológico de la Aviación Militar Venezolana.
-    Tu tarea es procesar datos meteorológicos y calcular riesgos operativos devolviendo EXCLUSIVAMENTE un objeto JSON válido.
+    // 1. CÁLCULOS MATEMÁTICOS DUROS (Mejor que pedirle al LLM que calcule)
+    const temp = weatherData.temp;
+    const wind = weatherData.wind;
+    const precip = weatherData.precip;
+    const clouds = weatherData.clouds;
+    const visKm = weatherData.visKm;
 
-    REGLAS DE CÁLCULO OBLIGATORIAS (úsalas estrictamente):
+    let iceRisk = 5;
+    if (temp <= 0) iceRisk = 90;
+    else if (temp > 0 && temp <= 5 && clouds > 60) iceRisk = 60;
+    else if (temp > 5 && temp <= 10 && clouds > 80) iceRisk = 30;
+    else if (temp > 10 && temp <= 20) iceRisk = 10;
+    if (precip > 0) iceRisk = Math.min(100, iceRisk + 10);
 
-    1. ENGELAMIENTO (ice): Calcula así:
-       - Si temp <= 0°C: riesgo base 80-95%
-       - Si temp entre 1-5°C con nubes > 60%: riesgo 40-70%
-       - Si temp entre 5-10°C con nubes > 80%: riesgo 20-40%
-       - Si temp entre 10-20°C: riesgo 5-15%
-       - Si temp > 20°C: riesgo 2-8% (nunca 0, siempre hay riesgo residual en altitud)
-       - Si hay precipitaciones > 0mm, suma +10% al resultado
+    let turbRisk = 5;
+    if (wind > 50) turbRisk = 85;
+    else if (wind > 30) turbRisk = 60;
+    else if (wind > 15) turbRisk = 30;
+    else if (wind > 5) turbRisk = 15;
+    if (precip > 2) turbRisk = Math.min(100, turbRisk + 15);
 
-    2. TURBULENCIA (turbulence): Calcula así:
-       - Si viento > 50 km/h: riesgo 75-95%
-       - Si viento 30-50 km/h: riesgo 45-70%
-       - Si viento 15-30 km/h: riesgo 20-40%
-       - Si viento 5-15 km/h: riesgo 8-18%
-       - Si viento < 5 km/h: riesgo 3-8%
-       - Si precipitaciones > 2mm, suma +15%
+    let visRisk = Math.max(5, 100 - (visKm * 10));
+    if (clouds > 80) visRisk = Math.min(100, visRisk + 10);
+    if (precip > 0) visRisk = Math.min(100, visRisk + 15);
 
-    3. VISIBILIDAD (visibility = impacto negativo):
-       - Fórmula: max(5, 100 - (visibilidadKm * 10))
-       - Si nubes > 80%, suma +10%
-       - Si precipitaciones > 0mm, suma +15%
-       - Nunca devuelvas 0%, mínimo 5%
+    // Asegurar límites
+    iceRisk = Math.round(Math.max(3, Math.min(100, iceRisk)));
+    turbRisk = Math.round(Math.max(3, Math.min(100, turbRisk)));
+    visRisk = Math.round(Math.max(5, Math.min(100, visRisk)));
 
-    IMPORTANTE: Los valores NUNCA deben ser todos 0%. Siempre existe riesgo residual. Valores mínimos: ice>=3, turbulence>=3, visibility>=5.
+    const isNacional = baseName.toLowerCase().includes('nacional');
+    const locationContext = isNacional ? "todas las bases a Nivel Nacional" : `la base ${baseName}`;
 
-    FORMATO DE SALIDA (solo esto, nada más):
-    {"ice": <int>, "turbulence": <int>, "visibility": <int>, "recommendation": "<máx 3 oraciones, tono militar táctico>"}
+    // 2. PROMPT AL LLM SOLO PARA LA GENERACIÓN DEL TEXTO SEMÁNTICO
+    const systemPrompt = `Eres SERMETAVIA-AI, el analista táctico del Servicio Meteorológico de la Aviación Militar Venezolana.
+    Debes emitir un dictamen o recomendación operativa de máximo 3 oraciones.
     
-    Sin Markdown, sin backticks, sin texto adicional. Solo el JSON.`;
+    REGLAS ESTRICTAS:
+    1. DEBES mencionar explícitamente en el texto el lugar evaluado: "${locationContext}".
+    2. Usa un tono militar, profesional, táctico y directo.
+    3. Tienes los porcentajes de riesgo calculados. NO repitas los números de los porcentajes, solo analiza si la situación es favorable o peligrosa en base a ellos.
+       - Nota: Visibilidad ALTA (ej 90%) significa ALTO RIESGO de no ver nada (peligro). Visibilidad BAJA (ej 5%) significa buen clima despejado.
+    4. NO uses markdown, no saludes. Entrega solo el párrafo de texto crudo.`;
 
-    const userPrompt = `DATOS DE SENSORES para base ${baseName}:
-    VIS=${weatherData.visKm}km | NUBES=${weatherData.clouds}% | VIENTO=${weatherData.wind}km/h | TEMP=${weatherData.temp}°C | PRECIP=${weatherData.precip}mm
+    const userPrompt = `Evalúa la factibilidad de operaciones aéreas para ${locationContext} con estos riesgos calculados por nuestros sistemas:
+    - Riesgo de Engelamiento/Hielo: ${iceRisk}%
+    - Riesgo de Turbulencia/Cizalladura: ${turbRisk}%
+    - Riesgo por Baja Visibilidad: ${visRisk}% (Nota: mientras más alto este porcentaje, peor es la visibilidad).
     
-    Aplica las reglas de cálculo y genera la matriz de riesgo JSON.`;
+    Genera el dictamen táctico final.`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -60,46 +71,42 @@ export async function POST(req: Request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant", // Modelo actualizado y soportado
+        model: "llama-3.1-8b-instant",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 250,
-        response_format: { type: "json_object" }
+        max_tokens: 150
       })
     });
 
     if (!response.ok) {
-      // Log más descriptivo para vercel
       const errText = await response.text();
       console.error(`[GROQ API ERROR] Status: ${response.status}`, errText);
-      return NextResponse.json({ error: `Groq rechazó la solicitud (Cod: ${response.status}). Intente de nuevo.` }, { status: response.status });
+      return NextResponse.json({ error: `Groq rechazó la solicitud (Cod: ${response.status}).` }, { status: response.status });
     }
 
     const data = await response.json();
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error("[GROQ PARSE ERROR] Estructura inesperada:", data);
-      return NextResponse.json({ error: "El modelo respondió pero con una estructura vacía o inválida." }, { status: 500 });
+      return NextResponse.json({ error: "Estructura inválida devuelta por IA." }, { status: 500 });
     }
 
-    let resultText = data.choices[0].message.content;
-    
-    // Limpieza de Markdown si la IA se equivocó y mandó ```json ... ```
-    resultText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
+    const recommendationText = data.choices[0].message.content.trim().replace(/"/g, '');
 
-    try {
-        const jsonParsed = JSON.parse(resultText);
-        return NextResponse.json({ prediction: jsonParsed });
-    } catch (parseError) {
-        console.error("Error parseando respuesta del LLM a JSON:", resultText);
-        return NextResponse.json({ error: "La IA no respetó el formato JSON de salida requerido." }, { status: 500 });
-    }
+    // 3. COMBINAR DATOS CALCULADOS CON TEXTO DE LA IA
+    return NextResponse.json({
+      prediction: {
+        ice: iceRisk,
+        turbulence: turbRisk,
+        visibility: visRisk,
+        recommendation: recommendationText
+      }
+    });
 
   } catch (error: any) {
-    console.error("[NEXTJS ENDPOINT ERROR] Fallo Crítico:", error.message || error);
-    return NextResponse.json({ error: error.message || "Fallo crítico al generar el pronóstico predictivo." }, { status: 500 });
+    console.error("[NEXTJS ENDPOINT ERROR]", error.message || error);
+    return NextResponse.json({ error: error.message || "Fallo crítico al predecir." }, { status: 500 });
   }
 }
