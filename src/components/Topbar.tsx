@@ -135,7 +135,13 @@ export default function Topbar() {
           <div className="hidden sm:flex items-center">
             <img src="/2.png" alt="Sermetavia Logo" className="h-[38px] w-auto object-contain mr-2" />
           </div>
-          <div>
+
+          {/* Logo visible solo en móviles */}
+          <div className="flex sm:hidden items-center ml-1">
+            <img src="/1.png" alt="Sermetavia Mobile" className="h-[34px] w-auto object-contain" />
+          </div>
+
+          <div className="hidden sm:block">
             <h1 className="text-sm font-bold text-white tracking-wide truncate max-w-[150px] sm:max-w-none">
               <span className="hidden xl:inline-block text-gray-300 font-medium tracking-normal mr-1">Red Meteorológica Nacional</span>
               <span className="xl:hidden">SERMETAVIA</span>
