@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Newspaper, AlertTriangle, Info, Radio, Zap, Wind } from "lucide-react";
+import { Newspaper, AlertTriangle, Info, Radio, Zap, Wind, Satellite } from "lucide-react";
 
 type Noticia = {
   id: string;
