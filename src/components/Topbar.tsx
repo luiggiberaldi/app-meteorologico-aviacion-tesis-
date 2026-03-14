@@ -53,6 +53,7 @@ const systemNav = [
 export default function Topbar() {
   const [timeUTC, setTimeUTC] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>(INITIAL_NOTIFICATIONS);
@@ -150,7 +151,7 @@ export default function Topbar() {
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* Base Selector */}
+          {/* Base Selector Desktop */}
           <div className="relative hidden lg:block">
             <select 
               className="appearance-none bg-[#0f172a] text-white text-xs sm:text-sm font-medium border border-gray-600 rounded-lg px-2 sm:px-3 py-1.5 pr-8 focus:outline-none focus:ring-2 focus:ring-[#10b981]"
@@ -167,6 +168,17 @@ export default function Topbar() {
               ))}
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+
+          {/* Base Selector Mobile (Abre Bottom Sheet) */}
+          <div className="lg:hidden flex items-center">
+            <button
+               onClick={() => setIsBottomSheetOpen(true)}
+               className="bg-[#0f172a] hover:bg-gray-800 text-white text-xs font-bold border border-gray-600 rounded-full px-3 py-1.5 flex items-center gap-1.5 transition-colors shadow-inner"
+            >
+               <span className="truncate max-w-[90px]">{selectedBase?.nombre || "Nacional"}</span>
+               <ChevronDown size={12} className="text-emerald-400 shrink-0" />
+            </button>
           </div>
 
           {/* Reloj UTC */}
@@ -282,28 +294,7 @@ export default function Topbar() {
                </button>
             </div>
 
-            {/* Selector de base EN EL MENU MOVIL */}
-            <div className="p-4 border-b border-gray-800 lg:hidden">
-              <label className="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Estación Activa</label>
-              <div className="relative">
-                <select 
-                  className="w-full appearance-none bg-[#1e293b] text-white text-xs font-medium border border-gray-600 rounded-lg px-3 py-2 pr-8 focus:outline-none focus:ring-1 focus:ring-[#10b981]"
-                  value={selectedBase?.id || ""}
-                  onChange={(e) => {
-                    const id = e.target.value;
-                    if (!id) setSelectedBase(null);
-                    else setSelectedBase(bases.find(b => b.id.toString() === id) || null);
-                    setIsMobileMenuOpen(false); // Cerrar menú al elegir base
-                  }}
-                >
-                  <option value="">Nacional</option>
-                  {bases.map(b => (
-                    <option key={b.id} value={b.id}>{b.nombre}</option>
-                  ))}
-                </select>
-                <ChevronDown size={14} className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
+            {/* Se removió el Selector nativo de móvil, ahora usa Bottom Sheet */}
 
             <nav className="flex-1 overflow-y-auto py-2">
               <p className="px-5 text-[10px] font-bold text-gray-600 uppercase tracking-widest mt-2 mb-2">Operaciones</p>
@@ -341,6 +332,86 @@ export default function Topbar() {
             @keyframes slideRight {
               from { transform: translateX(-100%); }
               to { transform: translateX(0); }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {/* BOTTOM SHEET SELECTOR DE BASE (MOBILE) */}
+      {isBottomSheetOpen && (
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end lg:hidden">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsBottomSheetOpen(false)}
+          ></div>
+          
+          {/* Sheet */}
+          <div className="relative bg-[#0f172a] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-gray-700 p-5 mt-20 animate-[slideUp_0.3s_ease-out] flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between mb-4 mt-1 px-1">
+              <div>
+                <h3 className="text-white font-bold text-lg tracking-wide">Área Operacional</h3>
+                <p className="text-gray-400 text-xs mt-0.5">Seleccione la estación a monitorear</p>
+              </div>
+              <button 
+                onClick={() => setIsBottomSheetOpen(false)}
+                className="p-2 bg-gray-800 rounded-full text-gray-400 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto space-y-2 pb-6 px-1 hide-scrollbar">
+              <button
+                onClick={() => { setSelectedBase(null); setIsBottomSheetOpen(false); }}
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-colors text-left ${!selectedBase ? 'bg-emerald-900/30 border-emerald-500/50' : 'bg-[#1e293b] border-gray-700 hover:bg-gray-800'}`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center ${!selectedBase ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-800 text-gray-400'}`}>
+                    <LayoutDashboard size={18} />
+                  </div>
+                  <div>
+                    <h4 className={`font-bold text-sm ${!selectedBase ? 'text-emerald-400' : 'text-white'}`}>Red Nacional</h4>
+                    <p className="text-[10px] text-gray-500 uppercase mt-0.5 font-bold tracking-widest">Promedio País</p>
+                  </div>
+                </div>
+                {!selectedBase && <div className="w-2.5 h-2.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />}
+              </button>
+
+              {bases.map(b => {
+                const isSelected = selectedBase?.id === b.id;
+                return (
+                  <button
+                    key={b.id}
+                    onClick={() => { setSelectedBase(b); setIsBottomSheetOpen(false); }}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-colors text-left ${isSelected ? 'bg-blue-900/30 border-blue-500/50' : 'bg-[#1e293b] border-gray-800 hover:bg-gray-800'}`}
+                  >
+                    <div className="flex items-center gap-4">
+                       <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-bold text-[11px] border ${isSelected ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-gray-800 text-gray-400 border-gray-700'}`}>
+                         {b.codigo}
+                       </div>
+                       <div className="min-w-0 pr-2">
+                         <h4 className={`font-bold text-sm truncate ${isSelected ? 'text-blue-400' : 'text-gray-200'}`}>{b.nombre}</h4>
+                         <p className="text-[10px] text-gray-500 font-mono mt-1">Lat: {b.latitud.toFixed(2)} / Lon: {b.longitud.toFixed(2)}</p>
+                       </div>
+                    </div>
+                    {isSelected && <div className="w-2.5 h-2.5 shrink-0 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa]" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <style jsx>{`
+            @keyframes slideUp {
+              from { transform: translateY(100%); opacity: 0; }
+              to { transform: translateY(0); opacity: 1; }
+            }
+            .hide-scrollbar::-webkit-scrollbar {
+              display: none;
+            }
+            .hide-scrollbar {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
             }
           `}</style>
         </div>
