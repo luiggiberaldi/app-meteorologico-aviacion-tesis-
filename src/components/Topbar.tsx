@@ -138,8 +138,8 @@ export default function Topbar() {
           </div>
 
           {/* Logo visible solo en móviles */}
-          <div className="flex sm:hidden items-center ml-1">
-            <img src="/1.png" alt="Sermetavia Mobile" className="h-[34px] w-auto object-contain" />
+          <div className="flex flex-1 sm:hidden items-center ml-2 mr-2">
+            <img src="/2.png" alt="Sermetavia Mobile" className="h-[36px] w-auto object-contain" />
           </div>
 
           <div className="hidden sm:block">
