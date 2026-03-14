@@ -271,8 +271,8 @@ export default function Topbar() {
           <aside className="relative flex flex-col w-[260px] bg-[#0f172a] h-full shadow-2xl animate-[slideRight_0.3s_ease-out]">
             <div className="flex items-center justify-between p-4 border-b border-gray-800">
                <div>
-                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">Red Meteorológica</p>
-                 <img src="/2.png" alt="Logo" className="h-[28px] w-auto object-contain" />
+                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">Red Meteorológica</p>
+                 <img src="/1.png" alt="Sermetavia Logo" className="h-[48px] w-auto object-contain" />
                </div>
                <button 
                  onClick={() => setIsMobileMenuOpen(false)}
