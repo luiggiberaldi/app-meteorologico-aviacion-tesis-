@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Plane, Menu, X, LayoutDashboard, BarChart3, FileText, ChevronDown, 
-  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings, LogOut 
+  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings, LogOut, Bell
 } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
 import { useAuth } from "@/context/AuthContext";
@@ -30,6 +30,7 @@ const systemNav = [
 export default function Topbar() {
   const [timeUTC, setTimeUTC] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { selectedBase, setSelectedBase, bases } = useBaseContext();
   const { user, signOut } = useAuth();
   const pathname = usePathname();
@@ -100,6 +101,51 @@ export default function Topbar() {
           <div className="flex items-center space-x-2 bg-black/30 px-2 sm:px-3 py-1.5 rounded border border-gray-600">
             <span className="hidden sm:inline-block text-xs text-gray-400 font-mono">HORA ZULU</span>
             <span className="text-xs sm:text-sm font-bold text-[#f59e0b] font-mono tracking-widest">{timeUTC || "00:00:00 UTC"}</span>
+          </div>
+
+          {/* Notificaciones */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              className="relative p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800 focus:outline-none"
+            >
+              <Bell size={20} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse border border-[#1e293b]"></span>
+            </button>
+
+            {isNotificationsOpen && (
+              <div className="absolute right-0 mt-2 w-80 bg-[#0f172a] border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden text-left">
+                <div className="bg-[#1e293b] px-4 py-3 border-b border-gray-700 flex justify-between items-center">
+                  <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">Alertas Activas</span>
+                  <span className="bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-red-500/30">3 NUEVAS</span>
+                </div>
+                <div className="max-h-[300px] overflow-y-auto">
+                  {/* Alerta 1 */}
+                  <div className="px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 border-l-red-500">
+                    <p className="text-xs font-bold text-white mb-0.5">Tormenta Severa Detectada</p>
+                    <p className="text-[11px] text-gray-400">Alto nivel CAPE en aproximación sureste. Posible cancelación de despegues.</p>
+                    <p className="text-[9px] text-gray-500 font-mono mt-1">Hace 2 min</p>
+                  </div>
+                  {/* Alerta 2 */}
+                  <div className="px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 border-l-amber-500">
+                    <p className="text-xs font-bold text-white mb-0.5">Descenso de Isoterma</p>
+                    <p className="text-[11px] text-gray-400">Nivel de congelamiento (0°C) ha descendido a 2,500m. Precausión por engelamiento.</p>
+                    <p className="text-[9px] text-gray-500 font-mono mt-1">Hace 15 min</p>
+                  </div>
+                  {/* Alerta 3 */}
+                  <div className="px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 border-l-blue-500">
+                    <p className="text-xs font-bold text-white mb-0.5">Alerta Evaporativa Agrícola</p>
+                    <p className="text-[11px] text-gray-400">Sensores TDA reportan evapotranspiración anómala en llanos centrales.</p>
+                    <p className="text-[9px] text-gray-500 font-mono mt-1">Hace 1 hora</p>
+                  </div>
+                </div>
+                <div className="bg-[#1e293b]/80 px-4 py-2 text-center">
+                  <Link href="/alertas" onClick={() => setIsNotificationsOpen(false)} className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold uppercase tracking-widest cursor-pointer">
+                    Ver Central de Alertas
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* User & Logout */}

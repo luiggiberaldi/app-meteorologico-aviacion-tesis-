@@ -8,7 +8,7 @@ export default function UsuariosPage() {
   const { user, getAllUsers } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const allUsers = getAllUsers();
+  const allUsers = getAllUsers().filter(u => !u.isHidden);
 
   const usuariosData = allUsers.map((u, i) => ({
     id: u.username,

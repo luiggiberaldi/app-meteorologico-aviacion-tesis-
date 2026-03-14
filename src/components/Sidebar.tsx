@@ -21,6 +21,8 @@ import {
 
 const mainNav = [
   { href: "/", label: "Centro de Mando", icon: LayoutDashboard },
+  { href: "/alertas", label: "Alertas Meteorológicas", icon: AlertTriangle },
+  { href: "/sensores", label: "Sensores Especializados", icon: Map },
   { href: "/planificacion", label: "Planificación de Vuelos", icon: Navigation },
   { href: "/imagenes-satelitales", label: "Imágenes Satelitales", icon: Satellite },
   { href: "/estadisticas", label: "Estadísticas y Operaciones", icon: BarChart3 },
