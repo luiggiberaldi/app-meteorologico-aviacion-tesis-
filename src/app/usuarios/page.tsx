@@ -54,7 +54,7 @@ export default function UsuariosPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-4 text-center">
           <Users size={22} className="text-blue-400 mx-auto mb-2" />
           <p className="text-2xl font-bold text-white">{allUsers.length}</p>
@@ -84,50 +84,49 @@ export default function UsuariosPage() {
         />
       </div>
 
-      {/* Table */}
-      <div className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-700 bg-[#0f172a]/50">
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Usuario</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Rol</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((u) => (
-                <tr key={u.id} className={`border-b border-gray-700/50 hover:bg-[#263548] transition-colors ${u.isCurrent ? 'bg-emerald-900/10' : ''}`}>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${u.isCurrent ? 'bg-emerald-600/30 border border-emerald-500/50 text-emerald-300' : 'bg-gray-700 text-gray-300'}`}>
-                        {u.nombre.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="text-white text-sm font-medium">
-                          {u.nombre}
-                          {u.isCurrent && <span className="text-[9px] text-emerald-400 ml-1.5">(TÚ)</span>}
-                        </p>
-                        <p className="text-gray-500 text-[11px]">@{u.usuario}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${u.rolColor}`}>
-                      {u.rol}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs font-semibold ${u.estadoColor} flex items-center gap-1.5`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                      {u.estado}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Users List (Responsiva en vez de tabla) */}
+      <div className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden divide-y divide-gray-700/50">
+        <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-3 bg-[#0f172a]/50 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+          <div className="col-span-6">Usuario</div>
+          <div className="col-span-3">Rol</div>
+          <div className="col-span-3">Estado</div>
         </div>
+        
+        {filteredUsers.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 text-sm">No se encontraron usuarios...</div>
+        ) : (
+          filteredUsers.map((u) => (
+            <div key={u.id} className={`p-4 flex flex-col md:grid md:grid-cols-12 md:items-center gap-4 hover:bg-[#263548] transition-colors ${u.isCurrent ? 'bg-emerald-900/10' : ''}`}>
+              <div className="col-span-6 flex items-center gap-3">
+                <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-sm font-bold ${u.isCurrent ? 'bg-emerald-600/30 border border-emerald-500/50 text-emerald-300' : 'bg-gray-700 text-gray-300'}`}>
+                  {u.nombre.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white text-sm font-medium truncate flex items-center gap-2">
+                    {u.nombre}
+                    {u.isCurrent && <span className="shrink-0 text-[9px] text-emerald-400 border border-emerald-500/30 px-1 rounded bg-emerald-900/40">TÚ</span>}
+                  </p>
+                  <p className="text-gray-500 text-[11px] truncate">@{u.usuario}</p>
+                </div>
+              </div>
+              
+              <div className="col-span-3 flex items-center justify-between md:block">
+                <span className="md:hidden text-xs text-gray-500 uppercase font-bold tracking-widest">Rol:</span>
+                <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${u.rolColor}`}>
+                  {u.rol}
+                </span>
+              </div>
+
+              <div className="col-span-3 flex items-center justify-between md:block">
+                <span className="md:hidden text-xs text-gray-500 uppercase font-bold tracking-widest">Est:</span>
+                <span className={`text-xs font-semibold ${u.estadoColor} flex items-center gap-1.5`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                  {u.estado}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

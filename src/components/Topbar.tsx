@@ -121,30 +121,31 @@ export default function Topbar() {
 
   return (
     <>
-      <header className="h-16 bg-[#1e293b] border-b border-gray-700 flex items-center justify-between px-4 lg:px-6 shadow-md shrink-0">
-        {/* Logo & Titulo */}
-        <div className="flex items-center space-x-3">
+      <header className="h-16 bg-[#1e293b] border-b border-gray-700 flex items-center justify-between px-3 lg:px-6 shadow-md shrink-0 relative z-40">
+        {/* Mobile Menu Icon & Logo */}
+        <div className="flex items-center space-x-2">
           <button 
-            className="md:hidden text-gray-300 hover:text-white p-1"
+            className="md:hidden text-gray-300 hover:text-white p-2 rounded-md hover:bg-gray-800"
             onClick={() => setIsMobileMenuOpen(true)}
             aria-label="Abrir menú"
           >
-            <Menu size={24} />
+            <Menu size={22} />
           </button>
           
-          <div className="hidden md:flex items-center">
-            <img src="/2.png" alt="Sermetavia Logo" className="h-[42px] w-auto object-contain mr-3" />
+          <div className="hidden sm:flex items-center">
+            <img src="/2.png" alt="Sermetavia Logo" className="h-[38px] w-auto object-contain mr-2" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-white tracking-wide">
-              <span className="hidden md:inline-block text-gray-300 font-medium tracking-normal text-sm">Red Meteorológica Nacional</span>
+            <h1 className="text-sm font-bold text-white tracking-wide truncate max-w-[150px] sm:max-w-none">
+              <span className="hidden xl:inline-block text-gray-300 font-medium tracking-normal mr-1">Red Meteorológica Nacional</span>
+              <span className="xl:hidden">SERMETAVIA</span>
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 sm:space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Base Selector */}
-          <div className="relative hidden sm:block">
+          <div className="relative hidden lg:block">
             <select 
               className="appearance-none bg-[#0f172a] text-white text-xs sm:text-sm font-medium border border-gray-600 rounded-lg px-2 sm:px-3 py-1.5 pr-8 focus:outline-none focus:ring-2 focus:ring-[#10b981]"
               value={selectedBase?.id || ""}
@@ -235,13 +236,13 @@ export default function Topbar() {
 
           {/* User & Logout */}
           {user && (
-            <div className="hidden md:flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-emerald-900/50 border border-emerald-600/40 flex items-center justify-center text-emerald-300 text-[10px] font-bold">
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex w-7 h-7 rounded-full bg-emerald-900/50 border border-emerald-600/40 items-center justify-center text-emerald-300 text-[10px] font-bold">
                 {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
               </div>
               <button
                 onClick={() => signOut()}
-                className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-full hover:bg-gray-800"
                 title="Cerrar Sesión"
               >
                 <LogOut size={18} />
@@ -251,55 +252,94 @@ export default function Topbar() {
         </div>
       </header>
 
-      {/* Mobile Drawer */}
+      {/* MOBILE MENU DRAWER */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          
-          <div className="relative w-64 bg-[#0f172a] h-full flex flex-col border-r border-gray-800 shadow-xl animate-in slide-in-from-left-full duration-200">
-             <div className="p-4 py-6 border-b border-gray-800 flex justify-between items-start">
-               <div className="flex flex-col">
-                 <img src="/1.png" alt="Sermetavia Logo" className="h-[72px] w-auto object-contain mb-2 self-start" />
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          {/* Fondo oscuro overlay */}
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+            onClick={() => setIsMobileMenuOpen(false)}
+          ></div>
+
+          {/* Menú Sidebar */}
+          <aside className="relative flex flex-col w-[260px] bg-[#0f172a] h-full shadow-2xl animate-[slideRight_0.3s_ease-out]">
+            <div className="flex items-center justify-between p-4 border-b border-gray-800">
+               <div>
+                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">Red Meteorológica</p>
+                 <img src="/2.png" alt="Logo" className="h-[28px] w-auto object-contain" />
                </div>
-               <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white p-1 bg-gray-800 rounded self-start">
+               <button 
+                 onClick={() => setIsMobileMenuOpen(false)}
+                 className="p-2 text-gray-400 hover:text-white bg-gray-800/50 rounded-full"
+               >
                  <X size={20} />
                </button>
-             </div>
-             
-             <nav className="flex-1 overflow-y-auto py-4">
-               <p className="px-6 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">Operaciones</p>
-               <ul className="space-y-1 px-3">
-                 {mainNav.map(item => (
-                   <li key={item.href}>
-                     <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={linkClass(item.href)}>
-                       <item.icon size={20} className={pathname === item.href ? "text-[#10b981]" : ""} />
-                       <span className="font-medium text-sm">{item.label}</span>
-                     </Link>
-                   </li>
-                 ))}
-               </ul>
+            </div>
 
-               <div className="my-4 mx-6 border-t border-gray-800"></div>
+            {/* Selector de base EN EL MENU MOVIL */}
+            <div className="p-4 border-b border-gray-800 lg:hidden">
+              <label className="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Estación Activa</label>
+              <div className="relative">
+                <select 
+                  className="w-full appearance-none bg-[#1e293b] text-white text-xs font-medium border border-gray-600 rounded-lg px-3 py-2 pr-8 focus:outline-none focus:ring-1 focus:ring-[#10b981]"
+                  value={selectedBase?.id || ""}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    if (!id) setSelectedBase(null);
+                    else setSelectedBase(bases.find(b => b.id.toString() === id) || null);
+                    setIsMobileMenuOpen(false); // Cerrar menú al elegir base
+                  }}
+                >
+                  <option value="">Nacional</option>
+                  {bases.map(b => (
+                    <option key={b.id} value={b.id}>{b.nombre}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
 
-               <p className="px-6 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">Sistema</p>
-               <ul className="space-y-1 px-3">
-                 {systemNav.map(item => (
-                   <li key={item.href}>
-                     <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={linkClass(item.href)}>
-                       <item.icon size={20} className={pathname === item.href ? "text-[#10b981]" : ""} />
-                       <span className="font-medium text-sm">{item.label}</span>
-                     </Link>
-                   </li>
-                 ))}
-               </ul>
-             </nav>
-             
-             <div className="p-4 border-t border-gray-800 text-center">
+            <nav className="flex-1 overflow-y-auto py-2">
+              <p className="px-5 text-[10px] font-bold text-gray-600 uppercase tracking-widest mt-2 mb-2">Operaciones</p>
+              <ul className="space-y-1 px-2">
+                {mainNav.map(item => (
+                  <li key={item.href}>
+                    <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={linkClass(item.href)}>
+                      <item.icon size={18} className={pathname === item.href ? "text-[#10b981]" : ""} />
+                      <span className="font-medium text-sm">{item.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="my-4 mx-5 border-t border-gray-800"></div>
+
+              <p className="px-5 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">Sistema</p>
+              <ul className="space-y-1 px-2">
+                {systemNav.map(item => (
+                  <li key={item.href}>
+                    <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={linkClass(item.href)}>
+                      <item.icon size={18} className={pathname === item.href ? "text-[#10b981]" : ""} />
+                      <span className="font-medium text-sm">{item.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <div className="p-4 border-t border-gray-800 text-center">
                <p className="text-[10px] text-gray-500">SERMETAVIA V 2.0.0</p>
-             </div>
-          </div>
+            </div>
+          </aside>
+
+          <style jsx>{`
+            @keyframes slideRight {
+              from { transform: translateX(-100%); }
+              to { transform: translateX(0); }
+            }
+          `}</style>
         </div>
       )}
+
     </>
   );
 }
