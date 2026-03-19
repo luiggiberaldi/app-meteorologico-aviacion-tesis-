@@ -96,21 +96,24 @@ export default function AstronomiaPage() {
           <div className="p-5 space-y-4">
             {/* Fase principal */}
             <div className="flex items-center gap-5">
+              {/* Disco lunar estilizado */}
               <div className="relative w-16 h-16 shrink-0">
-                <svg viewBox="0 0 64 64" className="w-full h-full -rotate-90">
-                  <circle cx="32" cy="32" r="28" fill="none" stroke="#1f2937" strokeWidth="5" />
-                  <circle cx="32" cy="32" r="28" fill="none" stroke="#818cf8" strokeWidth="5"
-                    strokeDasharray={`${(lunarPhase.illumination / 100) * 176} 176`}
-                    strokeLinecap="round" className="transition-all duration-700" />
-                </svg>
+                <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20" />
+                <div
+                  className="absolute inset-[3px] rounded-full transition-all duration-700"
+                  style={{
+                    background: `linear-gradient(90deg, #c7d2fe ${lunarPhase.illumination}%, #1e1b4b ${lunarPhase.illumination}%)`,
+                    boxShadow: lunarPhase.illumination > 50 ? '0 0 16px rgba(199,210,254,0.3)' : 'none'
+                  }}
+                />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-mono font-bold text-indigo-300">{lunarPhase.illumination}%</span>
+                  <span className="text-[10px] font-mono font-bold text-white drop-shadow-lg">{lunarPhase.illumination}%</span>
                 </div>
               </div>
               <div>
                 <h3 className="text-white font-bold text-base">{lunarPhase.phase}</h3>
-                <p className="text-gray-400 text-xs mt-1">Iluminación: <span className="text-indigo-300 font-bold">{lunarPhase.illumination}%</span></p>
-                <p className="text-gray-500 text-[11px] mt-0.5">Edad: {lunarPhase.age} días del ciclo</p>
+                <p className="text-indigo-300 text-xs font-semibold mt-1">Iluminación: {lunarPhase.illumination}%</p>
+                <p className="text-gray-500 text-[11px] mt-0.5">Día {lunarPhase.age} de 29.5 del ciclo</p>
               </div>
             </div>
 
