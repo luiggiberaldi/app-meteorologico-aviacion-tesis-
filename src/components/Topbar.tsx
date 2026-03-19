@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Plane, Menu, X, LayoutDashboard, BarChart3, FileText, ChevronDown, 
-  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings, LogOut, Bell
+  Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings, LogOut, Bell,
+  Moon, Flame, Waves
 } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
 import { useAuth } from "@/context/AuthContext";
@@ -40,6 +41,9 @@ const mainNav = [
   { href: "/estadisticas", label: "Estadísticas y Operaciones", icon: BarChart3 },
   { href: "/historico", label: "Datos Históricos", icon: FileText },
   { href: "/prediccion-ia", label: "IA Predictiva", icon: BrainCircuit },
+  { href: "/astronomia", label: "Astronomía y Estaciones", icon: Moon },
+  { href: "/alerta-temprana", label: "Alerta Temprana", icon: Flame },
+  { href: "/oleaje", label: "Oleaje Marítimo", icon: Waves },
 ];
 
 const systemNav = [
