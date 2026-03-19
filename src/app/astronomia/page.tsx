@@ -7,7 +7,7 @@ import {
   getNextEquinoxSolstice, getRainySeasonInfo, getZCITPosition,
   type SunTimes, type LunarPhaseInfo, type MoonTimes, type AstroEvent, type SeasonInfo, type ZCITInfo
 } from '@/lib/astro';
-import { Sun, Moon, CloudRain, CloudSun, Compass, ArrowDown, ArrowUp, Timer, CalendarDays, Globe } from 'lucide-react';
+import { Sunrise, Sunset, MoonStar, CloudRain, CloudSun, Radar, ArrowDown, ArrowUp, Clock, Orbit, Crosshair, Shield, Eye, Target } from 'lucide-react';
 
 export default function AstronomiaPage() {
   const { selectedBase, bases } = useBaseContext();
@@ -37,7 +37,7 @@ export default function AstronomiaPage() {
       {/* Header */}
       <div className="mb-2">
         <h1 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
-          <Globe className="text-amber-400" size={28} />
+          <Crosshair className="text-amber-400" size={28} />
           Astronomía y Estaciones
         </h1>
         <p className="text-gray-400 text-xs md:text-sm mt-1">
@@ -52,16 +52,16 @@ export default function AstronomiaPage() {
         {/* ═══ PANEL SOLAR ═══ */}
         <div className={cardBase}>
           <div className={`${headerBase} bg-gradient-to-r from-amber-900/30 to-transparent`}>
-            <Sun className="text-amber-400" size={22} />
-            <h2 className="text-white font-bold text-sm">Datos Solares</h2>
-            <span className="ml-auto text-[10px] text-gray-500 uppercase font-bold tracking-widest">HOY</span>
+            <Sunrise className="text-amber-400" size={22} />
+            <h2 className="text-white font-bold text-sm">Telemetría Solar</h2>
+            <span className="ml-auto text-[10px] text-gray-500 uppercase font-bold tracking-widest">TIEMPO REAL</span>
           </div>
           <div className="p-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <StatBox icon={<ArrowUp size={16} className="text-amber-400" />} label="Salida del Sol" value={sunData.sunrise + " UTC"} />
-              <StatBox icon={<ArrowDown size={16} className="text-orange-400" />} label="Puesta del Sol" value={sunData.sunset + " UTC"} />
-              <StatBox icon={<Timer size={16} className="text-yellow-300" />} label="Duración del Día" value={`${sunData.dayLengthHours}h ${sunData.dayLengthMinutes}m`} />
-              <StatBox icon={<Sun size={16} className="text-amber-500" />} label="Mediodía Solar" value={sunData.solarNoon + " UTC"} />
+              <StatBox icon={<Sunrise size={16} className="text-amber-400" />} label="Salida del Sol" value={sunData.sunrise + " UTC"} />
+              <StatBox icon={<Sunset size={16} className="text-orange-400" />} label="Puesta del Sol" value={sunData.sunset + " UTC"} />
+              <StatBox icon={<Clock size={16} className="text-yellow-300" />} label="Duración del Día" value={`${sunData.dayLengthHours}h ${sunData.dayLengthMinutes}m`} />
+              <StatBox icon={<Target size={16} className="text-amber-500" />} label="Mediodía Solar" value={sunData.solarNoon + " UTC"} />
             </div>
 
             {/* Declinación Solar */}
@@ -89,8 +89,8 @@ export default function AstronomiaPage() {
         {/* ═══ PANEL LUNAR ═══ */}
         <div className={cardBase}>
           <div className={`${headerBase} bg-gradient-to-r from-indigo-900/30 to-transparent`}>
-            <Moon className="text-indigo-300" size={22} />
-            <h2 className="text-white font-bold text-sm">Datos Lunares</h2>
+            <MoonStar className="text-indigo-300" size={22} />
+            <h2 className="text-white font-bold text-sm">Telemetría Lunar</h2>
             <span className="ml-auto text-[10px] text-gray-500 uppercase font-bold tracking-widest">CICLO SINÓDICO</span>
           </div>
           <div className="p-5 space-y-4">
@@ -107,8 +107,8 @@ export default function AstronomiaPage() {
             <div className="grid grid-cols-2 gap-4">
               <StatBox icon={<ArrowUp size={16} className="text-indigo-300" />} label="Salida de la Luna" value={moonData.moonrise + " UTC"} />
               <StatBox icon={<ArrowDown size={16} className="text-indigo-400" />} label="Puesta de la Luna" value={moonData.moonset + " UTC"} />
-              <StatBox icon={<Moon size={16} className="text-blue-300" />} label="Próxima Luna Nueva" value={lunarPhase.nextNewMoon.toLocaleDateString('es-VE', { day: 'numeric', month: 'short' })} />
-              <StatBox icon={<Moon size={16} className="text-yellow-200" />} label="Próxima Luna Llena" value={lunarPhase.nextFullMoon.toLocaleDateString('es-VE', { day: 'numeric', month: 'short' })} />
+              <StatBox icon={<MoonStar size={16} className="text-blue-300" />} label="Próxima Luna Nueva" value={lunarPhase.nextNewMoon.toLocaleDateString('es-VE', { day: 'numeric', month: 'short' })} />
+              <StatBox icon={<Eye size={16} className="text-yellow-200" />} label="Próxima Luna Llena" value={lunarPhase.nextFullMoon.toLocaleDateString('es-VE', { day: 'numeric', month: 'short' })} />
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function AstronomiaPage() {
         {/* ═══ EQUINOCCIOS / SOLSTICIOS ═══ */}
         <div className={cardBase}>
           <div className={`${headerBase} bg-gradient-to-r from-purple-900/30 to-transparent`}>
-            <CalendarDays className="text-purple-400" size={22} />
+            <Orbit className="text-purple-400" size={22} />
             <h2 className="text-white font-bold text-sm">Equinoccios y Solsticios</h2>
           </div>
           <div className="p-5">
@@ -156,8 +156,8 @@ export default function AstronomiaPage() {
         {/* ═══ PERÍODO LLUVIOSO / SECO ═══ */}
         <div className={cardBase}>
           <div className={`${headerBase} bg-gradient-to-r ${seasonInfo.currentSeason === 'lluvioso' ? 'from-blue-900/30' : seasonInfo.currentSeason === 'seco' ? 'from-orange-900/30' : 'from-teal-900/30'} to-transparent`}>
-            {seasonInfo.currentSeason === 'lluvioso' ? <CloudRain className="text-blue-400" size={22} /> : <CloudSun className="text-orange-400" size={22} />}
-            <h2 className="text-white font-bold text-sm">Período Climatológico</h2>
+            {seasonInfo.currentSeason === 'lluvioso' ? <CloudRain className="text-blue-400" size={22} /> : <Shield className="text-orange-400" size={22} />}
+            <h2 className="text-white font-bold text-sm">Período Climatológico Operacional</h2>
           </div>
           <div className="p-5 space-y-4">
             <div className="flex items-center gap-4">
@@ -194,7 +194,7 @@ export default function AstronomiaPage() {
       {/* THIRD ROW: ZCIT */}
       <div className={cardBase}>
         <div className={`${headerBase} bg-gradient-to-r from-cyan-900/30 to-transparent`}>
-          <Compass className="text-cyan-400" size={22} />
+          <Radar className="text-cyan-400" size={22} />
           <h2 className="text-white font-bold text-sm">Zona de Convergencia Intertropical (ZCIT)</h2>
         </div>
         <div className="p-5">
