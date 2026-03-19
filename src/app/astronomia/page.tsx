@@ -7,7 +7,7 @@ import {
   getNextEquinoxSolstice, getRainySeasonInfo, getZCITPosition,
   type SunTimes, type LunarPhaseInfo, type MoonTimes, type AstroEvent, type SeasonInfo, type ZCITInfo
 } from '@/lib/astro';
-import { Sunrise, Sunset, MoonStar, CloudRain, CloudSun, Radar, ArrowDown, ArrowUp, Clock, Orbit, Crosshair, Shield, Eye, Target } from 'lucide-react';
+import { Sunrise, Sunset, MoonStar, CloudRain, CloudSun, Radar, ArrowDown, ArrowUp, Clock, Orbit, Crosshair, Shield, Eye, Target, ScanLine } from 'lucide-react';
 
 export default function AstronomiaPage() {
   const { selectedBase, bases } = useBaseContext();
@@ -89,7 +89,7 @@ export default function AstronomiaPage() {
         {/* ═══ PANEL LUNAR ═══ */}
         <div className={cardBase}>
           <div className={`${headerBase} bg-gradient-to-r from-indigo-900/30 to-transparent`}>
-            <MoonStar className="text-indigo-300" size={22} />
+            <ScanLine className="text-indigo-300" size={22} />
             <h2 className="text-white font-bold text-sm">Telemetría Lunar</h2>
             <span className="ml-auto text-[10px] text-gray-500 uppercase font-bold tracking-widest">CICLO SINÓDICO</span>
           </div>

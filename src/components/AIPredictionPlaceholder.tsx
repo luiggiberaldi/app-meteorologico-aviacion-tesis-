@@ -18,6 +18,12 @@ interface PredictionData {
   recommendation: string;
 }
 
+interface BasePrediction {
+  baseName: string;
+  codigo: string;
+  data: PredictionData;
+}
+
 export default function AIPredictionModule() {
   const { selectedBase, bases } = useBaseContext();
   const location = selectedBase ? selectedBase.nombre : "Nacional (Promediado)";
@@ -25,6 +31,7 @@ export default function AIPredictionModule() {
 
   const [analyzing, setAnalyzing] = useState(false);
   const [predictionResult, setPredictionResult] = useState<PredictionData | null>(null);
+  const [nationalResults, setNationalResults] = useState<BasePrediction[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
@@ -77,9 +84,74 @@ export default function AIPredictionModule() {
     };
   };
 
-  const startAnalysis = async () => {
+  const fetchBaseWeather = async (base: any): Promise<any> => {
+    try {
+      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${base.latitud}&longitude=${base.longitud}&current=visibility,cloud_cover,wind_speed_10m,temperature_2m,precipitation`, { signal: AbortSignal.timeout(4000) });
+      if (!r.ok) throw new Error('API');
+      return await r.json();
+    } catch {
+      const isWarm = base.latitud < 11 && base.longitud > -70;
+      return { current: { visibility: 10000 - Math.random()*2000, cloud_cover: Math.random()*40, wind_speed_10m: 10+Math.random()*15, temperature_2m: isWarm ? 28+Math.random()*5 : 18+Math.random()*10, precipitation: 0 } };
+    }
+  };
+
+  const startNationalAnalysis = async () => {
     setAnalyzing(true);
     setPredictionResult(null);
+    setNationalResults([]);
+    setLogs([]);
+
+    addLog(`[INICIALIZACIÓN] Protocolo Nacional M.A.T. — Escaneando ${bases.length} estaciones en territorio venezolano.`);
+    await delay(600);
+    addLog(`[RED TÁCTICA] Desplegando nodos de telemetría simultanea...`, 'info');
+    await delay(400);
+
+    const results: BasePrediction[] = [];
+
+    for (let i = 0; i < bases.length; i++) {
+      const base = bases[i];
+      addLog(`[NODO ${i+1}/${bases.length}] Consultando ${base.codigo} — ${base.ciudad}, ${base.estado}...`);
+      await delay(250);
+      const json = await fetchBaseWeather(base);
+      const pred = generateSimulatedMatrix(json);
+      // Override recommendation with base-specific text
+      const maxRisk = Math.max(pred.ice, pred.turbulence, pred.visibility);
+      pred.recommendation = maxRisk > 50
+        ? `Condiciones subóptimas en ${base.nombre}. Riesgo elevado detectado.`
+        : `Operaciones normales en ${base.nombre}. Parámetros dentro de umbrales.`;
+      results.push({ baseName: base.nombre, codigo: base.codigo, data: pred });
+      const status = maxRisk > 50 ? 'warn' : 'success';
+      addLog(`[NODO ${i+1}] ${base.codigo}: Hielo ${pred.ice}% | Turb ${pred.turbulence}% | Vis ${pred.visibility}% — ${maxRisk > 50 ? 'ALERTA' : 'OK'}`, status);
+    }
+
+    await delay(500);
+    addLog(`[CONSOLIDACIÓN] Agregando matrices de ${bases.length} estaciones...`, 'info');
+    await delay(800);
+
+    setNationalResults(results);
+
+    // National aggregate
+    const avgIce = Math.round(results.reduce((s,r) => s+r.data.ice, 0) / results.length);
+    const avgTurb = Math.round(results.reduce((s,r) => s+r.data.turbulence, 0) / results.length);
+    const avgVis = Math.round(results.reduce((s,r) => s+r.data.visibility, 0) / results.length);
+    const alertBases = results.filter(r => Math.max(r.data.ice, r.data.turbulence, r.data.visibility) > 50);
+
+    setPredictionResult({
+      ice: avgIce, turbulence: avgTurb, visibility: avgVis,
+      recommendation: alertBases.length > 0
+        ? `[RESUMEN NACIONAL] ${alertBases.length} de ${results.length} estaciones presentan condiciones subóptimas: ${alertBases.map(b=>b.codigo).join(', ')}. Se recomienda precaución operacional en dichas zonas.`
+        : `[RESUMEN NACIONAL] Las ${results.length} estaciones del territorio reportan condiciones favorables para operaciones aéreas. Sin alertas activas.`
+    });
+
+    addLog(`[ÉXITO] Matriz Nacional consolidada. ${alertBases.length} alertas activas de ${results.length} estaciones.`, 'success');
+    addLog(`[FIN] Protocolo Nacional M.A.T. concluido.`);
+    setAnalyzing(false);
+  };
+
+  const startSingleAnalysis = async () => {
+    setAnalyzing(true);
+    setPredictionResult(null);
+    setNationalResults([]);
     setLogs([]);
     
     addLog(`[INICIALIZACIÓN] Conectando a nodo táctico: ${activeBase.codigo} - ${activeBase.nombre}`);
@@ -91,96 +163,50 @@ export default function AIPredictionModule() {
     try {
       addLog(`[TELEMETRÍA] Sincronizando con satélites ambientales...`, 'info');
       const metData = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${activeBase.latitud}&longitude=${activeBase.longitud}&current=visibility,cloud_cover,wind_speed_10m,temperature_2m,precipitation`);
-      
-      if (!metData.ok) {
-        throw new Error("Límite de cuota o pérdida de telemetría de red externa.");
-      }
-      
+      if (!metData.ok) throw new Error("Límite de cuota.");
       json = await metData.json();
       await delay(800);
       addLog(`[TELEMETRÍA] Parámetros crudos recibidos. Visibilidad: ${(json.current.visibility/1000).toFixed(1)}km, Temp: ${json.current.temperature_2m}°C, Viento: ${json.current.wind_speed_10m}kts`, 'success');
-      
     } catch (telemetryError: any) {
-      addLog(`[ADVERTENCIA] Satélites externos fuera de rango o sin cuota (${telemetryError.message}). Entrando en modo Autónomo (Datos del Sistema)...`, 'warn');
+      addLog(`[ADVERTENCIA] Modo Autónomo activado (${telemetryError.message}).`, 'warn');
       fallbackMode = true;
       await delay(1000);
-      
-      // Simulador Meteorológico Local Basado en la Base
-      const isWarm = activeBase.latitud < 11 && activeBase.longitud > -70; // Heurística simple
-      const mockVis = 10000 - (Math.random() * 2000); // 8-10km
-      const mockTemp = isWarm ? 28 + (Math.random() * 5) : 18 + (Math.random() * 10);
-      const mockWind = 10 + (Math.random() * 15);
-      
-      json = {
-        current: {
-          visibility: mockVis,
-          cloud_cover: Math.random() * 40,
-          wind_speed_10m: mockWind,
-          temperature_2m: mockTemp,
-          precipitation: 0
-        }
-      };
-
-      addLog(`[TELEMETRÍA LOCAL] Sensores Terrestres de ${activeBase.codigo} inyectados. Temp: ${json.current.temperature_2m.toFixed(1)}°C, Viento: ${json.current.wind_speed_10m.toFixed(1)}kts`, 'info');
+      const isWarm = activeBase.latitud < 11 && activeBase.longitud > -70;
+      json = { current: { visibility: 10000-Math.random()*2000, cloud_cover: Math.random()*40, wind_speed_10m: 10+Math.random()*15, temperature_2m: isWarm ? 28+Math.random()*5 : 18+Math.random()*10, precipitation: 0 } };
+      addLog(`[TELEMETRÍA LOCAL] Sensores de ${activeBase.codigo} inyectados. Temp: ${json.current.temperature_2m.toFixed(1)}°C`, 'info');
     }
 
     try {
       await delay(800);
       addLog(`[MOTOR IA] Inyectando vectores a modelo Predictivo de Servidor central...`);
-
-      // Intentar API Real (LLM) siempre que no estemos forzando fallback total remoto
-      let groqRes = null;
-      let usedRealAPI = false;
-      
+      let groqRes = null; let usedRealAPI = false;
       if (!fallbackMode) {
-          try {
-            const groqReq = await fetch('/api/ai-predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    baseName: activeBase.nombre,
-                    weatherData: {
-                        visKm: (json.current.visibility ?? 10000) / 1000,
-                        clouds: json.current.cloud_cover,
-                        wind: json.current.wind_speed_10m,
-                        temp: json.current.temperature_2m,
-                        precip: json.current.precipitation
-                    }
-                })
-            });
-            
-            if (groqReq.ok) {
-                groqRes = await groqReq.json();
-                usedRealAPI = true;
-            }
-          } catch (e) {
-              // Fallo silencioso, seguimos con fallback interno
-          }
+        try {
+          const groqReq = await fetch('/api/ai-predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ baseName: activeBase.nombre, weatherData: { visKm: (json.current.visibility??10000)/1000, clouds: json.current.cloud_cover, wind: json.current.wind_speed_10m, temp: json.current.temperature_2m, precip: json.current.precipitation } }) });
+          if (groqReq.ok) { groqRes = await groqReq.json(); usedRealAPI = true; }
+        } catch { /* fallback */ }
       }
-
       await delay(1200);
-
       if (usedRealAPI && groqRes?.prediction) {
-          addLog(`[INFERENCIA] Matriz probabilística generada con éxito por red neuronal externa.`, 'success');
-          setPredictionResult(groqRes.prediction);
+        addLog(`[INFERENCIA] Matriz generada por red neuronal externa.`, 'success');
+        setPredictionResult(groqRes.prediction);
       } else {
-          addLog(`[ADVERTENCIA] API de IA externa no responde o está en Límite de Cuota. Activando Engine de Tolerancia a Fallos Interno...`, 'warn');
-          await delay(900);
-          addLog(`[INFERENCIA LOCAL] Procesador Estocástico Táctico corriendo algoritmos internos...`);
-          await delay(1500);
-          const fallbackData = generateSimulatedMatrix(json);
-          addLog(`[ÉXITO] Matriz táctica generada vía motor de contingencia local hiperrealista.`, 'success');
-          setPredictionResult(fallbackData);
+        addLog(`[INFERENCIA LOCAL] Motor de contingencia interno activado...`, 'warn');
+        await delay(1500);
+        setPredictionResult(generateSimulatedMatrix(json));
+        addLog(`[ÉXITO] Matriz táctica generada.`, 'success');
       }
-
     } catch (err: any) {
-        addLog(`[ERROR CRÍTICO] Fallo en cascada interna: ${err.message}`, 'error');
-        addLog(`[SISTEMA] Abortando secuencia de inferencia.`, 'error');
+      addLog(`[ERROR CRÍTICO] ${err.message}`, 'error');
     } finally {
-        await delay(500);
-        addLog(`[FIN] Protocolo M.A.T. concluido.`);
-        setAnalyzing(false);
+      await delay(500);
+      addLog(`[FIN] Protocolo M.A.T. concluido.`);
+      setAnalyzing(false);
     }
+  };
+
+  const startAnalysis = () => {
+    if (!selectedBase) { startNationalAnalysis(); } else { startSingleAnalysis(); }
   };
 
   const getLogColor = (level: string) => {
@@ -207,7 +233,10 @@ export default function AIPredictionModule() {
           </div>
           <div className="p-5">
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Módulo Táctico que cruza telemetría IoT con algoritmos de redes neuronales (LLaMA) para proyectar matrices de riesgo en la estación <strong className="text-white">{location}</strong>.
+              {!selectedBase
+                ? <>Protocolo <strong className="text-emerald-400">Nacional</strong> — Escaneará las <strong className="text-white">{bases.length} estaciones</strong> del territorio y generará una matriz de riesgo consolidada.</>
+                : <>Módulo Táctico que cruza telemetría IoT con algoritmos de redes neuronales (LLaMA) para proyectar matrices de riesgo en <strong className="text-white">{location}</strong>.</>
+              }
             </p>
             
             <button 
@@ -222,7 +251,7 @@ export default function AIPredictionModule() {
               {analyzing ? (
                 <><Activity size={16} className="animate-spin" /> Procesando Petición...</>
               ) : (
-                <><BrainCircuit size={16} /> Iniciar Secuencia</>
+                <><BrainCircuit size={16} /> {!selectedBase ? 'Escaneo Nacional' : 'Iniciar Secuencia'}</>
               )}
             </button>
           </div>
@@ -356,8 +385,52 @@ export default function AIPredictionModule() {
           </div>
         )}
 
+        {/* Grid Nacional de Resultados por Base */}
+        {nationalResults.length > 0 && (
+          <div className="bg-[#1e293b] border border-gray-700/50 rounded-xl p-5 animate-in fade-in">
+            <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Radar size={16} className="text-cyan-400" /> Matriz por Estación ({nationalResults.length} nodos)
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {nationalResults.map((r) => {
+                const maxR = Math.max(r.data.ice, r.data.turbulence, r.data.visibility);
+                const borderColor = maxR > 60 ? 'border-red-500/40' : maxR > 30 ? 'border-amber-500/30' : 'border-emerald-500/30';
+                const bgColor = maxR > 60 ? 'bg-red-900/10' : maxR > 30 ? 'bg-amber-900/10' : 'bg-emerald-900/10';
+                return (
+                  <div key={r.codigo} className={`${bgColor} border ${borderColor} rounded-lg p-3`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white font-bold text-xs">{r.codigo}</span>
+                      <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${maxR > 60 ? 'bg-red-500/20 text-red-400' : maxR > 30 ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                        {maxR > 60 ? 'ALERTA' : maxR > 30 ? 'PRECAUCIÓN' : 'NORMAL'}
+                      </span>
+                    </div>
+                    <div className="space-y-1.5">
+                      <MiniBar label="ICE" value={r.data.ice} />
+                      <MiniBar label="TRB" value={r.data.turbulence} />
+                      <MiniBar label="VIS" value={r.data.visibility} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
       </div>
 
+    </div>
+  );
+}
+
+function MiniBar({ label, value }: { label: string; value: number }) {
+  const color = value > 60 ? 'bg-red-500' : value > 30 ? 'bg-amber-500' : 'bg-emerald-500';
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[8px] font-mono text-gray-500 w-6 shrink-0">{label}</span>
+      <div className="h-1.5 flex-1 bg-gray-800 rounded-full overflow-hidden">
+        <div className={`h-full ${color} rounded-full transition-all duration-700`} style={{ width: `${value}%` }} />
+      </div>
+      <span className={`text-[9px] font-mono font-bold w-7 text-right ${value > 60 ? 'text-red-400' : value > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>{value}%</span>
     </div>
   );
 }
