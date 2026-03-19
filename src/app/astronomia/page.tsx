@@ -96,11 +96,21 @@ export default function AstronomiaPage() {
           <div className="p-5 space-y-4">
             {/* Fase principal */}
             <div className="flex items-center gap-5">
-              <div className="text-6xl leading-none select-none">{lunarPhase.emoji}</div>
+              <div className="relative w-16 h-16 shrink-0">
+                <svg viewBox="0 0 64 64" className="w-full h-full -rotate-90">
+                  <circle cx="32" cy="32" r="28" fill="none" stroke="#1f2937" strokeWidth="5" />
+                  <circle cx="32" cy="32" r="28" fill="none" stroke="#818cf8" strokeWidth="5"
+                    strokeDasharray={`${(lunarPhase.illumination / 100) * 176} 176`}
+                    strokeLinecap="round" className="transition-all duration-700" />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-mono font-bold text-indigo-300">{lunarPhase.illumination}%</span>
+                </div>
+              </div>
               <div>
                 <h3 className="text-white font-bold text-base">{lunarPhase.phase}</h3>
                 <p className="text-gray-400 text-xs mt-1">Iluminación: <span className="text-indigo-300 font-bold">{lunarPhase.illumination}%</span></p>
-                <p className="text-gray-500 text-[11px] mt-0.5">Edad: {lunarPhase.age} días</p>
+                <p className="text-gray-500 text-[11px] mt-0.5">Edad: {lunarPhase.age} días del ciclo</p>
               </div>
             </div>
 
@@ -125,7 +135,9 @@ export default function AstronomiaPage() {
           </div>
           <div className="p-5">
             <div className="flex items-center gap-5 mb-4">
-              <div className="text-5xl leading-none select-none">{nextEvent.emoji}</div>
+              <div className="w-14 h-14 shrink-0 rounded-full bg-purple-500/10 border-2 border-purple-500/30 flex items-center justify-center">
+                <Orbit size={24} className="text-purple-400" />
+              </div>
               <div>
                 <h3 className="text-white font-bold text-base">{nextEvent.name}</h3>
                 <p className="text-gray-400 text-sm mt-1">{nextEvent.date.toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
@@ -161,7 +173,9 @@ export default function AstronomiaPage() {
           </div>
           <div className="p-5 space-y-4">
             <div className="flex items-center gap-4">
-              <div className="text-4xl leading-none select-none">{seasonInfo.seasonEmoji}</div>
+              <div className={`w-12 h-12 shrink-0 rounded-full border-2 flex items-center justify-center ${seasonInfo.currentSeason === 'lluvioso' ? 'bg-blue-500/10 border-blue-500/30' : seasonInfo.currentSeason === 'seco' ? 'bg-orange-500/10 border-orange-500/30' : 'bg-teal-500/10 border-teal-500/30'}`}>
+                {seasonInfo.currentSeason === 'lluvioso' ? <CloudRain size={20} className="text-blue-400" /> : <Shield size={20} className="text-orange-400" />}
+              </div>
               <div>
                 <h3 className="text-white font-bold text-lg">{seasonInfo.seasonLabel}</h3>
                 <p className="text-gray-400 text-xs">
