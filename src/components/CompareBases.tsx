@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { useBaseContext, BaseAerea } from '@/context/BaseContext';
 import { Activity, Thermometer, Wind, Eye, Gauge, CloudLightning, Loader2 } from 'lucide-react';
+import { kmhToKnots, degreesToCardinal } from '@/lib/utils';
 
 interface WeatherSnapshot {
   temperature_2m: number;
   wind_speed_10m: number;
+  wind_direction_10m: number;
   visibility: number;
   surface_pressure: number;
   cloud_cover: number;
@@ -37,7 +39,7 @@ export default function CompareBases() {
     // Función para obtener clima de una base específica
     const fetchBaseWeather = async (base: BaseAerea) => {
       try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${base.latitud}&longitude=${base.longitud}&current=temperature_2m,wind_speed_10m,visibility,surface_pressure,cloud_cover`);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${base.latitud}&longitude=${base.longitud}&current=temperature_2m,wind_speed_10m,wind_direction_10m,visibility,surface_pressure,cloud_cover`);
         if (!res.ok) throw new Error("Error fetching weather");
         
         const json = await res.json();
@@ -51,6 +53,7 @@ export default function CompareBases() {
               weather: {
                 temperature_2m: json.current.temperature_2m,
                 wind_speed_10m: json.current.wind_speed_10m,
+                wind_direction_10m: json.current.wind_direction_10m,
                 visibility: json.current.visibility,
                 surface_pressure: json.current.surface_pressure,
                 cloud_cover: json.current.cloud_cover
@@ -140,7 +143,12 @@ export default function CompareBases() {
                           {item.weather?.temperature_2m}°C
                         </td>
                         <td className="px-4 py-3 text-center font-mono text-sm text-gray-300">
-                          {item.weather?.wind_speed_10m} <span className="text-xs text-gray-500">km/h</span>
+                          <div className="flex flex-col items-center">
+                            <span>{item.weather && item.weather.wind_speed_10m !== undefined ? kmhToKnots(item.weather.wind_speed_10m) : '--'} <span className="text-xs text-gray-500">KT</span></span>
+                            {item.weather && item.weather.wind_direction_10m !== undefined && (
+                              <span className="text-[10px] text-gray-500 block leading-tight">{degreesToCardinal(item.weather.wind_direction_10m)}</span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-center font-mono text-sm text-gray-300">
                           {item.weather?.visibility ? (item.weather.visibility / 1000).toFixed(1) : '--'} <span className="text-xs text-gray-500">km</span>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plane, Wrench, CalendarClock, Settings, ShieldAlert, CheckCircle2, ChevronRight, Activity, CloudFog } from 'lucide-react';
 import { useBaseContext } from '@/context/BaseContext';
+import { kmhToKnots } from '@/lib/utils';
 
 // Catálogo maestro de aviones simulados
 const ALL_FLEET_DATA = [
@@ -77,8 +78,8 @@ export default function OperationsManagement() {
           const clouds = json.current.cloud_cover ?? 0;
           const wind = json.current.wind_speed_10m ?? 0;
           
-          // Si Vis < 5km, Nubes > 80% o Viento > 40km/h => Restringido por METEO
-          const isRestricted = visKm < 5 || clouds > 80 || wind > 40;
+          // Si Vis < 5km, Nubes > 80% o Viento > 21 KT => Restringido por METEO
+          const isRestricted = visKm < 5 || clouds > 80 || kmhToKnots(wind) > 21;
           setWeatherRestricted(isRestricted);
           setLoadingWeather(false);
         }

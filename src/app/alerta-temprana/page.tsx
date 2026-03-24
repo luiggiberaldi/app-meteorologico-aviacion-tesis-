@@ -8,6 +8,7 @@ import {
   AlertTriangle, Waves, Flame, CloudLightning, ShieldAlert, RefreshCw,
   TriangleAlert, CheckCircle2, Info, ChevronRight
 } from 'lucide-react';
+import { kmhToKnots } from '@/lib/utils';
 
 const LEVEL_CONFIG = {
   verde:    { bg: 'bg-emerald-900/20', border: 'border-emerald-500/40', text: 'text-emerald-400', label: 'NORMAL',    icon: CheckCircle2 },
@@ -169,7 +170,7 @@ export default function AlertaTempranaPage() {
                   <div className="grid grid-cols-3 gap-2">
                     <MiniStat label="Temp." value={`${weather.temperature.toFixed(0)}°C`} danger={weather.temperature > 35} />
                     <MiniStat label="Humedad" value={`${weather.humidity.toFixed(0)}%`} danger={weather.humidity < 30} />
-                    <MiniStat label="Viento" value={`${weather.windSpeed.toFixed(0)} km/h`} danger={weather.windSpeed > 25} />
+                    <MiniStat label="Viento" value={`${kmhToKnots(weather.windSpeed)} KT`} danger={kmhToKnots(weather.windSpeed) > 13} />
                   </div>
                 )}
                 <div className="bg-[#0f172a] rounded-xl p-3 border border-gray-800">
@@ -206,7 +207,7 @@ export default function AlertaTempranaPage() {
             <RefBox label="Temperatura" value={`${weather.temperature.toFixed(1)}°C`} />
             <RefBox label="Humedad" value={`${weather.humidity.toFixed(0)}%`} />
             <RefBox label="Presión" value={`${weather.surfacePressure.toFixed(0)} hPa`} />
-            <RefBox label="Viento" value={`${weather.windSpeed.toFixed(0)} km/h`} />
+            <RefBox label="Viento" value={`${kmhToKnots(weather.windSpeed)} KT`} />
             <RefBox label="Precipitación" value={`${(weather.precipitation ?? 0).toFixed(1)} mm`} />
             <RefBox label="Nubosidad" value={`${weather.cloudCover}%`} />
             <RefBox label="Visibilidad" value={`${((weather.visibility ?? 10000) / 1000).toFixed(1)} km`} />

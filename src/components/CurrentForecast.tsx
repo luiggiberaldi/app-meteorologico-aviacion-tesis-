@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Wind, Eye, Gauge, Cloud, Thermometer, RefreshCw, Droplets } from "lucide-react";
+import { Wind, Eye, Gauge, Cloud, Thermometer, RefreshCw, Droplets, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import WindBarb from "./WindBarb";
 import { useBaseContext } from "@/context/BaseContext";
+import { kmhToKnots, degreesToCardinal } from "@/lib/utils";
 
 interface WeatherData {
   windSpeed: number | null;
@@ -31,6 +32,7 @@ export default function CurrentForecast() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [cooldown, setCooldown] = useState(0);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   // Auto-refresh: 5 min -> 300 segundos
   useEffect(() => {
@@ -153,25 +155,49 @@ export default function CurrentForecast() {
       </div>
       
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <Widget 
-          title="Viento" 
-          icon={Wind} 
-          value={data.windSpeed !== null ? `${data.windSpeed} km/h` : "--"} 
-          desc={data.windDirection !== null ? `Dir: ${data.windDirection}°` : "Dir: ---°"} 
-          loading={loading && !data.windSpeed}
+        {/* WIDGET VIENTO REESTRUCTURADO */}
+        <div 
+          className="bg-[#1e293b] p-4 rounded-xl border border-gray-700 flex flex-col relative overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+          onClick={() => setExpanded("Viento")}
         >
-          {data.windSpeed !== null && data.windDirection !== null && (
-            <div className="ml-2 bg-gray-200 rounded-full p-1 self-end shadow-inner">
-              <WindBarb speed={data.windSpeed / 1.852} direction={data.windDirection} size={30} />
+          <div className="flex items-center justify-between mb-3 text-gray-400">
+            <span className="text-xs font-medium uppercase tracking-wider">Viento</span>
+            <Wind size={16} />
+          </div>
+          <div className="mt-auto flex justify-between items-end">
+            <div>
+              {loading && !data.windSpeed ? (
+                <div className="h-8 w-20 bg-gray-700 rounded animate-pulse mb-1"></div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-white font-bold text-2xl">{data.windDirection ?? "---"}°</span>
+                    <span className="text-white font-semibold text-lg">{degreesToCardinal(data.windDirection)}</span>
+                    {data.windDirection !== null && (
+                      <span className="text-cyan-400 text-xl" style={{ transform: `rotate(${data.windDirection}deg)`, display: 'inline-block' }}>↑</span>
+                    )}
+                  </div>
+                  <span className="block text-3xl font-bold text-white mb-1">
+                    {data.windSpeed !== null ? kmhToKnots(data.windSpeed) : "--"} <span className="text-sm text-gray-400 font-normal">KT</span>
+                  </span>
+                </>
+              )}
             </div>
-          )}
-        </Widget>
+            {data.windSpeed !== null && data.windDirection !== null && (
+              <div className="ml-2 bg-gray-200 rounded-full p-1 self-end shadow-inner shrink-0">
+                <WindBarb speed={kmhToKnots(data.windSpeed)} direction={data.windDirection} size={30} />
+              </div>
+            )}
+          </div>
+        </div>
+
         <Widget 
           title="Visibilidad" 
           icon={Eye} 
           value={data.visibility !== null ? `${(data.visibility / 1000).toFixed(1)} km` : "--"} 
           desc="VFR" 
           loading={loading && !data.visibility}
+          onClick={() => setExpanded("Visibilidad")}
         />
         <Widget 
           title="Presión Atm / QNH" 
@@ -179,6 +205,7 @@ export default function CurrentForecast() {
           value={data.pressure !== null ? `${data.pressure} hPa` : "---- hPa"} 
           desc="Superficie" 
           loading={loading && !data.pressure}
+          onClick={() => setExpanded("Presión Atm / QNH")}
         />
         <Widget 
           title="Nubosidad" 
@@ -186,6 +213,7 @@ export default function CurrentForecast() {
           value={data.cloudCover !== null ? `${data.cloudCover}%` : "---"} 
           desc="Cobertura" 
           loading={loading && !data.cloudCover}
+          onClick={() => setExpanded("Nubosidad")}
         />
         <Widget 
           title="Temperatura" 
@@ -193,6 +221,7 @@ export default function CurrentForecast() {
           value={data.temperature !== null ? `${data.temperature} °C` : "-- °C"} 
           desc="Actual" 
           loading={loading && !data.temperature}
+          onClick={() => setExpanded("Temperatura")}
         />
         <Widget 
           title="Humedad" 
@@ -200,15 +229,103 @@ export default function CurrentForecast() {
           value={data.humidity !== null ? `${data.humidity}%` : "--%"} 
           desc="Relativa" 
           loading={loading && !data.humidity}
+          onClick={() => setExpanded("Humedad")}
         />
       </div>
+
+      {/* MODAL AMPLIADO */}
+      {expanded && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setExpanded(null)}
+        >
+          <div 
+            className="w-[90vw] max-w-md rounded-2xl bg-slate-900 p-6 relative overflow-y-auto max-h-[80vh] shadow-xl border border-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              onClick={() => setExpanded(null)}
+            >
+              <X size={24} />
+            </button>
+            <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider border-b border-gray-700 pb-2">{expanded}</h3>
+            
+            <div className="space-y-4 text-gray-300">
+              {expanded === "Viento" && (
+                <>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Velocidad:</strong> <span className="text-white text-lg font-mono">{data.windSpeed !== null ? kmhToKnots(data.windSpeed) : '--'} KT</span></p>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Dirección:</strong> <span className="text-white text-lg font-mono">{data.windDirection ?? '---'}° ({degreesToCardinal(data.windDirection)})</span></p>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Velocidad (km/h):</strong> <span className="text-white font-mono">{data.windSpeed ?? '--'} km/h</span></p>
+                  <div className="mt-4 p-4 bg-black/30 rounded-lg text-sm text-gray-400">
+                    <p>El viento en superficie se reporta en Nudos (KT) para aviación. 1 KT equivale aproximadamente a 1.85 km/h.</p>
+                  </div>
+                </>
+              )}
+              {expanded === "Visibilidad" && (
+                <>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Visibilidad:</strong> <span className="text-white text-lg font-mono">{data.visibility !== null ? (data.visibility / 1000).toFixed(1) : '--'} km</span></p>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Estado VFR:</strong> <span className="text-green-400 font-bold uppercase">{data.visibility && data.visibility >= 5000 ? 'Óptimo' : 'Marginal/IFR'}</span></p>
+                  <div className="mt-4 p-4 bg-black/30 rounded-lg text-sm text-gray-400">
+                    <p>La visibilidad horizontal es crucial para operaciones VFR. Una visibilidad &lt; 5km requiere reglas de vuelo por instrumentos (IFR).</p>
+                  </div>
+                </>
+              )}
+              {expanded === "Presión Atm / QNH" && (
+                <>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">HectoPascales (hPa):</strong> <span className="text-white text-lg font-mono">{data.pressure ?? '--'} hPa</span></p>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Pulgadas Hg (inHg):</strong> <span className="text-white text-lg font-mono">{data.pressure ? (data.pressure * 0.02953).toFixed(2) : '--'} inHg</span></p>
+                  <div className="mt-4 p-4 bg-black/30 rounded-lg text-sm text-gray-400">
+                    <p>El QNH es un reglaje altimétrico que indica la elevación del campo al estar en tierra. 1013.25 es el estándar.</p>
+                  </div>
+                </>
+              )}
+              {expanded === "Nubosidad" && (
+                <>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Cobertura:</strong> <span className="text-white text-lg font-mono">{data.cloudCover ?? '--'}%</span></p>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Categoría (OACI):</strong> <span className="text-white font-mono uppercase">
+                    {data.cloudCover !== null ? (data.cloudCover <= 25 ? 'FEW (Escasas)' : data.cloudCover <= 50 ? 'SCT (Dispersas)' : data.cloudCover <= 87 ? 'BKN (Fragmentadas)' : 'OVC (Cubierto)') : '--'}
+                  </span></p>
+                  <div className="mt-4 p-4 bg-black/30 rounded-lg text-sm text-gray-400">
+                    <p>Porcentajes mayores al 50% (BKN u OVC) constituyen un "techo" de nubes que puede restringir vuelo VFR dependiendo de la altitud.</p>
+                  </div>
+                </>
+              )}
+              {expanded === "Temperatura" && (
+                <>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Celsius:</strong> <span className="text-white text-lg font-mono">{data.temperature ?? '--'} °C</span></p>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Fahrenheit:</strong> <span className="text-white font-mono">{data.temperature !== null ? ((data.temperature * 9/5) + 32).toFixed(1) : '--'} °F</span></p>
+                  <div className="mt-4 p-4 bg-black/30 rounded-lg text-sm text-gray-400">
+                    <p>Afecta el performance de la aeronave (Densidad Altitudinal). Temperaturas más altas requieren más pista para despegar.</p>
+                  </div>
+                </>
+              )}
+              {expanded === "Humedad" && (
+                <>
+                  <p className="flex justify-between items-center"><strong className="text-gray-400">Relativa:</strong> <span className="text-white text-lg font-mono">{data.humidity ?? '--'}%</span></p>
+                  <div className="mt-4 p-4 bg-black/30 rounded-lg text-sm text-gray-400">
+                    <p>Alta humedad junto a bajas temperaturas favorece la formación de niebla y reduce significativamente la visibilidad. En temperaturas cálidas altera levemente el performance.</p>
+                  </div>
+                </>
+              )}
+            </div>
+            
+            <button 
+              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              onClick={() => setExpanded(null)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
-function Widget({ title, icon: Icon, value, desc, loading, children }: { title: string, icon: any, value: string, desc: string, loading?: boolean, children?: React.ReactNode }) {
+function Widget({ title, icon: Icon, value, desc, loading, children, onClick }: { title: string, icon: any, value: string, desc: string, loading?: boolean, children?: React.ReactNode, onClick?: () => void }) {
   return (
-    <div className="bg-[#1e293b] p-4 rounded-xl border border-gray-700 flex flex-col relative overflow-hidden">
+    <div onClick={onClick} className="bg-[#1e293b] p-4 rounded-xl border border-gray-700 flex flex-col relative overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
       <div className="flex items-center justify-between mb-3 text-gray-400">
         <span className="text-xs font-medium uppercase tracking-wider">{title}</span>
         <Icon size={16} />

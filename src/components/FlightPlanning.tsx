@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useBaseContext, BaseAerea } from '@/context/BaseContext';
 import { Route, Navigation, Timer, Fuel, Wind, TrendingUp, Sun, CloudRain, PlaneTakeoff, PlaneLanding, Plane, AlertTriangle } from 'lucide-react';
+import { kmhToKnots, degreesToCardinal } from '@/lib/utils';
 
 // Aeronaves disponibles con sus velocidades de crucero típicas en nudos (kt) y consumo aprox lbs/h
 const AIRCRAFT_DB = [
@@ -83,14 +84,14 @@ export default function FlightPlanning() {
           if (res.ok) {
             const data = await res.json();
             const wSpeed = data.current.wind_speed_10m; // km/h
-            const wSpeedKt = wSpeed / 1.852; // a nudos
+            const wSpeedKt = kmhToKnots(wSpeed); // a nudos
             setOriginWind({ speed: wSpeedKt, dir: data.current.wind_direction_10m });
 
             // Lógica simple de advertencia de viento
             if (wSpeedKt > 30) {
-              setWindWarning(`PELIGRO: Vientos severos en origen (${wSpeedKt.toFixed(1)} KT). Operaciones suspendidas.`);
+              setWindWarning(`PELIGRO: Vientos severos en origen (${wSpeedKt} KT). Operaciones suspendidas.`);
             } else if (wSpeedKt > 15) {
-              setWindWarning(`PRECAUCIÓN: Posible viento cruzado fuerte (${wSpeedKt.toFixed(1)} KT). Evaluar límites de la aeronave.`);
+              setWindWarning(`PRECAUCIÓN: Posible viento cruzado fuerte (${wSpeedKt} KT). Evaluar límites de la aeronave.`);
             } else {
               setWindWarning(null);
             }
@@ -179,7 +180,7 @@ export default function FlightPlanning() {
                  {windWarning ? <AlertTriangle className={windWarning.includes('PELIGRO') ? 'text-red-400' : 'text-yellow-400'} size={20} shrink-0="true"/> : <Wind className="text-green-400" size={20} shrink-0="true"/>}
                  <div>
                    <p className={`text-xs font-bold ${windWarning ? (windWarning.includes('PELIGRO') ? 'text-red-400' : 'text-yellow-400') : 'text-green-400'} uppercase`}>
-                     Viento en Origen: {originWind.speed.toFixed(1)} KT / {originWind.dir}°
+                     Viento en Origen: {originWind.speed} KT / {degreesToCardinal(originWind.dir)} ({originWind.dir}°)
                    </p>
                    <p className="text-xs text-gray-300">
                      {windWarning || 'Condiciones de viento seguras para despegue.'}

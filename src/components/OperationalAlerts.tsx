@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle, ShieldAlert, Flag, CloudLightning, Wind } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
 import HelpTooltip from "@/components/HelpTooltip";
+import { kmhToKnots, degreesToCardinal } from "@/lib/utils";
 
 interface AlertState {
   level: "GREEN" | "YELLOW" | "RED" | "CRITICAL" | "UNKNOWN";
@@ -32,7 +33,7 @@ export default function OperationalAlerts() {
       // Values
       const visKm = current.visibility !== null ? current.visibility / 1000 : 10;
       const windKmph = current.wind_speed_10m !== null ? current.wind_speed_10m : 0;
-      const windKt = windKmph * 0.539957; // Convertir km/h a Nudos (KT)
+      const windKt = kmhToKnots(windKmph); // Convertir km/h a Nudos (KT) usando la utilidad
       const clouds = current.cloud_cover !== null ? current.cloud_cover : 0;
       const weatherCode = current.weather_code !== null ? current.weather_code : 0;
 

@@ -10,7 +10,7 @@ export default function PresionFrentes() {
   const zoom = selectedBase ? 7 : 6;
 
   // URL del iframe de Windy configurado para Presión Atmosférica MSL
-  const windyUrl = `https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km/h&zoom=${zoom}&overlay=pressure&product=ecmwf&level=surface&lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&marker=true&message=true`;
+  const windyUrl = `https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=kt&zoom=${zoom}&overlay=pressure&product=ecmwf&level=surface&lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&marker=true&message=true`;
 
   return (
     <div className="relative h-[600px] w-full bg-[#252d3d] overflow-hidden rounded-xl border border-[#364156]">

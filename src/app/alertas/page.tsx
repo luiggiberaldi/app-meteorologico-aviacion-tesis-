@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useBaseContext } from '@/context/BaseContext';
 import { WeatherService, WeatherData } from '@/lib/services/WeatherService';
 import { AlertTriangle, CloudLightning, Snowflake, Tornado, RefreshCw, ShieldAlert, Zap, ThermometerSnowflake } from 'lucide-react';
+import { kmhToKnots } from '@/lib/utils';
 
 export default function AlertasPage() {
   const { selectedBase } = useBaseContext();
@@ -38,10 +39,10 @@ export default function AlertasPage() {
   // --- LÓGICA DE ALERTAS BASADA EN DATOS REALES ---
   
   // 1. Ciclones / Vientos Severos
-  const gusts = data?.windGusts || 0;
-  const isHighWind = gusts > 50; // nudos/kmh
-  const cycloneLevel = isHighWind ? 'PELIGRO' : gusts > 30 ? 'ADVERTENCIA' : 'NORMAL';
-  const cycloneColor = isHighWind ? 'text-red-500 border-red-500/50 bg-red-500/10' : gusts > 30 ? 'text-amber-500 border-amber-500/50 bg-amber-500/10' : 'text-emerald-500 border-emerald-500/50 bg-emerald-500/10';
+  const gustsKT = kmhToKnots(data?.windGusts || 0);
+  const isHighWind = gustsKT > 27; // KT
+  const cycloneLevel = isHighWind ? 'PELIGRO' : gustsKT > 16 ? 'ADVERTENCIA' : 'NORMAL';
+  const cycloneColor = isHighWind ? 'text-red-500 border-red-500/50 bg-red-500/10' : gustsKT > 16 ? 'text-amber-500 border-amber-500/50 bg-amber-500/10' : 'text-emerald-500 border-emerald-500/50 bg-emerald-500/10';
 
   // 2. Relámpagos / Actividad Eléctrica (Usando CAPE - Convective Available Potential Energy)
   const cape = data?.cape || 0; 
@@ -89,7 +90,7 @@ export default function AlertasPage() {
             <div className="bg-black/30 rounded p-3 border border-black/20">
               <div className="flex justify-between items-center text-sm">
                 <span className="opacity-80 font-mono text-xs">Ráfagas Máximas:</span>
-                <span className="font-bold font-mono text-lg">{gusts.toFixed(1)} km/h</span>
+                <span className="font-bold font-mono text-lg">{gustsKT} KT</span>
               </div>
             </div>
             

@@ -6,6 +6,8 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
+import { kmhToKnots } from './utils';
+
 // ─── CONSTANTES ───────────────────────────────────────────────
 const RAD = Math.PI / 180;
 const DEG = 180 / Math.PI;
@@ -32,6 +34,24 @@ export function getSolarDeclination(date: Date): number {
   // Fórmula de Spencer (precisa a ±0.3°)
   const B = (360 / 365) * (doy - 81) * RAD;
   return DEG * Math.asin(0.39779 * Math.sin(B));
+}
+
+// ─── ELEVACIÓN SOLAR ──────────────────────────────────────────
+export function getSolarElevation(lat: number, lon: number, date: Date): number {
+  const decl = getSolarDeclination(date) * RAD;
+  const latRad = lat * RAD;
+  const eot = equationOfTime(date); // minutos
+  
+  // Tiempo Solar Real
+  const utcHours = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
+  const solarTimeHrs = utcHours + (lon / 15) + (eot / 60);
+  
+  // Ángulo horario (Hour Angle) en radianes
+  const hourAngleRad = (solarTimeHrs - 12) * 15 * RAD;
+  
+  // Fórmula de elevación
+  const sinH = Math.sin(latRad) * Math.sin(decl) + Math.cos(latRad) * Math.cos(decl) * Math.cos(hourAngleRad);
+  return DEG * Math.asin(sinH);
 }
 
 // ─── ECUACIÓN DEL TIEMPO ──────────────────────────────────────
@@ -449,7 +469,7 @@ export function generateEarlyAlerts(
       id: 'ciclon-1', type: 'ciclon',
       level: pressure < 990 ? 'rojo' : 'naranja',
       title: 'Actividad Ciclónica',
-      description: `Presión: ${pressure.toFixed(0)} hPa, Vientos: ${windSpeed.toFixed(0)} km/h. Condiciones compatibles con perturbación tropical.`,
+      description: `Presión: ${pressure.toFixed(0)} hPa, Vientos: ${kmhToKnots(windSpeed)} KT. Condiciones compatibles con perturbación tropical.`,
       recommendation: 'Cancelar operaciones aéreas. Asegurar aeronaves.',
       color: pressure < 990 ? '#ef4444' : '#f97316',
       basesAffected: [baseName],

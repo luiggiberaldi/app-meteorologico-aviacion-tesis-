@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useBaseContext } from '@/context/BaseContext';
 import {
-  getSunTimes, getMoonTimes, getLunarPhase, getSolarDeclination,
+  getSunTimes, getMoonTimes, getLunarPhase, getSolarDeclination, getSolarElevation,
   getNextEquinoxSolstice, getRainySeasonInfo, getZCITPosition,
   type SunTimes, type LunarPhaseInfo, type MoonTimes, type AstroEvent, type SeasonInfo, type ZCITInfo
 } from '@/lib/astro';
@@ -25,6 +25,7 @@ export default function AstronomiaPage() {
   const moonData: MoonTimes = useMemo(() => getMoonTimes(base.latitud, base.longitud, now), [base, now]);
   const lunarPhase: LunarPhaseInfo = useMemo(() => getLunarPhase(now), [now]);
   const solarDecl: number = useMemo(() => getSolarDeclination(now), [now]);
+  const solarElev: number = useMemo(() => getSolarElevation(base.latitud, base.longitud, now), [base, now]);
   const nextEvent: AstroEvent = useMemo(() => getNextEquinoxSolstice(now), [now]);
   const seasonInfo: SeasonInfo = useMemo(() => getRainySeasonInfo(base.estado || 'Aragua', now), [base, now]);
   const zcit: ZCITInfo = useMemo(() => getZCITPosition(now), [now]);
@@ -81,6 +82,30 @@ export default function AstronomiaPage() {
                 <span>-23.5° (Invierno)</span>
                 <span>0° (Equinoccio)</span>
                 <span>+23.5° (Verano)</span>
+              </div>
+            </div>
+
+            {/* Inclinación / Elevación Solar */}
+            <div className="bg-[#0f172a] rounded-xl p-4 border border-gray-800 mt-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Inclinación (Elevación) Solar</span>
+                <span className={`text-lg font-mono font-bold ${solarElev > 0 ? 'text-amber-400' : 'text-indigo-400'}`}>
+                  {solarElev > 0 ? '+' : ''}{solarElev.toFixed(2)}°
+                </span>
+              </div>
+              {/* Barra visual - Horizonte a Cénit */}
+              <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className={`absolute h-full rounded-full transition-all ${solarElev > 0 ? 'bg-gradient-to-r from-orange-500 to-yellow-300' : 'bg-gradient-to-r from-indigo-900 to-indigo-500'}`}
+                  style={{ width: `${Math.max(0, Math.min(100, ((solarElev + 90) / 180) * 100))}%` }}
+                />
+                {/* Línea del horizonte (0°) */}
+                <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-gray-600/50" />
+              </div>
+              <div className="flex justify-between text-[9px] text-gray-600 mt-1 font-mono relative">
+                <span className="w-1/3 text-left">-90° (Nadir)</span>
+                <span className="w-1/3 text-center">0° (Horizonte)</span>
+                <span className="w-1/3 text-right">+90° (Cénit)</span>
               </div>
             </div>
           </div>

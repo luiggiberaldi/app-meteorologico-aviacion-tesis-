@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Minus, AlertCircle, CheckCircle2, AlertTriangle, Eye, Cloud, Wind, Thermometer, Droplets, Gauge, RefreshCw } from 'lucide-react';
 import { useBaseContext } from '@/context/BaseContext';
+import { kmhToKnots, degreesToCardinal } from '@/lib/utils';
 
 interface WeatherData {
   windSpeed: number | null;
@@ -177,7 +178,7 @@ export default function GeneralSituation() {
                 <StatusItem
                   icon={<Wind size={16} />}
                   label="Viento"
-                  value={weatherData.windSpeed !== null ? `${weatherData.windSpeed.toFixed(1)} km/h / ${weatherData.windDirection ?? 0}°` : '---'}
+                  value={weatherData.windSpeed !== null ? `${kmhToKnots(weatherData.windSpeed)} KT / ${degreesToCardinal(weatherData.windDirection)} (${weatherData.windDirection ?? 0}°) ` : '---'}
                   status={windSpeedKmph < 20 ? 'good' : windSpeedKmph < 30 ? 'warning' : 'danger'}
                 />
                 <StatusItem
