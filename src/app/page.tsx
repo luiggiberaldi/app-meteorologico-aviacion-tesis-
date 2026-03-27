@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import CurrentForecast from "@/components/CurrentForecast";
+import CloudProfile from "@/components/CloudProfile";
 import OperationalAlerts from "@/components/OperationalAlerts";
 import GeneralSituation from "@/components/GeneralSituation";
 
@@ -26,6 +27,9 @@ export default function DashboardPage() {
 
       {/* Pronóstico Actual */}
       <CurrentForecast />
+
+      {/* Perfil de Nubosidad y Clasificación */}
+      <CloudProfile />
 
       {/* Mapa Meteorológico Nacional */}
       <VenezuelaWeatherMap />
