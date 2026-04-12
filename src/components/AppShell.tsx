@@ -11,7 +11,8 @@ import { BaseProvider } from '@/context/BaseContext';
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, loading } = useAuth();
-  const isLoginPage = pathname === '/login';
+  const normalizedPathname = pathname?.replace(/\/+$/, '') || '';
+  const isLoginPage = normalizedPathname === '/login';
 
   // En la página de login, renderizar solo el children sin shell
   if (isLoginPage) {

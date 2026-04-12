@@ -1,12 +1,16 @@
 /** @type {import('next').NextConfig} */
 const withPWA = require('next-pwa')({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
+  disable: true,
+  register: false,
   skipWaiting: true,
 });
 
-module.exports = withPWA({
-  // Aquí van las configuraciones existentes de Next.js si las hay
-  turbopack: {}
-});
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
+  images: { unoptimized: true },
+};
+
+module.exports = withPWA(nextConfig);

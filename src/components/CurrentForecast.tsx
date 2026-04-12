@@ -5,6 +5,7 @@ import { Wind, Eye, Gauge, Cloud, Thermometer, RefreshCw, Droplets, X } from "lu
 import { supabase } from "@/lib/supabase";
 import WindBarb from "./WindBarb";
 import { useBaseContext } from "@/context/BaseContext";
+import { useSettings } from "@/context/SettingsContext";
 import { kmhToKnots, degreesToCardinal } from "@/lib/utils";
 
 interface WeatherData {
@@ -19,6 +20,7 @@ interface WeatherData {
 
 export default function CurrentForecast() {
   const { selectedBase } = useBaseContext();
+  const { settings } = useSettings();
   const [data, setData] = useState<WeatherData>({
     windSpeed: null,
     windDirection: null,
@@ -115,10 +117,10 @@ export default function CurrentForecast() {
 
   useEffect(() => {
     fetchWeather();
-    // Auto actualizar cada 5 minutos
-    const interval = setInterval(fetchWeather, 5 * 60 * 1000);
+    // Auto actualizar según intervalo de configuración
+    const interval = setInterval(fetchWeather, settings.autoRefreshInterval * 1000);
     return () => clearInterval(interval);
-  }, [fetchWeather]);
+  }, [fetchWeather, settings.autoRefreshInterval]);
 
   return (
     <section>

@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/context/AuthContext";
+import { SettingsProvider } from "@/context/SettingsContext";
 import AppShell from "@/components/AppShell";
 import Script from "next/script";
 import "./globals.css";
@@ -27,9 +28,11 @@ export default function RootLayout({
       </head>
       <body className="flex h-screen overflow-hidden print:h-auto print:overflow-visible bg-military-bg text-military-text font-sans antialiased">
         <AuthProvider>
-          <AppShell>
-            {children}
-          </AppShell>
+          <SettingsProvider>
+            <AppShell>
+              {children}
+            </AppShell>
+          </SettingsProvider>
         </AuthProvider>
 
         <Script id="register-sw" strategy="afterInteractive">

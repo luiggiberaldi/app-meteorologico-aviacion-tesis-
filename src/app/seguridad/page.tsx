@@ -1,17 +1,17 @@
 "use client";
 
-import { ShieldCheck, Lock, Key, Database, Globe, Eye, Server, CheckCircle } from "lucide-react";
+import { ShieldCheck, Lock, Key, Database, Globe, Eye, Server, CheckCircle, Wifi, HardDrive } from "lucide-react";
 
 const politicas = [
   {
     titulo: "Cifrado HTTPS/TLS",
-    descripcion: "Todas las comunicaciones entre el cliente y el servidor están cifradas mediante protocolo TLS 1.3. Los certificados SSL son gestionados automáticamente por Vercel Edge Network, garantizando la integridad de los datos en tránsito.",
+    descripcion: "Todas las comunicaciones entre el cliente y el servidor están cifradas mediante protocolo TLS 1.3. Los certificados SSL son gestionados automáticamente por Cloudflare, garantizando la integridad de los datos en tránsito.",
     icon: Lock,
     estado: "Activo"
   },
   {
-    titulo: "Autenticación JWT (JSON Web Tokens)",
-    descripcion: "El sistema utiliza tokens JWT firmados criptográficamente para autenticar las sesiones de usuario. Los tokens tienen una expiración configurable y se renuevan automáticamente para prevenir accesos no autorizados.",
+    titulo: "Autenticación con Persistencia Local",
+    descripcion: "El sistema implementa un mecanismo de autenticación basado en sesión local con credenciales cifradas. Las contraseñas requieren un mínimo de 6 caracteres y las sesiones se mantienen activas hasta el cierre explícito por el usuario.",
     icon: Key,
     estado: "Activo"
   },
@@ -23,7 +23,7 @@ const politicas = [
   },
   {
     titulo: "Protección de API Keys",
-    descripcion: "Las claves de acceso a APIs externas (Groq, Open-Meteo) se almacenan como variables de entorno en el servidor (server-side only) y nunca se exponen al navegador del cliente. Las claves sensibles están excluidas del repositorio mediante .gitignore.",
+    descripcion: "Las claves de acceso a APIs externas (Groq, Open-Meteo) se almacenan como variables de entorno en el servidor y nunca se exponen al navegador del cliente. Las claves sensibles están excluidas del repositorio mediante .gitignore y se inyectan como secrets en Cloudflare Workers.",
     icon: Key,
     estado: "Activo"
   },
@@ -35,14 +35,26 @@ const politicas = [
   },
   {
     titulo: "Auditoría y Logging",
-    descripcion: "Todas las solicitudes al módulo de IA Predictiva y las operaciones críticas del sistema son registradas con timestamp, IP de origen y resultado de la operación. Los logs son almacenados por el proveedor de hosting (Vercel) con retención de 30 días.",
+    descripcion: "Todas las solicitudes al módulo de IA Predictiva y las operaciones críticas del sistema son registradas con timestamp, IP de origen y resultado de la operación. Los logs son almacenados por la infraestructura de Cloudflare Workers con retención configurable.",
     icon: Eye,
     estado: "Activo"
   },
   {
-    titulo: "Infraestructura Serverless",
-    descripcion: "La aplicación se ejecuta en una infraestructura serverless (Vercel Edge Functions) que elimina la superficie de ataque de servidores tradicionales. No existe un servidor persistente que pueda ser comprometido.",
+    titulo: "Infraestructura Edge (Cloudflare Workers)",
+    descripcion: "La aplicación se ejecuta en Cloudflare Workers, una infraestructura edge serverless distribuida globalmente que elimina la superficie de ataque de servidores tradicionales. No existe un servidor persistente que pueda ser comprometido, y el código se ejecuta en aislamiento V8.",
     icon: Server,
+    estado: "Activo"
+  },
+  {
+    titulo: "Almacenamiento Local Seguro",
+    descripcion: "Las configuraciones del usuario y datos de sesión se almacenan en localStorage del navegador, aislados por origen (same-origin policy). Los datos sensibles nunca se transmiten a terceros y pueden ser eliminados por el usuario desde la configuración del sistema.",
+    icon: HardDrive,
+    estado: "Activo"
+  },
+  {
+    titulo: "Conexión Segura con APIs Meteorológicas",
+    descripcion: "Todas las conexiones a servicios externos (Open-Meteo, Supabase, Groq) utilizan HTTPS exclusivamente. Los endpoints están validados y las respuestas son verificadas antes de procesarse para prevenir inyección de datos maliciosos.",
+    icon: Wifi,
     estado: "Activo"
   },
 ];

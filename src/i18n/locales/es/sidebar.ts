@@ -1,0 +1,25 @@
+const sidebar = {
+  controlPanel: 'Panel de Control',
+  operations: 'Operaciones',
+  system: 'Sistema',
+  commandCenter: 'Centro de Mando',
+  weatherAlerts: 'Alertas Meteorológicas',
+  specializedSensors: 'Sensores Especializados',
+  flightPlanning: 'Planificación de Vuelos',
+  satelliteImages: 'Imágenes Satelitales',
+  statistics: 'Estadísticas y Operaciones',
+  historicalData: 'Datos Históricos',
+  aiPrediction: 'IA Predictiva',
+  astronomy: 'Astronomía y Estaciones',
+  earlyWarning: 'Alerta Temprana',
+  maritimeWaves: 'Oleaje Marítimo',
+  news: 'Noticias',
+  userManual: 'Manual de Usuario',
+  cyberSecurity: 'Seguridad Cibernética',
+  users: 'Usuarios',
+  settings: 'Configuración',
+  systemActive: 'Sistema Activo',
+  metNetwork: 'Red Meteorológica',
+} as const;
+
+export default sidebar;

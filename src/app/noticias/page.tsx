@@ -86,7 +86,7 @@ const DYNAMIC_NEWS_POOL = [
     titulo: "Enlace Satelital Restablecido GOES-16",
     categoria: "Informativo",
     categoriaColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    icon: Satellite, // fallback to Info
+    icon: Satellite,
     contenido: "El flujo de imágenes en infrarrojo y banda visible del satélite principal ha sido restablecido al 100% de operatividad en todo el territorio."
   },
   {
@@ -116,7 +116,7 @@ export default function NoticiasPage() {
         fecha: new Date().toLocaleTimeString('es-VE') + ' ' + new Date().toLocaleDateString('es-VE'),
         categoria: randomNewsTemplate.categoria,
         categoriaColor: randomNewsTemplate.categoriaColor,
-        icon: randomNewsTemplate.icon === Satellite ? Radio : randomNewsTemplate.icon, // Fallback en caso de q el icono no se haya importado bien,
+        icon: randomNewsTemplate.icon,
         contenido: randomNewsTemplate.contenido
       };
 

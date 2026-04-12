@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Tipos base
 export interface BaseAerea {
@@ -48,9 +48,21 @@ interface BaseContextProps {
 const BaseContext = createContext<BaseContextProps | undefined>(undefined);
 
 export function BaseProvider({ children }: { children: ReactNode }) {
-  // Inicialmente, seleccionamos "Todas las bases" (null) o la primera base por defecto.
-  // Vamos a usar null para la vista general nacional.
   const [selectedBase, setSelectedBase] = useState<BaseAerea | null>(null);
+
+  // Cargar base predeterminada desde configuración
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('sermetavia_settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        if (settings.defaultBase) {
+          const found = basesAereasDisponibles.find(b => b.codigo === settings.defaultBase);
+          if (found) setSelectedBase(found);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   return (
     <BaseContext.Provider value={{ selectedBase, setSelectedBase, bases: basesAereasDisponibles }}>

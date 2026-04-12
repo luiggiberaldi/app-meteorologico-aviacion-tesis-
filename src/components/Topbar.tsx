@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Plane, Menu, X, LayoutDashboard, BarChart3, FileText, ChevronDown, 
+import {
+  Plane, Menu, X, LayoutDashboard, BarChart3, FileText, ChevronDown,
   Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings, LogOut, Bell,
   Moon, Flame, Waves
 } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
 import { useAuth } from "@/context/AuthContext";
+import { useSettings } from "@/context/SettingsContext";
+import { useTranslation } from "@/i18n";
 
 type Notificacion = {
   id: string;
@@ -19,39 +21,24 @@ type Notificacion = {
   colorBorder: string;
 };
 
-const INITIAL_NOTIFICATIONS: Notificacion[] = [
-  { id: 'n1', titulo: 'Tormenta Severa Detectada', descripcion: 'Alto nivel CAPE en aproximación sureste. Posible cancelación de despegues.', tiempo: 'Hace 2 min', colorBorder: 'border-l-red-500' },
-  { id: 'n2', titulo: 'Descenso de Isoterma', descripcion: 'Nivel de congelamiento (0°C) ha descendido a 2,500m. Precaución por engelamiento.', tiempo: 'Hace 15 min', colorBorder: 'border-l-amber-500' },
-  { id: 'n3', titulo: 'Alerta Evaporativa Agrícola', descripcion: 'Sensores TDA reportan evapotranspiración anómala en llanos centrales.', tiempo: 'Hace 1 hora', colorBorder: 'border-l-blue-500' }
+const mainNavKeys = [
+  { href: "/", labelKey: 'commandCenter' as const, icon: LayoutDashboard },
+  { href: "/planificacion", labelKey: 'flightPlanning' as const, icon: Navigation },
+  { href: "/imagenes-satelitales", labelKey: 'satelliteImages' as const, icon: Satellite },
+  { href: "/estadisticas", labelKey: 'statistics' as const, icon: BarChart3 },
+  { href: "/historico", labelKey: 'historicalData' as const, icon: FileText },
+  { href: "/prediccion-ia", labelKey: 'aiPrediction' as const, icon: BrainCircuit },
+  { href: "/astronomia", labelKey: 'astronomy' as const, icon: Moon },
+  { href: "/alerta-temprana", labelKey: 'earlyWarning' as const, icon: Flame },
+  { href: "/oleaje", labelKey: 'maritimeWaves' as const, icon: Waves },
 ];
 
-const DYNAMIC_ALERTS_POOL = [
-  { titulo: 'Cizalladura de Viento', descripcion: 'Reporte de windshear en capa baja (LLWS) cerca de umbral de pista.', colorBorder: 'border-l-amber-500' },
-  { titulo: 'Aproximación IFR Requerida', descripcion: 'Techo de nubes descendiendo rápidamente. Obligatorio operaciones por instrumentos.', colorBorder: 'border-l-red-500' },
-  { titulo: 'Anomalía de Presión', descripcion: 'Sensores barométricos indican caída súbita de presión. Posible formación ciclónica.', colorBorder: 'border-l-red-500' },
-  { titulo: 'Restablecimiento de GOES', descripcion: 'Recepción de barrido satelital normalizada en banda infrarroja.', colorBorder: 'border-l-emerald-500' },
-  { titulo: 'Humedad del Suelo Crítica', descripcion: 'Sensores en cabecera de pista detectan saturación 95%. Riesgo moderado de aquaplaning.', colorBorder: 'border-l-blue-500' },
-  { titulo: 'Ráfagas de Viento Fuertes', descripcion: 'Vientos cruzados exceden 25 nudos. Precaución aeronaves ligeras en aproximación.', colorBorder: 'border-l-amber-500' }
-];
-
-const mainNav = [
-  { href: "/", label: "Centro de Mando", icon: LayoutDashboard },
-  { href: "/planificacion", label: "Planificación de Vuelos", icon: Navigation },
-  { href: "/imagenes-satelitales", label: "Imágenes Satelitales", icon: Satellite },
-  { href: "/estadisticas", label: "Estadísticas y Operaciones", icon: BarChart3 },
-  { href: "/historico", label: "Datos Históricos", icon: FileText },
-  { href: "/prediccion-ia", label: "IA Predictiva", icon: BrainCircuit },
-  { href: "/astronomia", label: "Astronomía y Estaciones", icon: Moon },
-  { href: "/alerta-temprana", label: "Alerta Temprana", icon: Flame },
-  { href: "/oleaje", label: "Oleaje Marítimo", icon: Waves },
-];
-
-const systemNav = [
-  { href: "/noticias", label: "Noticias", icon: Newspaper },
-  { href: "/manual", label: "Manual de Usuario", icon: BookOpen },
-  { href: "/seguridad", label: "Seguridad Cibernética", icon: ShieldCheck },
-  { href: "/usuarios", label: "Usuarios", icon: Users },
-  { href: "/configuracion", label: "Configuración", icon: Settings },
+const systemNavKeys = [
+  { href: "/noticias", labelKey: 'news' as const, icon: Newspaper },
+  { href: "/manual", labelKey: 'userManual' as const, icon: BookOpen },
+  { href: "/seguridad", labelKey: 'cyberSecurity' as const, icon: ShieldCheck },
+  { href: "/usuarios", labelKey: 'users' as const, icon: Users },
+  { href: "/configuracion", labelKey: 'settings' as const, icon: Settings },
 ];
 
 export default function Topbar() {
@@ -59,14 +46,41 @@ export default function Topbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  
-  const [notificaciones, setNotificaciones] = useState<Notificacion[]>(INITIAL_NOTIFICATIONS);
+
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [unreadCount, setUnreadCount] = useState(3);
   const [isAnimatingBell, setIsAnimatingBell] = useState(false);
 
   const { selectedBase, setSelectedBase, bases } = useBaseContext();
   const { user, signOut } = useAuth();
+  const { settings } = useSettings();
   const pathname = usePathname();
+  const { t } = useTranslation('topbar');
+  const { t: tSidebar } = useTranslation('sidebar');
+
+  // Initialize notifications with translations
+  useEffect(() => {
+    setNotificaciones([
+      { id: 'n1', titulo: t('notifSevereStorm'), descripcion: t('notifSevereStormDesc'), tiempo: t('ago2min'), colorBorder: 'border-l-red-500' },
+      { id: 'n2', titulo: t('notifIsotherm'), descripcion: t('notifIsothermDesc'), tiempo: t('ago15min'), colorBorder: 'border-l-amber-500' },
+      { id: 'n3', titulo: t('notifEvaporative'), descripcion: t('notifEvaporativeDesc'), tiempo: t('ago1hour'), colorBorder: 'border-l-blue-500' }
+    ]);
+  }, [t]);
+
+  const DYNAMIC_ALERTS_POOL_KEYS = [
+    { tituloKey: 'notifWindShear' as const, descKey: 'notifWindShearDesc' as const, colorBorder: 'border-l-amber-500' },
+    { tituloKey: 'notifIFR' as const, descKey: 'notifIFRDesc' as const, colorBorder: 'border-l-red-500' },
+    { tituloKey: 'notifPressure' as const, descKey: 'notifPressureDesc' as const, colorBorder: 'border-l-red-500' },
+    { tituloKey: 'notifGOES' as const, descKey: 'notifGOESDesc' as const, colorBorder: 'border-l-emerald-500' },
+    { tituloKey: 'notifHumidity' as const, descKey: 'notifHumidityDesc' as const, colorBorder: 'border-l-blue-500' },
+    { tituloKey: 'notifGusts' as const, descKey: 'notifGustsDesc' as const, colorBorder: 'border-l-amber-500' },
+  ];
+
+  const isActivePath = (href: string) => {
+    const normalizedPathname = pathname?.replace(/\/+$/, '') || '';
+    const normalizedHref = href.replace(/\/+$/, '') || '';
+    return normalizedPathname === normalizedHref;
+  };
 
   useEffect(() => {
     const updateClock = () => {
@@ -80,45 +94,49 @@ export default function Topbar() {
 
   useEffect(() => {
     // Generador Táctico Dinámico de Notificaciones
+    if (!settings.notificationsEnabled) return;
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let bellTimeoutId: ReturnType<typeof setTimeout>;
+
     const tick = () => {
-      const template = DYNAMIC_ALERTS_POOL[Math.floor(Math.random() * DYNAMIC_ALERTS_POOL.length)];
+      const template = DYNAMIC_ALERTS_POOL_KEYS[Math.floor(Math.random() * DYNAMIC_ALERTS_POOL_KEYS.length)];
       const newNotif: Notificacion = {
         id: Math.random().toString(36).substr(2, 9),
-        titulo: template.titulo,
-        descripcion: template.descripcion,
-        tiempo: 'Justo ahora',
+        titulo: t(template.tituloKey),
+        descripcion: t(template.descKey),
+        tiempo: t('justNow'),
         colorBorder: template.colorBorder
       };
 
       setNotificaciones(prev => {
-        // Envejecer el tiempo artificialmente para darle efecto real
-        const next = [newNotif, ...prev].map(n => {
-           if (n.tiempo === 'Justo ahora') return { ...n, tiempo: 'Hace ' + Math.floor(Math.random() * 5 + 1) + ' min' };
+        const next = [newNotif, ...prev].map((n, i) => {
+           if (i > 0 && n.tiempo === t('justNow')) return { ...n, tiempo: t('agoMin').replace('{n}', String(Math.floor(Math.random() * 5 + 1))) };
            return n;
         });
-        next[0].tiempo = 'Justo ahora';
-        if (next.length > 8) next.pop(); // Max 8 notificaciones en la vista superior
+        next[0].tiempo = t('justNow');
+        if (next.length > 8) next.pop();
         return next;
       });
 
       setUnreadCount(prev => prev + 1);
-      
-      // Animación de llegada
       setIsAnimatingBell(true);
-      setTimeout(() => setIsAnimatingBell(false), 2000);
+      bellTimeoutId = setTimeout(() => setIsAnimatingBell(false), 2000);
 
-      const nextDelay = 15000 + Math.random() * 25000; // Entre 15 y 40 segundos
+      const nextDelay = 15000 + Math.random() * 25000;
       timeoutId = setTimeout(tick, nextDelay);
     };
 
-    let timeoutId = setTimeout(tick, 12000);
-    return () => clearTimeout(timeoutId);
-  }, []);
+    timeoutId = setTimeout(tick, 12000);
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(bellTimeoutId);
+    };
+  }, [settings.notificationsEnabled, t]);
 
   const linkClass = (href: string) => {
-    const isActive = pathname === href;
     return `flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors ${
-      isActive
+      isActivePath(href)
         ? "bg-[#1e293b] text-white border-l-4 border-[#10b981]"
         : "text-gray-400 hover:bg-[#1e293b] hover:text-white"
     }`;
@@ -129,26 +147,25 @@ export default function Topbar() {
       <header className="h-16 bg-[#1e293b] border-b border-gray-700 flex items-center justify-between px-3 lg:px-6 shadow-md shrink-0 relative z-40">
         {/* Mobile Menu Icon & Logo */}
         <div className="flex items-center space-x-2">
-          <button 
+          <button
             className="md:hidden text-gray-300 hover:text-white p-2 rounded-md hover:bg-gray-800"
             onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Abrir menú"
+            aria-label={t('openMenu')}
           >
             <Menu size={22} />
           </button>
-          
+
           <div className="hidden sm:flex items-center">
             <img src="/2.png" alt="Sermetavia Logo" className="h-[38px] w-auto object-contain mr-2" />
           </div>
 
-          {/* Logo visible solo en móviles */}
           <div className="flex flex-1 sm:hidden items-center ml-2 mr-2">
             <img src="/2.png" alt="Sermetavia Mobile" className="h-[36px] w-auto object-contain" />
           </div>
 
           <div className="hidden sm:block">
             <h1 className="text-sm font-bold text-white tracking-wide truncate max-w-[150px] sm:max-w-none">
-              <span className="hidden xl:inline-block text-gray-300 font-medium tracking-normal mr-1">Red Meteorológica Nacional</span>
+              <span className="hidden xl:inline-block text-gray-300 font-medium tracking-normal mr-1">{t('nationalNetwork')}</span>
               <span className="xl:hidden">SERMETAVIA</span>
             </h1>
           </div>
@@ -157,7 +174,7 @@ export default function Topbar() {
         <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Base Selector Desktop */}
           <div className="relative hidden lg:block">
-            <select 
+            <select
               className="appearance-none bg-[#0f172a] text-white text-xs sm:text-sm font-medium border border-gray-600 rounded-lg px-2 sm:px-3 py-1.5 pr-8 focus:outline-none focus:ring-2 focus:ring-[#10b981]"
               value={selectedBase?.id || ""}
               onChange={(e) => {
@@ -166,7 +183,7 @@ export default function Topbar() {
                 else setSelectedBase(bases.find(b => b.id.toString() === id) || null);
               }}
             >
-              <option value="">Todas las Bases (Nacional)</option>
+              <option value="">{t('allBases')}</option>
               {bases.map(b => (
                 <option key={b.id} value={b.id}>{b.nombre}</option>
               ))}
@@ -174,29 +191,29 @@ export default function Topbar() {
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
 
-          {/* Base Selector Mobile (Abre Bottom Sheet) */}
+          {/* Base Selector Mobile */}
           <div className="lg:hidden flex items-center">
             <button
                onClick={() => setIsBottomSheetOpen(true)}
                className="bg-[#0f172a] hover:bg-gray-800 text-white text-xs font-bold border border-gray-600 rounded-full px-3 py-1.5 flex items-center gap-1.5 transition-colors shadow-inner"
             >
-               <span className="truncate max-w-[90px]">{selectedBase?.nombre || "Nacional"}</span>
+               <span className="truncate max-w-[90px]">{selectedBase?.nombre || t('national')}</span>
                <ChevronDown size={12} className="text-emerald-400 shrink-0" />
             </button>
           </div>
 
           {/* Reloj UTC */}
           <div className="flex items-center space-x-2 bg-black/30 px-2 sm:px-3 py-1.5 rounded border border-gray-600">
-            <span className="hidden sm:inline-block text-xs text-gray-400 font-mono">HORA ZULU</span>
+            <span className="hidden sm:inline-block text-xs text-gray-400 font-mono">{t('zuluTime')}</span>
             <span className="text-xs sm:text-sm font-bold text-[#f59e0b] font-mono tracking-widest">{timeUTC || "00:00:00 UTC"}</span>
           </div>
 
           {/* Notificaciones */}
           <div className="relative">
-            <button 
+            <button
               onClick={() => {
                 setIsNotificationsOpen(!isNotificationsOpen);
-                if (!isNotificationsOpen) setUnreadCount(0); // Marcar como leidas al abrir
+                if (!isNotificationsOpen) setUnreadCount(0);
               }}
               className={`relative p-2 transition-colors rounded-full hover:bg-gray-800 focus:outline-none ${isAnimatingBell ? 'text-white' : 'text-gray-400 hover:text-white'}`}
             >
@@ -208,7 +225,6 @@ export default function Topbar() {
               )}
             </button>
 
-            {/* Estilo local para animación customizada de la campana */}
             <style jsx>{`
               @keyframes bell {
                 0% { transform: rotate(0deg); }
@@ -223,19 +239,19 @@ export default function Topbar() {
             {isNotificationsOpen && (
               <div className="absolute right-0 mt-2 w-80 bg-[#0f172a] border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden text-left">
                 <div className="bg-[#1e293b] px-4 py-3 border-b border-gray-700 flex justify-between items-center">
-                  <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">Alertas Activas</span>
+                  <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">{t('activeAlerts')}</span>
                   {unreadCount > 0 ? (
                     <span className="bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-red-500/30">
-                      {unreadCount} NUEVA{unreadCount > 1 ? 'S' : ''}
+                      {unreadCount} {unreadCount > 1 ? t('newPlural') : t('newSingular')}
                     </span>
                   ) : (
-                     <span className="text-[10px] text-gray-500 monospace">Al día</span>
+                     <span className="text-[10px] text-gray-500 monospace">{t('upToDate')}</span>
                   )}
                 </div>
                 <div className="max-h-[300px] overflow-y-auto">
                   {notificaciones.map((notif, index) => (
-                    <div 
-                      key={notif.id} 
+                    <div
+                      key={notif.id}
                       className={`px-4 py-3 border-b border-gray-800/50 hover:bg-[#1e293b]/50 transition-colors cursor-pointer border-l-2 ${notif.colorBorder} ${index < unreadCount ? 'bg-[#1e293b]/30' : ''}`}
                     >
                       <div className="flex justify-between items-start mb-0.5">
@@ -249,7 +265,7 @@ export default function Topbar() {
                 </div>
                 <div className="bg-[#1e293b]/80 px-4 py-2 text-center">
                   <Link href="/alertas" onClick={() => setIsNotificationsOpen(false)} className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold uppercase tracking-widest cursor-pointer">
-                    Ver Central de Alertas
+                    {t('viewAlertCenter')}
                   </Link>
                 </div>
               </div>
@@ -265,7 +281,7 @@ export default function Topbar() {
               <button
                 onClick={() => signOut()}
                 className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-full hover:bg-gray-800"
-                title="Cerrar Sesión"
+                title={t('closeSession')}
               >
                 <LogOut size={18} />
               </button>
@@ -277,20 +293,18 @@ export default function Topbar() {
       {/* MOBILE MENU DRAWER */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
-          {/* Fondo oscuro overlay */}
-          <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
 
-          {/* Menú Sidebar */}
           <aside className="relative flex flex-col w-[260px] bg-[#0f172a] h-full shadow-2xl animate-[slideRight_0.3s_ease-out]">
             <div className="flex items-center justify-between p-4 border-b border-gray-800">
                <div>
-                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">Red Meteorológica</p>
+                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">{tSidebar('metNetwork')}</p>
                  <img src="/1.png" alt="Sermetavia Logo" className="h-[48px] w-auto object-contain" />
                </div>
-               <button 
+               <button
                  onClick={() => setIsMobileMenuOpen(false)}
                  className="p-2 text-gray-400 hover:text-white bg-gray-800/50 rounded-full"
                >
@@ -298,16 +312,14 @@ export default function Topbar() {
                </button>
             </div>
 
-            {/* Se removió el Selector nativo de móvil, ahora usa Bottom Sheet */}
-
             <nav className="flex-1 overflow-y-auto py-2">
-              <p className="px-5 text-[10px] font-bold text-gray-600 uppercase tracking-widest mt-2 mb-2">Operaciones</p>
+              <p className="px-5 text-[10px] font-bold text-gray-600 uppercase tracking-widest mt-2 mb-2">{tSidebar('operations')}</p>
               <ul className="space-y-1 px-2">
-                {mainNav.map(item => (
+                {mainNavKeys.map(item => (
                   <li key={item.href}>
                     <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={linkClass(item.href)}>
-                      <item.icon size={18} className={pathname === item.href ? "text-[#10b981]" : ""} />
-                      <span className="font-medium text-sm">{item.label}</span>
+                      <item.icon size={18} className={isActivePath(item.href) ? "text-[#10b981]" : ""} />
+                      <span className="font-medium text-sm">{tSidebar(item.labelKey)}</span>
                     </Link>
                   </li>
                 ))}
@@ -315,13 +327,13 @@ export default function Topbar() {
 
               <div className="my-4 mx-5 border-t border-gray-800"></div>
 
-              <p className="px-5 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">Sistema</p>
+              <p className="px-5 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">{tSidebar('system')}</p>
               <ul className="space-y-1 px-2">
-                {systemNav.map(item => (
+                {systemNavKeys.map(item => (
                   <li key={item.href}>
                     <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} className={linkClass(item.href)}>
-                      <item.icon size={18} className={pathname === item.href ? "text-[#10b981]" : ""} />
-                      <span className="font-medium text-sm">{item.label}</span>
+                      <item.icon size={18} className={isActivePath(item.href) ? "text-[#10b981]" : ""} />
+                      <span className="font-medium text-sm">{tSidebar(item.labelKey)}</span>
                     </Link>
                   </li>
                 ))}
@@ -344,27 +356,25 @@ export default function Topbar() {
       {/* BOTTOM SHEET SELECTOR DE BASE (MOBILE) */}
       {isBottomSheetOpen && (
         <div className="fixed inset-0 z-[60] flex flex-col justify-end lg:hidden">
-          {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
             onClick={() => setIsBottomSheetOpen(false)}
           ></div>
-          
-          {/* Sheet */}
+
           <div className="relative bg-[#0f172a] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-gray-700 p-5 mt-20 animate-[slideUp_0.3s_ease-out] flex flex-col max-h-[85vh]">
             <div className="flex items-center justify-between mb-4 mt-1 px-1">
               <div>
-                <h3 className="text-white font-bold text-lg tracking-wide">Área Operacional</h3>
-                <p className="text-gray-400 text-xs mt-0.5">Seleccione la estación a monitorear</p>
+                <h3 className="text-white font-bold text-lg tracking-wide">{t('operationalArea')}</h3>
+                <p className="text-gray-400 text-xs mt-0.5">{t('selectStation')}</p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsBottomSheetOpen(false)}
                 className="p-2 bg-gray-800 rounded-full text-gray-400 hover:text-white"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto space-y-2 pb-6 px-1 hide-scrollbar">
               <button
                 onClick={() => { setSelectedBase(null); setIsBottomSheetOpen(false); }}
@@ -375,8 +385,8 @@ export default function Topbar() {
                     <LayoutDashboard size={18} />
                   </div>
                   <div>
-                    <h4 className={`font-bold text-sm ${!selectedBase ? 'text-emerald-400' : 'text-white'}`}>Red Nacional</h4>
-                    <p className="text-[10px] text-gray-500 uppercase mt-0.5 font-bold tracking-widest">Promedio País</p>
+                    <h4 className={`font-bold text-sm ${!selectedBase ? 'text-emerald-400' : 'text-white'}`}>{t('nationalNetwork2')}</h4>
+                    <p className="text-[10px] text-gray-500 uppercase mt-0.5 font-bold tracking-widest">{t('countryAverage')}</p>
                   </div>
                 </div>
                 {!selectedBase && <div className="w-2.5 h-2.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />}

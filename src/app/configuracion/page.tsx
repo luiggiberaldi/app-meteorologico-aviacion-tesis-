@@ -12,94 +12,19 @@ import {
   Save, RotateCcw, UserCog, AlertCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useSettings, DEFAULT_SETTINGS, type AppSettings } from '@/context/SettingsContext';
+import { useTranslation } from '@/i18n';
 
-// ─── Tipos ───
-interface AppSettings {
-  // General
-  language: string;
-  timezone: string;
-  defaultBase: string;
-  autoRefreshInterval: number;
-  dateFormat: string;
-  // Unidades
-  tempUnit: 'C' | 'F';
-  windUnit: 'KT' | 'KMH' | 'MS';
-  visibilityUnit: 'KM' | 'SM' | 'M';
-  pressureUnit: 'HPA' | 'INHG' | 'MB';
-  altitudeUnit: 'FT' | 'M';
-  fuelUnit: 'LBS' | 'KG' | 'GAL' | 'LT';
-  // Apariencia
-  theme: 'dark' | 'light' | 'auto';
-  sidebarCollapsed: boolean;
-  animationsEnabled: boolean;
-  compactMode: boolean;
-  fontSize: 'small' | 'medium' | 'large';
-  // Notificaciones
-  notificationsEnabled: boolean;
-  soundEnabled: boolean;
-  weatherAlerts: boolean;
-  maintenanceAlerts: boolean;
-  operationalAlerts: boolean;
-  alertThresholdWind: number;
-  alertThresholdVisibility: number;
-  // Datos
-  dataRetentionDays: number;
-  autoBackup: boolean;
-  backupFrequency: 'daily' | 'weekly' | 'monthly';
-  cacheEnabled: boolean;
-  // Avanzado
-  debugMode: boolean;
-  apiTimeout: number;
-  maxRetries: number;
-  offlineMode: boolean;
-  telemetryEnabled: boolean;
-}
-
-const DEFAULT_SETTINGS: AppSettings = {
-  language: 'es',
-  timezone: 'America/Caracas',
-  defaultBase: 'SVMI',
-  autoRefreshInterval: 300,
-  dateFormat: 'DD/MM/YYYY',
-  tempUnit: 'C',
-  windUnit: 'KT',
-  visibilityUnit: 'KM',
-  pressureUnit: 'HPA',
-  altitudeUnit: 'FT',
-  fuelUnit: 'LBS',
-  theme: 'dark',
-  sidebarCollapsed: false,
-  animationsEnabled: true,
-  compactMode: false,
-  fontSize: 'medium',
-  notificationsEnabled: true,
-  soundEnabled: true,
-  weatherAlerts: true,
-  maintenanceAlerts: true,
-  operationalAlerts: true,
-  alertThresholdWind: 30,
-  alertThresholdVisibility: 5000,
-  dataRetentionDays: 90,
-  autoBackup: true,
-  backupFrequency: 'weekly',
-  cacheEnabled: true,
-  debugMode: false,
-  apiTimeout: 10,
-  maxRetries: 3,
-  offlineMode: true,
-  telemetryEnabled: false,
-};
-
-// ─── Tabs ───
-const TABS = [
-  { id: 'account', label: 'Mi Cuenta', icon: UserCog },
-  { id: 'general', label: 'General', icon: Settings },
-  { id: 'units', label: 'Unidades', icon: Gauge },
-  { id: 'appearance', label: 'Apariencia', icon: Monitor },
-  { id: 'notifications', label: 'Notificaciones', icon: Bell },
-  { id: 'data', label: 'Datos y Respaldos', icon: Database },
-  { id: 'advanced', label: 'Avanzado', icon: Wrench },
-  { id: 'about', label: 'Acerca de', icon: Info },
+// ─── Tabs definition (labelKey used for translation lookup) ───
+const TAB_DEFS = [
+  { id: 'account', labelKey: 'tabAccount' as const, icon: UserCog },
+  { id: 'general', labelKey: 'tabGeneral' as const, icon: Settings },
+  { id: 'units', labelKey: 'tabUnits' as const, icon: Gauge },
+  { id: 'appearance', labelKey: 'tabAppearance' as const, icon: Monitor },
+  { id: 'notifications', labelKey: 'tabNotifications' as const, icon: Bell },
+  { id: 'data', labelKey: 'tabData' as const, icon: Database },
+  { id: 'advanced', labelKey: 'tabAdvanced' as const, icon: Wrench },
+  { id: 'about', labelKey: 'tabAbout' as const, icon: Info },
 ];
 
 // ─── Componentes auxiliares ───
@@ -183,10 +108,9 @@ function Divider() {
 // ─── Componente Principal ───
 export default function ConfiguracionPage() {
   const [activeTab, setActiveTab] = useState('account');
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
-  const [saved, setSaved] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+  const { settings, updateSetting, saveSettings, resetSettings, hasChanges, saved } = useSettings();
   const { user, updateCredentials } = useAuth();
+  const { t } = useTranslation('settings');
   // Estado del formulario de cuenta
   const [accUsername, setAccUsername] = useState('');
   const [accPassword, setAccPassword] = useState('');
@@ -203,47 +127,16 @@ export default function ConfiguracionPage() {
     }
   }, [user]);
 
-  // Cargar config de localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('sermetavia_settings');
-      if (stored) {
-        setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(stored) });
-      }
-    } catch { /* ignore */ }
-  }, []);
-
-  const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-    setHasChanges(true);
-    setSaved(false);
-  };
-
-  const handleSave = () => {
-    try {
-      localStorage.setItem('sermetavia_settings', JSON.stringify(settings));
-      setSaved(true);
-      setHasChanges(false);
-      setTimeout(() => setSaved(false), 3000);
-    } catch { /* ignore */ }
-  };
-
-  const handleReset = () => {
-    setSettings(DEFAULT_SETTINGS);
-    setHasChanges(true);
-    setSaved(false);
-  };
-
   // ─── Render de cada tab ───
   const handleSaveAccount = () => {
     setAccError(null);
     setAccSuccess(null);
-    if (!accUsername.trim()) { setAccError('El usuario no puede estar vacío'); return; }
-    if (accPassword.length < 6) { setAccError('La contraseña debe tener al menos 6 caracteres'); return; }
-    if (!accDisplayName.trim()) { setAccError('El nombre no puede estar vacío'); return; }
+    if (!accUsername.trim()) { setAccError(t('emptyUserError')); return; }
+    if (accPassword.length < 6) { setAccError(t('shortPasswordError')); return; }
+    if (!accDisplayName.trim()) { setAccError(t('emptyNameError')); return; }
     const result = updateCredentials(accUsername.trim(), accPassword, accDisplayName.trim());
     if (result.error) { setAccError(result.error); }
-    else { setAccSuccess('Credenciales actualizadas correctamente'); setTimeout(() => setAccSuccess(null), 4000); }
+    else { setAccSuccess(t('credentialsUpdated')); setTimeout(() => setAccSuccess(null), 4000); }
   };
 
   const renderContent = () => {
@@ -251,7 +144,7 @@ export default function ConfiguracionPage() {
       case 'account':
         return (
           <div className="space-y-1">
-            <SectionTitle icon={UserCog} title="Credenciales de Acceso" />
+            <SectionTitle icon={UserCog} title={t('accessCredentials')} />
             {accError && (
               <div className="flex items-center gap-2 bg-red-900/30 border border-red-500/40 rounded-lg p-3 mb-3">
                 <AlertCircle size={16} className="text-red-400 shrink-0" />
@@ -265,29 +158,29 @@ export default function ConfiguracionPage() {
               </div>
             )}
             <div className="py-3">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Nombre para Mostrar</label>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">{t('displayName')}</label>
               <input type="text" value={accDisplayName} onChange={e => setAccDisplayName(e.target.value)}
                 className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
-              <p className="text-[11px] text-gray-500 mt-1">Nombre que se muestra en el sistema y reportes</p>
+              <p className="text-[11px] text-gray-500 mt-1">{t('displayNameDesc')}</p>
             </div>
             <Divider />
             <div className="py-3">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Usuario</label>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">{t('usernameLabel')}</label>
               <input type="text" value={accUsername} onChange={e => setAccUsername(e.target.value)}
                 className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
-              <p className="text-[11px] text-gray-500 mt-1">Nombre de usuario para iniciar sesión</p>
+              <p className="text-[11px] text-gray-500 mt-1">{t('usernameDesc')}</p>
             </div>
             <Divider />
             <div className="py-3">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Contraseña</label>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">{t('passwordLabel')}</label>
               <input type="password" value={accPassword} onChange={e => setAccPassword(e.target.value)}
                 className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
-              <p className="text-[11px] text-gray-500 mt-1">Mínimo 6 caracteres</p>
+              <p className="text-[11px] text-gray-500 mt-1">{t('passwordDesc')}</p>
             </div>
             <div className="pt-4">
               <button onClick={handleSaveAccount}
                 className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-lg transition-colors text-sm font-medium shadow-lg shadow-emerald-900/30">
-                <Save size={16} /> Guardar Cambios de Cuenta
+                <Save size={16} /> {t('saveAccountChanges')}
               </button>
             </div>
           </div>
@@ -296,10 +189,10 @@ export default function ConfiguracionPage() {
       case 'general':
         return (
           <div className="space-y-1">
-            <SectionTitle icon={Globe} title="Regional" />
+            <SectionTitle icon={Globe} title={t('sectionRegional')} />
             <SelectField
               value={settings.language} onChange={v => updateSetting('language', v)}
-              label="Idioma" description="Idioma de la interfaz del sistema"
+              label={t('language')} description={t('languageDesc')}
               options={[
                 { value: 'es', label: 'Español' },
                 { value: 'en', label: 'English' },
@@ -309,7 +202,7 @@ export default function ConfiguracionPage() {
             <Divider />
             <SelectField
               value={settings.timezone} onChange={v => updateSetting('timezone', v)}
-              label="Zona Horaria" description="Hora local del sistema"
+              label={t('timezone')} description={t('timezoneDesc')}
               options={[
                 { value: 'America/Caracas', label: 'UTC-4 (Venezuela)' },
                 { value: 'America/Bogota', label: 'UTC-5 (Colombia)' },
@@ -320,7 +213,7 @@ export default function ConfiguracionPage() {
             <Divider />
             <SelectField
               value={settings.dateFormat} onChange={v => updateSetting('dateFormat', v)}
-              label="Formato de Fecha"
+              label={t('dateFormat')}
               options={[
                 { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
                 { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
@@ -329,11 +222,12 @@ export default function ConfiguracionPage() {
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={MapPin} title="Base Predeterminada" />
+            <SectionTitle icon={MapPin} title={t('sectionDefaultBase')} />
             <SelectField
               value={settings.defaultBase} onChange={v => updateSetting('defaultBase', v)}
-              label="Base Inicial" description="Base que se carga al abrir la aplicación"
+              label={t('defaultBase')} description={t('defaultBaseDesc')}
               options={[
+                { value: '', label: t('nationalAllBases') },
                 { value: 'SVMI', label: 'SVMI - Maiquetía' },
                 { value: 'SVBS', label: 'SVBS - Baraguá' },
                 { value: 'SVBM', label: 'SVBM - Barquisimeto' },
@@ -345,18 +239,18 @@ export default function ConfiguracionPage() {
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={RefreshCw} title="Actualización de Datos" />
+            <SectionTitle icon={RefreshCw} title={t('sectionDataUpdate')} />
             <SelectField
               value={String(settings.autoRefreshInterval)}
               onChange={v => updateSetting('autoRefreshInterval', Number(v))}
-              label="Intervalo de Refresco" description="Frecuencia de actualización automática de datos meteorológicos"
+              label={t('refreshInterval')} description={t('refreshIntervalDesc')}
               options={[
-                { value: '60', label: 'Cada 1 minuto' },
-                { value: '120', label: 'Cada 2 minutos' },
-                { value: '300', label: 'Cada 5 minutos' },
-                { value: '600', label: 'Cada 10 minutos' },
-                { value: '900', label: 'Cada 15 minutos' },
-                { value: '1800', label: 'Cada 30 minutos' },
+                { value: '60', label: t('every1min') },
+                { value: '120', label: t('every2min') },
+                { value: '300', label: t('every5min') },
+                { value: '600', label: t('every10min') },
+                { value: '900', label: t('every15min') },
+                { value: '1800', label: t('every30min') },
               ]}
             />
           </div>
@@ -365,10 +259,10 @@ export default function ConfiguracionPage() {
       case 'units':
         return (
           <div className="space-y-1">
-            <SectionTitle icon={Thermometer} title="Unidades Meteorológicas" />
+            <SectionTitle icon={Thermometer} title={t('sectionMeteoUnits')} />
             <SelectField
               value={settings.tempUnit} onChange={v => updateSetting('tempUnit', v as any)}
-              label="Temperatura"
+              label={t('temperature')}
               options={[
                 { value: 'C', label: '°C (Celsius)' },
                 { value: 'F', label: '°F (Fahrenheit)' },
@@ -377,7 +271,7 @@ export default function ConfiguracionPage() {
             <Divider />
             <SelectField
               value={settings.windUnit} onChange={v => updateSetting('windUnit', v as any)}
-              label="Velocidad del Viento"
+              label={t('windSpeed')}
               options={[
                 { value: 'KT', label: 'Nudos (KT)' },
                 { value: 'KMH', label: 'km/h' },
@@ -387,7 +281,7 @@ export default function ConfiguracionPage() {
             <Divider />
             <SelectField
               value={settings.visibilityUnit} onChange={v => updateSetting('visibilityUnit', v as any)}
-              label="Visibilidad"
+              label={t('visibility')}
               options={[
                 { value: 'KM', label: 'Kilómetros (km)' },
                 { value: 'SM', label: 'Millas Estatutarias (SM)' },
@@ -397,7 +291,7 @@ export default function ConfiguracionPage() {
             <Divider />
             <SelectField
               value={settings.pressureUnit} onChange={v => updateSetting('pressureUnit', v as any)}
-              label="Presión Atmosférica"
+              label={t('pressure')}
               options={[
                 { value: 'HPA', label: 'Hectopascales (hPa)' },
                 { value: 'INHG', label: 'Pulgadas Hg (inHg)' },
@@ -406,10 +300,10 @@ export default function ConfiguracionPage() {
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Plane} title="Unidades de Aviación" />
+            <SectionTitle icon={Plane} title={t('sectionAviationUnits')} />
             <SelectField
               value={settings.altitudeUnit} onChange={v => updateSetting('altitudeUnit', v as any)}
-              label="Altitud"
+              label={t('altitude')}
               options={[
                 { value: 'FT', label: 'Pies (ft)' },
                 { value: 'M', label: 'Metros (m)' },
@@ -418,7 +312,7 @@ export default function ConfiguracionPage() {
             <Divider />
             <SelectField
               value={settings.fuelUnit} onChange={v => updateSetting('fuelUnit', v as any)}
-              label="Combustible"
+              label={t('fuel')}
               options={[
                 { value: 'LBS', label: 'Libras (lbs)' },
                 { value: 'KG', label: 'Kilogramos (kg)' },
@@ -432,48 +326,48 @@ export default function ConfiguracionPage() {
       case 'appearance':
         return (
           <div className="space-y-1">
-            <SectionTitle icon={Sun} title="Tema" />
+            <SectionTitle icon={Sun} title={t('sectionTheme')} />
             <SelectField
               value={settings.theme} onChange={v => updateSetting('theme', v as any)}
-              label="Tema de la Interfaz" description="Apariencia visual del sistema"
+              label={t('interfaceTheme')} description={t('interfaceThemeDesc')}
               options={[
-                { value: 'dark', label: '🌙 Modo Oscuro' },
-                { value: 'light', label: '☀️ Modo Claro' },
-                { value: 'auto', label: '🔄 Automático (SO)' },
+                { value: 'dark', label: `🌙 ${t('darkMode')}` },
+                { value: 'light', label: `☀️ ${t('lightMode')}` },
+                { value: 'auto', label: `🔄 ${t('autoMode')}` },
               ]}
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Monitor} title="Interfaz" />
+            <SectionTitle icon={Monitor} title={t('sectionInterface')} />
             <SelectField
               value={settings.fontSize} onChange={v => updateSetting('fontSize', v as any)}
-              label="Tamaño de Fuente" description="Tamaño del texto en toda la aplicación"
+              label={t('fontSize')} description={t('fontSizeDesc')}
               options={[
-                { value: 'small', label: 'Pequeño' },
-                { value: 'medium', label: 'Normal' },
-                { value: 'large', label: 'Grande' },
+                { value: 'small', label: t('fontSmall') },
+                { value: 'medium', label: t('fontNormal') },
+                { value: 'large', label: t('fontLarge') },
               ]}
             />
             <Divider />
             <Toggle
               value={settings.animationsEnabled}
               onChange={v => updateSetting('animationsEnabled', v)}
-              label="Animaciones"
-              description="Transiciones y efectos animados en la interfaz"
+              label={t('animations')}
+              description={t('animationsDesc')}
             />
             <Divider />
             <Toggle
               value={settings.compactMode}
               onChange={v => updateSetting('compactMode', v)}
-              label="Modo Compacto"
-              description="Reduce el espaciado para mostrar más información en pantalla"
+              label={t('compactMode')}
+              description={t('compactModeDesc')}
             />
             <Divider />
             <Toggle
               value={settings.sidebarCollapsed}
               onChange={v => updateSetting('sidebarCollapsed', v)}
-              label="Barra Lateral Colapsada"
-              description="Inicia la barra lateral en modo minimizado"
+              label={t('collapsedSidebar')}
+              description={t('collapsedSidebarDesc')}
             />
           </div>
         );
@@ -481,57 +375,57 @@ export default function ConfiguracionPage() {
       case 'notifications':
         return (
           <div className="space-y-1">
-            <SectionTitle icon={Bell} title="Notificaciones Generales" />
+            <SectionTitle icon={Bell} title={t('sectionGeneralNotifs')} />
             <Toggle
               value={settings.notificationsEnabled}
               onChange={v => updateSetting('notificationsEnabled', v)}
-              label="Notificaciones del Sistema"
-              description="Recibir alertas y avisos del sistema en tiempo real"
+              label={t('systemNotifications')}
+              description={t('systemNotificationsDesc')}
             />
             <Divider />
             <Toggle
               value={settings.soundEnabled}
               onChange={v => updateSetting('soundEnabled', v)}
-              label="Sonido de Alertas"
-              description="Reproducir sonido al recibir alertas críticas"
+              label={t('alertSound')}
+              description={t('alertSoundDesc')}
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Radio} title="Tipos de Alerta" />
+            <SectionTitle icon={Radio} title={t('sectionAlertTypes')} />
             <Toggle
               value={settings.weatherAlerts}
               onChange={v => updateSetting('weatherAlerts', v)}
-              label="Alertas Meteorológicas"
-              description="Notificar condiciones climáticas adversas (tormenta, vientos fuertes, baja visibilidad)"
+              label={t('weatherAlerts')}
+              description={t('weatherAlertsDesc')}
             />
             <Divider />
             <Toggle
               value={settings.maintenanceAlerts}
               onChange={v => updateSetting('maintenanceAlerts', v)}
-              label="Alertas de Mantenimiento"
-              description="Notificar cuando una aeronave tenga mantenimiento programado próximo"
+              label={t('maintenanceAlerts')}
+              description={t('maintenanceAlertsDesc')}
             />
             <Divider />
             <Toggle
               value={settings.operationalAlerts}
               onChange={v => updateSetting('operationalAlerts', v)}
-              label="Alertas Operacionales"
-              description="Notificar cambios de estado en las operaciones de vuelo"
+              label={t('operationalAlerts')}
+              description={t('operationalAlertsDesc')}
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Gauge} title="Umbrales de Alerta" />
+            <SectionTitle icon={Gauge} title={t('sectionAlertThresholds')} />
             <NumberField
               value={settings.alertThresholdWind}
               onChange={v => updateSetting('alertThresholdWind', v)}
-              label="Umbral de Viento" description="Velocidad de viento (KT) para generar alerta"
+              label={t('windThreshold')} description={t('windThresholdDesc')}
               min={10} max={80} suffix="KT"
             />
             <Divider />
             <NumberField
               value={settings.alertThresholdVisibility}
               onChange={v => updateSetting('alertThresholdVisibility', v)}
-              label="Umbral de Visibilidad" description="Visibilidad mínima (metros) para generar alerta"
+              label={t('visibilityThreshold')} description={t('visibilityThresholdDesc')}
               min={500} max={10000} suffix="m"
             />
           </div>
@@ -540,43 +434,43 @@ export default function ConfiguracionPage() {
       case 'data':
         return (
           <div className="space-y-1">
-            <SectionTitle icon={HardDrive} title="Almacenamiento Local" />
+            <SectionTitle icon={HardDrive} title={t('sectionLocalStorage')} />
             <NumberField
               value={settings.dataRetentionDays}
               onChange={v => updateSetting('dataRetentionDays', v)}
-              label="Retención de Datos" description="Días que se conservan los registros meteorológicos en caché local"
-              min={7} max={365} suffix="días"
+              label={t('dataRetention')} description={t('dataRetentionDesc')}
+              min={7} max={365} suffix={t('days')}
             />
             <Divider />
             <Toggle
               value={settings.cacheEnabled}
               onChange={v => updateSetting('cacheEnabled', v)}
-              label="Caché de Datos"
-              description="Almacenar datos consultados recientemente para acceso rápido"
+              label={t('dataCache')}
+              description={t('dataCacheDesc')}
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Download} title="Respaldos" />
+            <SectionTitle icon={Download} title={t('sectionBackups')} />
             <Toggle
               value={settings.autoBackup}
               onChange={v => updateSetting('autoBackup', v)}
-              label="Respaldo Automático"
-              description="Generar respaldos periódicos de la configuración y datos locales"
+              label={t('autoBackup')}
+              description={t('autoBackupDesc')}
             />
             <Divider />
             <SelectField
               value={settings.backupFrequency}
               onChange={v => updateSetting('backupFrequency', v as any)}
-              label="Frecuencia de Respaldo" description="Intervalo entre respaldos automáticos"
+              label={t('backupFrequency')} description={t('backupFrequencyDesc')}
               options={[
-                { value: 'daily', label: 'Diario' },
-                { value: 'weekly', label: 'Semanal' },
-                { value: 'monthly', label: 'Mensual' },
+                { value: 'daily', label: t('daily') },
+                { value: 'weekly', label: t('weekly') },
+                { value: 'monthly', label: t('monthly') },
               ]}
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Trash2} title="Acciones de Datos" />
+            <SectionTitle icon={Trash2} title={t('sectionDataActions')} />
             <div className="flex flex-wrap gap-3 py-3">
               <button
                 onClick={() => {
@@ -591,10 +485,10 @@ export default function ConfiguracionPage() {
                 }}
                 className="flex items-center gap-2 bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 border border-blue-700/50 px-4 py-2 rounded-lg transition-colors text-sm"
               >
-                <Download size={16} /> Exportar Configuración
+                <Download size={16} /> {t('exportConfig')}
               </button>
               <label className="flex items-center gap-2 bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-700/50 px-4 py-2 rounded-lg transition-colors text-sm cursor-pointer">
-                <Upload size={16} /> Importar Configuración
+                <Upload size={16} /> {t('importConfig')}
                 <input
                   type="file"
                   accept=".json"
@@ -606,8 +500,13 @@ export default function ConfiguracionPage() {
                       reader.onload = ev => {
                         try {
                           const imported = JSON.parse(ev.target?.result as string);
-                          setSettings({ ...DEFAULT_SETTINGS, ...imported });
-                          setHasChanges(true);
+                          updateSetting('language', imported.language ?? DEFAULT_SETTINGS.language);
+                          // Apply all imported settings
+                          Object.keys(imported).forEach(key => {
+                            if (key in DEFAULT_SETTINGS) {
+                              updateSetting(key as keyof AppSettings, imported[key]);
+                            }
+                          });
                         } catch { /* ignore */ }
                       };
                       reader.readAsText(file);
@@ -617,14 +516,14 @@ export default function ConfiguracionPage() {
               </label>
               <button
                 onClick={() => {
-                  if (confirm('¿Está seguro de que desea limpiar todos los datos almacenados localmente? Esta acción no se puede deshacer.')) {
+                  if (confirm(t('clearDataConfirm'))) {
                     localStorage.clear();
                     window.location.reload();
                   }
                 }}
                 className="flex items-center gap-2 bg-red-900/30 hover:bg-red-900/50 text-red-300 border border-red-700/50 px-4 py-2 rounded-lg transition-colors text-sm"
               >
-                <Trash2 size={16} /> Limpiar Datos Locales
+                <Trash2 size={16} /> {t('clearLocalData')}
               </button>
             </div>
           </div>
@@ -633,59 +532,59 @@ export default function ConfiguracionPage() {
       case 'advanced':
         return (
           <div className="space-y-1">
-            <SectionTitle icon={Zap} title="Rendimiento" />
+            <SectionTitle icon={Zap} title={t('sectionPerformance')} />
             <NumberField
               value={settings.apiTimeout}
               onChange={v => updateSetting('apiTimeout', v)}
-              label="Timeout de API" description="Tiempo máximo de espera para solicitudes de red"
-              min={5} max={60} suffix="seg"
+              label={t('apiTimeout')} description={t('apiTimeoutDesc')}
+              min={5} max={60} suffix={t('seconds')}
             />
             <Divider />
             <NumberField
               value={settings.maxRetries}
               onChange={v => updateSetting('maxRetries', v)}
-              label="Reintentos Máximos" description="Número de reintentos antes de reportar error de conexión"
+              label={t('maxRetries')} description={t('maxRetriesDesc')}
               min={0} max={10}
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Shield} title="Conectividad" />
+            <SectionTitle icon={Shield} title={t('sectionConnectivity')} />
             <Toggle
               value={settings.offlineMode}
               onChange={v => updateSetting('offlineMode', v)}
-              label="Modo Offline (PWA)"
-              description="Habilitar caché del Service Worker para funcionamiento sin conexión a Internet"
+              label={t('offlineMode')}
+              description={t('offlineModeDesc')}
             />
             <Divider />
             <Toggle
               value={settings.telemetryEnabled}
               onChange={v => updateSetting('telemetryEnabled', v)}
-              label="Telemetría de Uso"
-              description="Enviar datos anónimos de uso al equipo de desarrollo para mejorar la plataforma"
+              label={t('telemetry')}
+              description={t('telemetryDesc')}
             />
 
             <div className="mt-6" />
-            <SectionTitle icon={Wrench} title="Desarrollo" />
+            <SectionTitle icon={Wrench} title={t('sectionDevelopment')} />
             <Toggle
               value={settings.debugMode}
               onChange={v => updateSetting('debugMode', v)}
-              label="Modo Debug"
-              description="Activa logs avanzados en la consola del navegador y muestra IDs técnicos"
+              label={t('debugMode')}
+              description={t('debugModeDesc')}
             />
 
             <div className="mt-6 p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
-              <p className="text-xs text-yellow-300 font-bold mb-1">⚠️ Zona de Peligro</p>
-              <p className="text-xs text-yellow-200/70 mb-3">Estas acciones afectan la operación del sistema. Usar con precaución.</p>
+              <p className="text-xs text-yellow-300 font-bold mb-1">⚠️ {t('dangerZone')}</p>
+              <p className="text-xs text-yellow-200/70 mb-3">{t('dangerZoneDesc')}</p>
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => {
-                    if (confirm('¿Restaurar TODA la configuración a valores de fábrica?')) {
-                      handleReset();
+                    if (confirm(t('factoryResetConfirm'))) {
+                      resetSettings();
                     }
                   }}
                   className="flex items-center gap-2 bg-red-900/40 hover:bg-red-800/50 text-red-300 border border-red-600/50 px-4 py-2 rounded-lg transition-colors text-sm"
                 >
-                  <RotateCcw size={16} /> Restaurar Valores de Fábrica
+                  <RotateCcw size={16} /> {t('factoryReset')}
                 </button>
               </div>
             </div>
@@ -698,7 +597,7 @@ export default function ConfiguracionPage() {
             <div className="text-center py-6">
               <img src="/2.png" alt="SERMETAVIA" className="h-24 w-auto mx-auto mb-4 object-contain" />
               <h2 className="text-2xl font-bold text-white">SERMETAVIA</h2>
-              <p className="text-gray-400 text-sm mt-1">Servicio Meteorológico de la Aviación Militar Bolivariana</p>
+              <p className="text-gray-400 text-sm mt-1">{t('aboutService')}</p>
               <div className="inline-block mt-3 bg-emerald-900/30 border border-emerald-600/40 rounded-full px-4 py-1">
                 <span className="text-emerald-300 text-sm font-mono">v2.0.0</span>
               </div>
@@ -706,13 +605,13 @@ export default function ConfiguracionPage() {
 
             <div className="bg-[#0f172a] rounded-xl border border-gray-700 divide-y divide-gray-800">
               {[
-                ['Plataforma', 'Next.js 15 + React 19'],
-                ['Base de Datos', 'Supabase (PostgreSQL)'],
-                ['API Meteorológica', 'Open-Meteo (Libre)'],
-                ['Cartografía', 'Leaflet + OpenStreetMap'],
-                ['Gráficas', 'Recharts 2.x'],
-                ['PWA', 'Service Worker + Manifest'],
-                ['Despliegue', 'Vercel Edge Network'],
+                [t('aboutPlatform'), 'Next.js 15 + React 19'],
+                [t('aboutDatabase'), 'Supabase (PostgreSQL)'],
+                [t('aboutWeatherAPI'), 'Open-Meteo (Libre)'],
+                [t('aboutCartography'), 'Leaflet + OpenStreetMap'],
+                [t('aboutCharts'), 'Recharts 2.x'],
+                [t('aboutPWA'), 'Service Worker + Manifest'],
+                [t('aboutDeployment'), 'Cloudflare Workers'],
               ].map(([key, val]) => (
                 <div key={key} className="flex justify-between items-center px-4 py-3">
                   <span className="text-sm text-gray-400">{key}</span>
@@ -722,26 +621,24 @@ export default function ConfiguracionPage() {
             </div>
 
             <div className="bg-[#0f172a] rounded-xl border border-gray-700 p-4">
-              <h4 className="text-sm font-bold text-white mb-3">Equipo de Desarrollo</h4>
+              <h4 className="text-sm font-bold text-white mb-3">{t('devTeam')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-emerald-900/50 border border-emerald-600/40 flex items-center justify-center text-emerald-300 text-xs font-bold">LB</div>
                   <div>
-                    <p className="text-sm text-white">Proyecto de Tesis</p>
-                    <p className="text-xs text-gray-500">Aviación Militar Bolivariana</p>
+                    <p className="text-sm text-white">{t('thesisProject')}</p>
+                    <p className="text-xs text-gray-500">{t('militaryAviation')}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="bg-[#0f172a] rounded-xl border border-gray-700 p-4">
-              <h4 className="text-sm font-bold text-white mb-3">Licencia y Uso</h4>
+              <h4 className="text-sm font-bold text-white mb-3">{t('licenseTitle')}</h4>
               <p className="text-xs text-gray-400 leading-relaxed">
-                Este software es propiedad del Servicio Meteorológico de la Aviación Militar Bolivariana (SERMETAVIA).
-                Su uso está exclusivamente autorizado para fines institucionales y académicos.
-                Queda estrictamente prohibida su distribución, copia o modificación sin autorización expresa.
+                {t('licenseText')}
               </p>
-              <p className="text-xs text-gray-500 mt-3">© 2026 SERMETAVIA — Todos los derechos reservados.</p>
+              <p className="text-xs text-gray-500 mt-3">{t('copyright')}</p>
             </div>
           </div>
         );
@@ -754,15 +651,15 @@ export default function ConfiguracionPage() {
   return (
     <div className="space-y-6 pb-12">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-white mb-1">CONFIGURACIÓN</h2>
-        <p className="text-gray-400 text-sm">Personaliza el comportamiento, aspecto y preferencias del sistema SERMETAVIA.</p>
+        <h2 className="text-2xl font-bold tracking-tight text-white mb-1">{t('pageTitle')}</h2>
+        <p className="text-gray-400 text-sm">{t('pageDescription')}</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar de tabs */}
         <div className="lg:w-56 shrink-0">
           <nav className="bg-[#1e293b] rounded-xl border border-gray-700 overflow-hidden">
-            {TABS.map(tab => (
+            {TAB_DEFS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -773,7 +670,7 @@ export default function ConfiguracionPage() {
                 }`}
               >
                 <tab.icon size={18} className={activeTab === tab.id ? 'text-emerald-400' : ''} />
-                {tab.label}
+                {t(tab.labelKey)}
               </button>
             ))}
           </nav>
@@ -791,25 +688,25 @@ export default function ConfiguracionPage() {
               <div className="flex items-center gap-2">
                 {saved && (
                   <span className="flex items-center gap-1 text-emerald-400 text-sm animate-pulse">
-                    <Check size={16} /> Configuración guardada
+                    <Check size={16} /> {t('settingsSaved')}
                   </span>
                 )}
                 {hasChanges && !saved && (
-                  <span className="text-yellow-400 text-sm">● Cambios sin guardar</span>
+                  <span className="text-yellow-400 text-sm">● {t('unsavedChanges')}</span>
                 )}
               </div>
               <div className="flex gap-3">
                 <button
-                  onClick={handleReset}
+                  onClick={resetSettings}
                   className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-600 px-4 py-2 rounded-lg transition-colors text-sm"
                 >
-                  <RotateCcw size={16} /> Restaurar
+                  <RotateCcw size={16} /> {t('restore')}
                 </button>
                 <button
-                  onClick={handleSave}
+                  onClick={saveSettings}
                   className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg transition-colors text-sm font-medium shadow-lg shadow-emerald-900/30"
                 >
-                  <Save size={16} /> Guardar Cambios
+                  <Save size={16} /> {t('save')}
                 </button>
               </div>
             </div>
