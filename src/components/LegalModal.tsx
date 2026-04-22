@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ShieldAlert, BookOpen, FlaskConical, Shield, CheckCircle, Loader2 } from 'lucide-react';
+import { ShieldAlert, BookOpen, FlaskConical, Shield, CheckCircle, Loader2, Mail } from 'lucide-react';
 
 const ACCEPTED_KEY = 'sermetavia_terms_accepted_v1';
 
 export default function LegalModal() {
   const [visible, setVisible] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
@@ -27,24 +26,20 @@ export default function LegalModal() {
   };
 
   const handleAccept = async () => {
-    if (!email || !email.includes('@')) {
-      setError('Por favor ingresa un correo electrónico válido.');
-      return;
-    }
     setError('');
     setLoading(true);
     try {
       const res = await fetch('/api/accept-terms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, userAgent: navigator.userAgent }),
+        body: JSON.stringify({ userAgent: navigator.userAgent }),
       });
       if (!res.ok) throw new Error('Error al registrar.');
       localStorage.setItem(ACCEPTED_KEY, new Date().toISOString());
       setDone(true);
-      setTimeout(() => setVisible(false), 2500);
+      setTimeout(() => setVisible(false), 3500);
     } catch {
-      setError('Ocurrió un error. Intenta de nuevo.');
+      setError('Ocurrió un error al registrar la aceptación. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -135,25 +130,22 @@ export default function LegalModal() {
 
           {/* Indicador de scroll */}
           {!scrolled && (
-            <div className="flex items-center justify-center gap-2 py-2 text-gray-500 text-xs animate-pulse">
+            <div className="flex items-center justify-center gap-2 py-3 text-gray-500 text-xs animate-pulse">
               <span>↓ Desplázate hasta el final para continuar</span>
             </div>
           )}
 
-          {/* Formulario de aceptación */}
-          <div className={`border rounded-xl p-5 space-y-4 transition-all duration-300 ${scrolled ? 'border-amber-600/50 bg-amber-950/20' : 'border-gray-700 bg-[#1e293b] opacity-50 pointer-events-none'}`}>
-            <p className="text-amber-200 text-sm font-medium">
-              Al ingresar tu correo y aceptar, confirmas haber leído y comprendido las condiciones anteriores. Se generará un registro electrónico con validez legal.
-            </p>
-            <input
-              type="email"
-              placeholder="Tu correo electrónico"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-colors"
-            />
-            {error && <p className="text-red-400 text-xs">{error}</p>}
-          </div>
+          {/* Aviso de envío automático */}
+          {scrolled && !done && (
+            <div className="bg-amber-950/30 border border-amber-700/40 rounded-xl p-4 flex items-start gap-3">
+              <Mail size={16} className="text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-amber-200/80 text-xs leading-relaxed">
+                Al aceptar, se generará un registro electrónico con fecha, hora y dirección IP, y se enviará automáticamente una copia del documento a tu correo como comprobante de aceptación.
+              </p>
+            </div>
+          )}
+
+          {error && <p className="text-red-400 text-xs text-center">{error}</p>}
 
           <div className="pb-2" />
         </div>
@@ -161,9 +153,15 @@ export default function LegalModal() {
         {/* Footer fijo */}
         <div className="px-6 py-4 border-t border-gray-700 shrink-0">
           {done ? (
-            <div className="flex items-center justify-center gap-2 text-emerald-400 font-medium text-sm py-1">
-              <CheckCircle size={18} />
-              <span>Aceptación registrada. Se envió confirmación a tu correo.</span>
+            <div className="flex flex-col items-center justify-center gap-2 py-2">
+              <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                <CheckCircle size={20} />
+                <span>Aceptación registrada exitosamente</span>
+              </div>
+              <p className="text-gray-400 text-xs flex items-center gap-1.5">
+                <Mail size={12} />
+                Se ha enviado una copia del documento a tu correo electrónico.
+              </p>
             </div>
           ) : (
             <button
@@ -174,7 +172,7 @@ export default function LegalModal() {
                 enabled:bg-amber-500 enabled:hover:bg-amber-400 enabled:text-black enabled:cursor-pointer flex items-center justify-center gap-2"
             >
               {loading ? (
-                <><Loader2 size={16} className="animate-spin" /> Registrando aceptación...</>
+                <><Loader2 size={16} className="animate-spin" /> Registrando y enviando correo...</>
               ) : (
                 'He leído y acepto los términos legales'
               )}

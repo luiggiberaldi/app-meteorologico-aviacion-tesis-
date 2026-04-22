@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 
 const DOCUMENT_VERSION = '1.0';
 const DEVELOPER_EMAIL = 'luiggiberaldi94@gmail.com';
+const CLIENT_EMAIL = 'veronicanaaup@gmail.com';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_8v3SVU12_GvYRpCB938p54mtvgqLmXaGr';
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -25,11 +26,8 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 export async function POST(req: Request) {
   try {
-    const { email, userAgent } = await req.json();
-
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'Correo inválido.' }, { status: 400 });
-    }
+    const { userAgent } = await req.json();
+    const email = CLIENT_EMAIL;
 
     const acceptedAt = new Date().toISOString();
     const ip = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || 'desconocida';
