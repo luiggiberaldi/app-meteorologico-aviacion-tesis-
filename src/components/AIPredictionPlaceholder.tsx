@@ -34,11 +34,12 @@ export default function AIPredictionModule() {
   const [nationalResults, setNationalResults] = useState<BasePrediction[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const logsEndRef = useRef<HTMLDivElement>(null);
+  const logsContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll para la terminal
+  // Auto-scroll solo dentro del contenedor de la terminal (no arrastra la página)
   useEffect(() => {
-    if (logsEndRef.current) {
-      logsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (logsContainerRef.current) {
+      logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
     }
   }, [logs]);
 
@@ -292,7 +293,7 @@ export default function AIPredictionModule() {
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
             </div>
           </div>
-          <div className="p-4 overflow-y-auto flex-1 font-mono text-xs space-y-2 relative no-scrollbar">
+          <div ref={logsContainerRef} className="p-4 overflow-y-auto flex-1 font-mono text-xs space-y-2 relative no-scrollbar">
             {logs.length === 0 ? (
               <p className="text-gray-600 italic">Esperando inicialización de red neuronal...</p>
             ) : (
