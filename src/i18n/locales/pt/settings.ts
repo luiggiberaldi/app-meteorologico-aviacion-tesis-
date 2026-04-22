@@ -13,6 +13,7 @@ const settings: Record<keyof typeof es, string> = {
   tabData: 'Dados e Backups',
   tabAdvanced: 'Avancado',
   tabAbout: 'Sobre',
+  tabLegal: 'Aviso Legal',
   // Account
   accessCredentials: 'Credenciais de Acesso',
   displayName: 'Nome de Exibicao',

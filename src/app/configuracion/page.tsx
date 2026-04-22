@@ -9,7 +9,7 @@ import {
   RefreshCw, Zap, Shield, Server,
   Check, ChevronRight, ToggleLeft, ToggleRight,
   Gauge, Wind, Eye, Plane, Radio,
-  Save, RotateCcw, UserCog, AlertCircle
+  Save, RotateCcw, UserCog, AlertCircle, ShieldAlert, BookOpen, FlaskConical, Ban
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useSettings, DEFAULT_SETTINGS, type AppSettings } from '@/context/SettingsContext';
@@ -25,6 +25,7 @@ const TAB_DEFS = [
   { id: 'data', labelKey: 'tabData' as const, icon: Database },
   { id: 'advanced', labelKey: 'tabAdvanced' as const, icon: Wrench },
   { id: 'about', labelKey: 'tabAbout' as const, icon: Info },
+  { id: 'legal', labelKey: 'tabLegal' as const, icon: ShieldAlert },
 ];
 
 // ─── Componentes auxiliares ───
@@ -639,6 +640,85 @@ export default function ConfiguracionPage() {
                 {t('licenseText')}
               </p>
               <p className="text-xs text-gray-500 mt-3">{t('copyright')}</p>
+            </div>
+          </div>
+        );
+
+      case 'legal':
+        return (
+          <div className="space-y-6">
+            {/* Banner principal */}
+            <div className="bg-red-950/60 border-2 border-red-500/60 rounded-xl p-5 flex gap-4">
+              <ShieldAlert size={36} className="text-red-400 shrink-0 mt-1" />
+              <div>
+                <h3 className="text-red-300 font-bold text-lg uppercase tracking-wide mb-1">
+                  Aviso Legal — Uso Exclusivamente Académico
+                </h3>
+                <p className="text-red-200/80 text-sm leading-relaxed">
+                  Esta plataforma es el resultado de un <strong>proyecto de tesis universitaria</strong> y <strong>no constituye</strong> un sistema operacional, militar ni de certificación aeronáutica de ningún tipo. Su uso está restringido exclusivamente a fines de evaluación académica.
+                </p>
+              </div>
+            </div>
+
+            {/* Bloque 1: No es un sistema real */}
+            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Ban size={18} className="text-orange-400" />
+                <h4 className="text-white font-bold text-sm uppercase tracking-widest">No es un Sistema Militar Real</h4>
+              </div>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                SERMETAVIA es un <strong>prototipo académico</strong> desarrollado como trabajo de grado. No está afiliado, aprobado ni respaldado por ninguna institución de las Fuerzas Armadas, organismos de aviación civil (INAC), la Fuerza Aérea Venezolana, ni ningún organismo gubernamental. El uso del nombre "SERMETAVIA" y referencias a la Base Aérea Logística Baragua son únicamente con fines ilustrativos y académicos en el contexto de la tesis.
+              </p>
+            </div>
+
+            {/* Bloque 2: Datos simulados */}
+            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <FlaskConical size={18} className="text-amber-400" />
+                <h4 className="text-white font-bold text-sm uppercase tracking-widest">Datos Estimados y Simulados</h4>
+              </div>
+              <ul className="text-gray-300 text-sm leading-relaxed space-y-2">
+                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Los <strong>porcentajes de riesgo</strong> (engelamiento, turbulencia, visibilidad) son estimaciones matemáticas aproximadas, no mediciones certificadas.</li>
+                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Las <strong>notificaciones de alerta</strong> del sistema son generadas de forma simulada con fines demostrativos.</li>
+                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Los <strong>dictámenes tácticos del módulo IA</strong> son generados por un modelo de lenguaje (LLM) y no tienen validez operacional.</li>
+                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Los <strong>datos meteorológicos</strong> provienen de Open-Meteo (servicio público), no de sensores oficiales IATA/OACI ni de estaciones certificadas.</li>
+              </ul>
+            </div>
+
+            {/* Bloque 3: No usar como referencia */}
+            <div className="bg-[#0f172a] border border-red-800/40 rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertCircle size={18} className="text-red-400" />
+                <h4 className="text-white font-bold text-sm uppercase tracking-widest">Prohibición de Uso Operacional</h4>
+              </div>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                <strong className="text-red-300">ESTÁ ESTRICTAMENTE PROHIBIDO</strong> utilizar esta plataforma como:
+              </p>
+              <ul className="text-gray-300 text-sm leading-relaxed space-y-2">
+                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Referencia para toma de decisiones de vuelo reales.</li>
+                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Herramienta de despacho, planificación o control de aeronaves.</li>
+                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Sustituto de sistemas meteorológicos aeronáuticos oficiales (METAR, TAF, SIGMET certificados).</li>
+                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Fuente de información para cualquier operación aérea civil o militar.</li>
+              </ul>
+            </div>
+
+            {/* Bloque 4: Exención de responsabilidad */}
+            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <BookOpen size={18} className="text-blue-400" />
+                <h4 className="text-white font-bold text-sm uppercase tracking-widest">Exención de Responsabilidad</h4>
+              </div>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                El autor del proyecto y la institución académica asociada <strong>no asumen ninguna responsabilidad</strong> por daños directos, indirectos, incidentales o consecuentes derivados del uso de esta plataforma fuera del ámbito académico para el que fue diseñada. El uso de este sistema implica la aceptación plena de las condiciones aquí establecidas.
+              </p>
+              <p className="text-gray-400 text-xs mt-2 border-t border-gray-800 pt-3">
+                Versión del aviso: 1.0 — Aplicable desde la publicación del proyecto de tesis. Cualquier reproducción del sistema debe mantener este aviso legal íntegro y visible.
+              </p>
+            </div>
+
+            {/* Pie */}
+            <div className="text-center text-xs text-gray-600 pt-2">
+              © 2026 — Proyecto de Tesis Académica · SERMETAVIA · Todos los derechos reservados sobre el código fuente.
             </div>
           </div>
         );

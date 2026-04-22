@@ -11,6 +11,7 @@ const settings = {
   tabData: 'Datos y Respaldos',
   tabAdvanced: 'Avanzado',
   tabAbout: 'Acerca de',
+  tabLegal: 'Aviso Legal',
   // Account
   accessCredentials: 'Credenciales de Acceso',
   displayName: 'Nombre para Mostrar',
