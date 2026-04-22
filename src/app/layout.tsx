@@ -1,6 +1,7 @@
 import { AuthProvider } from "@/context/AuthContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import AppShell from "@/components/AppShell";
+import LegalModal from "@/components/LegalModal";
 import Script from "next/script";
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className="flex h-screen overflow-hidden print:h-auto print:overflow-visible bg-military-bg text-military-text font-sans antialiased">
+        <LegalModal />
         <AuthProvider>
           <SettingsProvider>
             <AppShell>
