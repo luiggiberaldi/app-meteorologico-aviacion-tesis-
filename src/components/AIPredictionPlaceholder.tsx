@@ -24,6 +24,27 @@ interface BasePrediction {
   data: PredictionData;
 }
 
+// RNG determinista — misma semilla = mismos números en todos los dispositivos
+function seededRng(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = Math.imul(s ^ (s >>> 15), s | 1);
+    s ^= s + Math.imul(s ^ (s >>> 7), s | 61);
+    return ((s ^ (s >>> 14)) >>> 0) / 0xffffffff;
+  };
+}
+
+// Semilla = hora UTC actual + hash del nombre de la base
+function getSeed(baseName: string): number {
+  const hour = Math.floor(Date.now() / (1000 * 60 * 60));
+  let hash = 0;
+  for (let i = 0; i < baseName.length; i++) {
+    hash = ((hash << 5) - hash) + baseName.charCodeAt(i);
+    hash |= 0;
+  }
+  return (hour + Math.abs(hash)) >>> 0;
+}
+
 export default function AIPredictionModule() {
   const { selectedBase, bases } = useBaseContext();
   const location = selectedBase ? selectedBase.nombre : "Nacional (Promediado)";
@@ -55,7 +76,8 @@ export default function AIPredictionModule() {
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
   // Generador Táctico Simulado Avanzado (Fallback hiperrealista)
-  const generateSimulatedMatrix = (weather: any): PredictionData => {
+  const generateSimulatedMatrix = (weather: any, baseName: string): PredictionData => {
+    const rng = seededRng(getSeed(baseName));
     const temp = weather.current.temperature_2m;
     const wind = weather.current.wind_speed_10m;
     const precip = weather.current.precipitation;
@@ -67,7 +89,7 @@ export default function AIPredictionModule() {
     else if (temp < 10 && clouds > 80) iceRisk = 45;
     else iceRisk = Math.max(5, (15 - temp) * 2);
 
-    let turbRisk = Math.min(95, wind * 2.5); // Nudos a impacto de turb
+    let turbRisk = Math.min(95, wind * 2.5);
     let visRisk = vis < 2 ? 90 : vis < 5 ? 60 : vis < 8 ? 30 : 5;
 
     let rec = "";
@@ -78,9 +100,9 @@ export default function AIPredictionModule() {
     }
 
     return {
-      ice: Math.min(100, Math.max(0, Math.round(iceRisk + (Math.random()*10 - 5)))),
-      turbulence: Math.min(100, Math.max(0, Math.round(turbRisk + (Math.random()*10 - 5)))),
-      visibility: Math.min(100, Math.max(0, Math.round(visRisk + (Math.random()*10 - 5)))),
+      ice: Math.min(100, Math.max(0, Math.round(iceRisk + (rng()*10 - 5)))),
+      turbulence: Math.min(100, Math.max(0, Math.round(turbRisk + (rng()*10 - 5)))),
+      visibility: Math.min(100, Math.max(0, Math.round(visRisk + (rng()*10 - 5)))),
       recommendation: rec
     };
   };
@@ -91,8 +113,9 @@ export default function AIPredictionModule() {
       if (!r.ok) throw new Error('API');
       return await r.json();
     } catch {
+      const rng = seededRng(getSeed(base.nombre));
       const isWarm = base.latitud < 11 && base.longitud > -70;
-      return { current: { visibility: 10000 - Math.random()*2000, cloud_cover: Math.random()*40, wind_speed_10m: 10+Math.random()*15, temperature_2m: isWarm ? 28+Math.random()*5 : 18+Math.random()*10, precipitation: 0 } };
+      return { current: { visibility: 10000 - rng()*2000, cloud_cover: rng()*40, wind_speed_10m: 10+rng()*15, temperature_2m: isWarm ? 28+rng()*5 : 18+rng()*10, precipitation: 0 } };
     }
   };
 
@@ -114,7 +137,7 @@ export default function AIPredictionModule() {
       addLog(`[NODO ${i+1}/${bases.length}] Consultando ${base.codigo} — ${base.ciudad}, ${base.estado}...`);
       await delay(250);
       const json = await fetchBaseWeather(base);
-      const pred = generateSimulatedMatrix(json);
+      const pred = generateSimulatedMatrix(json, base.nombre);
       // Override recommendation with base-specific text
       const maxRisk = Math.max(pred.ice, pred.turbulence, pred.visibility);
       pred.recommendation = maxRisk > 50
@@ -173,7 +196,8 @@ export default function AIPredictionModule() {
       fallbackMode = true;
       await delay(1000);
       const isWarm = activeBase.latitud < 11 && activeBase.longitud > -70;
-      json = { current: { visibility: 10000-Math.random()*2000, cloud_cover: Math.random()*40, wind_speed_10m: 10+Math.random()*15, temperature_2m: isWarm ? 28+Math.random()*5 : 18+Math.random()*10, precipitation: 0 } };
+      const rng = seededRng(getSeed(activeBase.nombre));
+      json = { current: { visibility: 10000-rng()*2000, cloud_cover: rng()*40, wind_speed_10m: 10+rng()*15, temperature_2m: isWarm ? 28+rng()*5 : 18+rng()*10, precipitation: 0 } };
       addLog(`[TELEMETRÍA LOCAL] Sensores de ${activeBase.codigo} inyectados. Temp: ${json.current.temperature_2m.toFixed(1)}°C`, 'info');
     }
 
@@ -194,7 +218,7 @@ export default function AIPredictionModule() {
       } else {
         addLog(`[INFERENCIA LOCAL] Motor de contingencia interno activado...`, 'warn');
         await delay(1500);
-        setPredictionResult(generateSimulatedMatrix(json));
+        setPredictionResult(generateSimulatedMatrix(json, activeBase.nombre));
         addLog(`[ÉXITO] Matriz táctica generada.`, 'success');
       }
     } catch (err: any) {
