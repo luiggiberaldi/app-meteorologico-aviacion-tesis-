@@ -77,6 +77,13 @@ export default function LegalModal() {
           onScroll={handleScroll}
           className="overflow-y-auto flex-1 px-6 py-5 space-y-5 scroll-smooth"
         >
+          {/* Identificación de las partes */}
+          <div className="bg-[#1e293b] rounded-xl p-4 space-y-1.5 border border-gray-600">
+            <p className="text-gray-400 text-xs uppercase tracking-widest font-bold mb-2">Identificación de las Partes</p>
+            <p className="text-gray-300 text-sm"><span className="text-gray-500">DESARROLLADOR:</span> <strong className="text-white">Luigi Vicenzo Beraldi Palacios</strong>, titular de la cédula de identidad <strong className="text-white">V-24.457.713</strong></p>
+            <p className="text-gray-300 text-sm"><span className="text-gray-500">CLIENTE:</span> <strong className="text-white">La persona que acepta el presente documento</strong>, cuyo nombre e identidad quedan registrados electrónicamente al momento de la aceptación.</p>
+          </div>
+
           <p className="text-gray-300 text-sm leading-relaxed">
             De conformidad con la <strong className="text-white">Ley de Mensajes de Datos y Firmas Electrónicas</strong> (G.O. N° 37.148, 2001),
             el <strong className="text-white">Código Civil de Venezuela</strong> y la <strong className="text-white">Ley sobre el Derecho de Autor</strong> (G.O. N° 4.638 Ext., 1993),

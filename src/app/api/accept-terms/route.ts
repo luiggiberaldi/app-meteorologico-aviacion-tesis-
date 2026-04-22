@@ -72,6 +72,10 @@ export async function POST(req: Request) {
           <p style="color:#94a3b8;font-size:13px;margin:4px 0">Plataforma Meteorológica Aeronáutica</p>
         </div>
         <h2 style="color:#f1f5f9;font-size:16px">Confirmación de Aceptación de Términos Legales</h2>
+        <div style="background:#1e293b;border-radius:8px;padding:12px 16px;margin:12px 0;border-left:3px solid #334155">
+          <p style="margin:3px 0;font-size:12px;color:#94a3b8"><strong style="color:#cbd5e1">DESARROLLADOR:</strong> Luigi Vicenzo Beraldi Palacios — C.I. V-24.457.713</p>
+          <p style="margin:3px 0;font-size:12px;color:#94a3b8"><strong style="color:#cbd5e1">CLIENTE:</strong> ${fullName || 'No especificado'}</p>
+        </div>
         <p style="color:#cbd5e1;font-size:14px;line-height:1.6">
           Este correo confirma que usted ha aceptado los <strong>Términos y Condiciones de Uso</strong> de la plataforma SERMETAVIA,
           quedando constancia electrónica de dicha aceptación conforme a la <strong>Ley de Mensajes de Datos y Firmas Electrónicas</strong>
