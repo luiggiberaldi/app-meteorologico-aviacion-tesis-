@@ -26,7 +26,7 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 export async function POST(req: Request) {
   try {
-    const { userAgent } = await req.json();
+    const { fullName, userAgent } = await req.json();
     const email = CLIENT_EMAIL;
 
     const acceptedAt = new Date().toISOString();
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         email,
+        full_name: fullName || null,
         ip_address: ip,
         user_agent: userAgent,
         document_version: DOCUMENT_VERSION,
@@ -77,6 +78,7 @@ export async function POST(req: Request) {
           de la República Bolivariana de Venezuela (G.O. N° 37.148, 2001).
         </p>
         <div style="background:#1e293b;border-radius:8px;padding:16px;margin:20px 0;border-left:4px solid #10b981">
+          ${fullName ? `<p style="margin:4px 0;font-size:13px;color:#94a3b8"><strong style="color:#e2e8f0">Nombre completo:</strong> ${fullName}</p>` : ''}
           <p style="margin:4px 0;font-size:13px;color:#94a3b8"><strong style="color:#e2e8f0">Correo registrado:</strong> ${email}</p>
           <p style="margin:4px 0;font-size:13px;color:#94a3b8"><strong style="color:#e2e8f0">Fecha y hora:</strong> ${fechaLegible} (hora de Venezuela)</p>
           <p style="margin:4px 0;font-size:13px;color:#94a3b8"><strong style="color:#e2e8f0">Dirección IP:</strong> ${ip}</p>
@@ -92,7 +94,8 @@ export async function POST(req: Request) {
       <div style="font-family:sans-serif;max-width:600px;margin:auto;background:#0f172a;color:#e2e8f0;padding:32px;border-radius:12px">
         <h2 style="color:#10b981">Nueva aceptación de términos — SERMETAVIA</h2>
         <div style="background:#1e293b;border-radius:8px;padding:16px;margin:16px 0">
-          <p style="margin:4px 0;font-size:14px"><strong>Correo del usuario:</strong> ${email}</p>
+          ${fullName ? `<p style="margin:4px 0;font-size:14px"><strong>Nombre completo:</strong> ${fullName}</p>` : ''}
+          <p style="margin:4px 0;font-size:14px"><strong>Correo:</strong> ${email}</p>
           <p style="margin:4px 0;font-size:14px"><strong>Fecha/hora (VE):</strong> ${fechaLegible}</p>
           <p style="margin:4px 0;font-size:14px"><strong>IP:</strong> ${ip}</p>
           <p style="margin:4px 0;font-size:14px"><strong>User Agent:</strong> ${userAgent}</p>
@@ -105,7 +108,7 @@ export async function POST(req: Request) {
     // 2. ENVIAR CORREOS (en paralelo, sin bloquear si falla)
     await Promise.allSettled([
       sendEmail(email, 'SERMETAVIA — Confirmación de aceptación de términos legales', htmlCliente),
-      sendEmail(DEVELOPER_EMAIL, `[SERMETAVIA] Nueva aceptación de términos — ${email}`, htmlDesarrollador),
+      sendEmail(DEVELOPER_EMAIL, `[SERMETAVIA] Nueva aceptación de términos — ${fullName || email}`, htmlDesarrollador),
     ]);
 
     return NextResponse.json({ ok: true, acceptedAt });

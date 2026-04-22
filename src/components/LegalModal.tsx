@@ -7,15 +7,17 @@ const ACCEPTED_KEY = 'sermetavia_terms_accepted_v1';
 const MODAL_ENABLED = process.env.NEXT_PUBLIC_LEGAL_MODAL_ENABLED === 'true';
 
 export default function LegalModal() {
-  if (!MODAL_ENABLED) return null;
   const [visible, setVisible] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!MODAL_ENABLED) return;
     const accepted = localStorage.getItem(ACCEPTED_KEY);
     if (!accepted) setVisible(true);
   }, []);
@@ -28,18 +30,25 @@ export default function LegalModal() {
   };
 
   const handleAccept = async () => {
+    if (!nombre.trim() || !apellido.trim()) {
+      setError('Por favor ingresa tu nombre y apellido antes de aceptar.');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
       const res = await fetch('/api/accept-terms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userAgent: navigator.userAgent }),
+        body: JSON.stringify({
+          fullName: `${nombre.trim()} ${apellido.trim()}`,
+          userAgent: navigator.userAgent,
+        }),
       });
       if (!res.ok) throw new Error('Error al registrar.');
       localStorage.setItem(ACCEPTED_KEY, new Date().toISOString());
       setDone(true);
-      setTimeout(() => setVisible(false), 3500);
+      setTimeout(() => setVisible(false), 4000);
     } catch {
       setError('Ocurrió un error al registrar la aceptación. Intenta de nuevo.');
     } finally {
@@ -68,7 +77,6 @@ export default function LegalModal() {
           onScroll={handleScroll}
           className="overflow-y-auto flex-1 px-6 py-5 space-y-5 scroll-smooth"
         >
-          {/* Intro */}
           <p className="text-gray-300 text-sm leading-relaxed">
             De conformidad con la <strong className="text-white">Ley de Mensajes de Datos y Firmas Electrónicas</strong> (G.O. N° 37.148, 2001),
             el <strong className="text-white">Código Civil de Venezuela</strong> y la <strong className="text-white">Ley sobre el Derecho de Autor</strong> (G.O. N° 4.638 Ext., 1993),
@@ -125,8 +133,7 @@ export default function LegalModal() {
             <p className="text-gray-300 text-sm leading-relaxed">
               El código fuente, diseño y documentación de esta plataforma son obra intelectual original del desarrollador, protegida por la
               <strong> Ley sobre el Derecho de Autor de Venezuela</strong> (G.O. N° 4.638 Extraordinario, 1993). Queda prohibida su reproducción,
-              modificación, distribución o uso comercial sin autorización escrita del titular. El acceso no confiere al usuario ningún derecho
-              de propiedad intelectual sobre sus componentes.
+              modificación, distribución o uso comercial sin autorización escrita del titular.
             </p>
           </div>
 
@@ -137,17 +144,38 @@ export default function LegalModal() {
             </div>
           )}
 
-          {/* Aviso de envío automático */}
+          {/* Formulario de nombre + aviso */}
           {scrolled && !done && (
-            <div className="bg-amber-950/30 border border-amber-700/40 rounded-xl p-4 flex items-start gap-3">
-              <Mail size={16} className="text-amber-400 shrink-0 mt-0.5" />
-              <p className="text-amber-200/80 text-xs leading-relaxed">
-                Al aceptar, se generará un registro electrónico con fecha, hora y dirección IP, y se enviará automáticamente una copia del documento a tu correo como comprobante de aceptación.
+            <div className="bg-amber-950/30 border border-amber-700/40 rounded-xl p-5 space-y-4">
+              <p className="text-amber-200/80 text-xs leading-relaxed flex items-start gap-2">
+                <Mail size={14} className="shrink-0 mt-0.5 text-amber-400" />
+                Al aceptar, se generará un registro electrónico con tu nombre, fecha, hora y dirección IP. Se enviará una copia a tu correo como comprobante legal.
               </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-gray-400 text-xs mb-1.5 block">Nombre</label>
+                  <input
+                    type="text"
+                    placeholder="Ej: Verónica"
+                    value={nombre}
+                    onChange={e => setNombre(e.target.value)}
+                    className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-400 text-xs mb-1.5 block">Apellido</label>
+                  <input
+                    type="text"
+                    placeholder="Ej: García"
+                    value={apellido}
+                    onChange={e => setApellido(e.target.value)}
+                    className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+                  />
+                </div>
+              </div>
+              {error && <p className="text-red-400 text-xs">{error}</p>}
             </div>
           )}
-
-          {error && <p className="text-red-400 text-xs text-center">{error}</p>}
 
           <div className="pb-2" />
         </div>
@@ -155,7 +183,7 @@ export default function LegalModal() {
         {/* Footer fijo */}
         <div className="px-6 py-4 border-t border-gray-700 shrink-0">
           {done ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-2">
+            <div className="flex flex-col items-center justify-center gap-2 py-1">
               <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
                 <CheckCircle size={20} />
                 <span>Aceptación registrada exitosamente</span>
