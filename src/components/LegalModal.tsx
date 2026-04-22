@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ShieldAlert, BookOpen, FlaskConical, Shield, CheckCircle, Loader2, Mail } from 'lucide-react';
+import { ShieldAlert, BookOpen, FlaskConical, Shield, CheckCircle, Loader2, Mail, PackageCheck, AlertTriangle } from 'lucide-react';
 
 const ACCEPTED_KEY = 'sermetavia_terms_accepted_v1';
 const MODAL_ENABLED = process.env.NEXT_PUBLIC_LEGAL_MODAL_ENABLED === 'true';
@@ -134,6 +134,47 @@ export default function LegalModal() {
               El código fuente, diseño y documentación de esta plataforma son obra intelectual original del desarrollador, protegida por la
               <strong> Ley sobre el Derecho de Autor de Venezuela</strong> (G.O. N° 4.638 Extraordinario, 1993). Queda prohibida su reproducción,
               modificación, distribución o uso comercial sin autorización escrita del titular.
+            </p>
+          </div>
+
+          {/* Art. 5 */}
+          <div className="bg-[#1e293b] rounded-xl p-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <PackageCheck size={15} className="text-amber-400" />
+              <h4 className="text-amber-400 font-bold text-xs uppercase tracking-widest">Artículo 5 — Traspaso del Sistema y Base de Datos</h4>
+            </div>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              La presente plataforma, incluyendo su <strong>código fuente</strong>, <strong>estructura de base de datos</strong> (Supabase/PostgreSQL),
+              configuración de servicios y documentación técnica, será entregada a la CLIENTE en su totalidad una vez concluida la relación de
+              desarrollo, conforme a lo acordado entre las partes.
+            </p>
+            <p className="text-gray-300 text-sm leading-relaxed mt-1">
+              Dicha entrega constituye una <strong>cesión limitada de uso</strong> del sistema en los términos del
+              <strong> artículo 53 de la Ley sobre el Derecho de Autor venezolana</strong>, y no transfiere la titularidad intelectual sobre el
+              código al receptor, salvo acuerdo expreso y escrito en contrario. La CLIENTE acepta recibir el sistema en el estado en que se encuentra
+              al momento de la entrega, sin derecho a reclamar modificaciones posteriores no pactadas.
+            </p>
+          </div>
+
+          {/* Art. 6 */}
+          <div className="bg-[#1e293b] rounded-xl p-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={15} className="text-amber-400" />
+              <h4 className="text-amber-400 font-bold text-xs uppercase tracking-widest">Artículo 6 — Irresponsabilidad Post-Entrega</h4>
+            </div>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Una vez realizado el traspaso del sistema, el desarrollador queda <strong>completamente desvinculado</strong> de cualquier
+              responsabilidad derivada del uso, modificación, distribución, almacenamiento de datos o cualquier otra actividad que la CLIENTE
+              o terceros realicen con la plataforma. Lo anterior de conformidad con:
+            </p>
+            <ul className="text-gray-300 text-sm leading-relaxed space-y-1.5 mt-2 ml-2">
+              <li className="flex gap-2"><span className="text-amber-400 shrink-0">i.</span><span><strong>Art. 1.185 CC:</strong> Al no existir culpa ni negligencia imputable al desarrollador en el uso posterior del sistema.</span></li>
+              <li className="flex gap-2"><span className="text-amber-400 shrink-0">ii.</span><span><strong>Art. 1.274 CC:</strong> La responsabilidad del desarrollador se limita estrictamente al alcance del trabajo de desarrollo acordado y ya ejecutado.</span></li>
+              <li className="flex gap-2"><span className="text-amber-400 shrink-0">iii.</span><span><strong>Art. 1.159 CC:</strong> El contrato entre las partes tiene fuerza de ley entre ellas; la CLIENTE acepta este alcance como parte de los términos convenidos.</span></li>
+            </ul>
+            <p className="text-gray-300 text-sm leading-relaxed mt-2">
+              Esto incluye, sin limitación: violaciones de datos, uso indebido de la plataforma, daños a terceros, incumplimientos regulatorios
+              o cualquier consecuencia derivada de la operación del sistema tras la entrega.
             </p>
           </div>
 
