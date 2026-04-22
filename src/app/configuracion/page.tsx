@@ -647,79 +647,88 @@ export default function ConfiguracionPage() {
       case 'legal':
         return (
           <div className="space-y-6">
-            {/* Banner principal */}
-            <div className="bg-red-950/60 border-2 border-red-500/60 rounded-xl p-5 flex gap-4">
-              <ShieldAlert size={36} className="text-red-400 shrink-0 mt-1" />
-              <div>
-                <h3 className="text-red-300 font-bold text-lg uppercase tracking-wide mb-1">
-                  Aviso Legal — Uso Exclusivamente Académico
-                </h3>
-                <p className="text-red-200/80 text-sm leading-relaxed">
-                  Esta plataforma es el resultado de un <strong>proyecto de tesis universitaria</strong> y <strong>no constituye</strong> un sistema operacional, militar ni de certificación aeronáutica de ningún tipo. Su uso está restringido exclusivamente a fines de evaluación académica.
-                </p>
+
+            {/* Encabezado */}
+            <div className="bg-[#0f172a] border border-gray-600 rounded-xl p-5">
+              <div className="flex items-start gap-4">
+                <ShieldAlert size={32} className="text-amber-400 shrink-0 mt-1" />
+                <div>
+                  <h3 className="text-white font-bold text-base uppercase tracking-widest mb-1">
+                    Aviso Legal y Condiciones de Uso
+                  </h3>
+                  <p className="text-gray-400 text-xs leading-relaxed">
+                    De conformidad con las disposiciones del <strong className="text-gray-300">Código Civil de Venezuela</strong> (G.O. N° 2.990, 1982), la <strong className="text-gray-300">Ley Especial contra los Delitos Informáticos</strong> (G.O. N° 37.313, 2001) y la <strong className="text-gray-300">Ley de Infogobierno</strong> (G.O. N° 40.274, 2013), el autor establece las siguientes condiciones de uso para esta plataforma.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Bloque 1: No es un sistema real */}
-            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Ban size={18} className="text-orange-400" />
-                <h4 className="text-white font-bold text-sm uppercase tracking-widest">No es un Sistema Militar Real</h4>
-              </div>
+            {/* Art. 1: Naturaleza del sistema */}
+            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-2">
+              <h4 className="text-amber-400 font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                <BookOpen size={15} /> Artículo 1 — Naturaleza y Alcance del Sistema
+              </h4>
               <p className="text-gray-300 text-sm leading-relaxed">
-                SERMETAVIA es un <strong>prototipo académico</strong> desarrollado como trabajo de grado. No está afiliado, aprobado ni respaldado por ninguna institución de las Fuerzas Armadas, organismos de aviación civil (INAC), la Fuerza Aérea Venezolana, ni ningún organismo gubernamental. El uso del nombre "SERMETAVIA" y referencias a la Base Aérea Logística Baragua son únicamente con fines ilustrativos y académicos en el contexto de la tesis.
+                La plataforma SERMETAVIA constituye un <strong>prototipo de software desarrollado con fines académicos</strong>, presentado como Trabajo Especial de Grado. No representa un sistema operacional certificado, ni ha sido sometido a procesos de validación técnica por parte de autoridades aeronáuticas, meteorológicas o militares de la República Bolivariana de Venezuela.
+              </p>
+              <p className="text-gray-300 text-sm leading-relaxed mt-2">
+                El uso de denominaciones institucionales y referencias geográficas tiene carácter <strong>exclusivamente ilustrativo</strong> dentro del contexto académico de la investigación, sin que ello implique afiliación, aprobación ni respaldo de ningún organismo del Estado venezolano.
               </p>
             </div>
 
-            {/* Bloque 2: Datos simulados */}
-            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <FlaskConical size={18} className="text-amber-400" />
-                <h4 className="text-white font-bold text-sm uppercase tracking-widest">Datos Estimados y Simulados</h4>
-              </div>
-              <ul className="text-gray-300 text-sm leading-relaxed space-y-2">
-                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Los <strong>porcentajes de riesgo</strong> (engelamiento, turbulencia, visibilidad) son estimaciones matemáticas aproximadas, no mediciones certificadas.</li>
-                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Las <strong>notificaciones de alerta</strong> del sistema son generadas de forma simulada con fines demostrativos.</li>
-                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Los <strong>dictámenes tácticos del módulo IA</strong> son generados por un modelo de lenguaje (LLM) y no tienen validez operacional.</li>
-                <li className="flex gap-2"><span className="text-amber-400 shrink-0">•</span> Los <strong>datos meteorológicos</strong> provienen de Open-Meteo (servicio público), no de sensores oficiales IATA/OACI ni de estaciones certificadas.</li>
+            {/* Art. 2: Exención de responsabilidad civil */}
+            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-2">
+              <h4 className="text-amber-400 font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                <ShieldAlert size={15} /> Artículo 2 — Exención de Responsabilidad Civil
+              </h4>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Conforme al <strong>artículo 1.185 del Código Civil venezolano</strong> (hecho ilícito) y al principio de responsabilidad subjetiva que rige en el ordenamiento jurídico venezolano, el autor <strong>no incurrirá en responsabilidad civil</strong> por daños o perjuicios de cualquier naturaleza que pudieran derivarse del uso de esta plataforma, toda vez que:
+              </p>
+              <ul className="text-gray-300 text-sm leading-relaxed space-y-1.5 mt-2 ml-2">
+                <li className="flex gap-2"><span className="text-amber-400 shrink-0">i.</span> El sistema es puesto a disposición sin garantía de exactitud, completitud ni idoneidad operacional.</li>
+                <li className="flex gap-2"><span className="text-amber-400 shrink-0">ii.</span> El usuario accede voluntariamente y bajo su exclusiva responsabilidad.</li>
+                <li className="flex gap-2"><span className="text-amber-400 shrink-0">iii.</span> El presente aviso constituye notificación previa y suficiente de las limitaciones del sistema, eliminando el elemento de culpa del autor conforme al artículo <strong>1.193 CC</strong>.</li>
               </ul>
             </div>
 
-            {/* Bloque 3: No usar como referencia */}
-            <div className="bg-[#0f172a] border border-red-800/40 rounded-xl p-5 space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertCircle size={18} className="text-red-400" />
-                <h4 className="text-white font-bold text-sm uppercase tracking-widest">Prohibición de Uso Operacional</h4>
-              </div>
+            {/* Art. 3: Limitaciones de los datos */}
+            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-2">
+              <h4 className="text-amber-400 font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                <FlaskConical size={15} /> Artículo 3 — Limitaciones de los Datos Presentados
+              </h4>
               <p className="text-gray-300 text-sm leading-relaxed">
-                <strong className="text-red-300">ESTÁ ESTRICTAMENTE PROHIBIDO</strong> utilizar esta plataforma como:
+                Los datos, estimaciones e interpretaciones generados por esta plataforma provienen de fuentes de acceso público (Open-Meteo API) y algoritmos de estimación no certificados. En consecuencia:
               </p>
-              <ul className="text-gray-300 text-sm leading-relaxed space-y-2">
-                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Referencia para toma de decisiones de vuelo reales.</li>
-                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Herramienta de despacho, planificación o control de aeronaves.</li>
-                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Sustituto de sistemas meteorológicos aeronáuticos oficiales (METAR, TAF, SIGMET certificados).</li>
-                <li className="flex gap-2"><span className="text-red-400 shrink-0">✗</span> Fuente de información para cualquier operación aérea civil o militar.</li>
+              <ul className="text-gray-300 text-sm leading-relaxed space-y-1.5 mt-2 ml-2">
+                <li className="flex gap-2"><span className="text-gray-500 shrink-0">•</span> No sustituyen la información meteorológica oficial emitida por el <strong>INAMEH</strong> ni por servicios aeronáuticos certificados bajo normas OACI.</li>
+                <li className="flex gap-2"><span className="text-gray-500 shrink-0">•</span> Los dictámenes del módulo de Inteligencia Artificial son generados por modelos de lenguaje (LLM) y carecen de validez técnica, científica u operacional.</li>
+                <li className="flex gap-2"><span className="text-gray-500 shrink-0">•</span> No deben emplearse como fundamento para ninguna decisión que comprometa la seguridad de personas, aeronaves o instalaciones.</li>
               </ul>
             </div>
 
-            {/* Bloque 4: Exención de responsabilidad */}
-            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <BookOpen size={18} className="text-blue-400" />
-                <h4 className="text-white font-bold text-sm uppercase tracking-widest">Exención de Responsabilidad</h4>
-              </div>
+            {/* Art. 4: Propiedad intelectual */}
+            <div className="bg-[#0f172a] border border-gray-700 rounded-xl p-5 space-y-2">
+              <h4 className="text-amber-400 font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Shield size={15} /> Artículo 4 — Propiedad Intelectual
+              </h4>
               <p className="text-gray-300 text-sm leading-relaxed">
-                El autor del proyecto y la institución académica asociada <strong>no asumen ninguna responsabilidad</strong> por daños directos, indirectos, incidentales o consecuentes derivados del uso de esta plataforma fuera del ámbito académico para el que fue diseñada. El uso de este sistema implica la aceptación plena de las condiciones aquí establecidas.
+                El código fuente, diseño, arquitectura y documentación de esta plataforma son obra intelectual original del autor, protegida por la <strong>Ley sobre el Derecho de Autor de Venezuela</strong> (G.O. N° 4.638 Extraordinario, 1993). Queda prohibida su reproducción total o parcial, modificación, distribución o uso comercial sin autorización expresa y escrita del titular.
               </p>
-              <p className="text-gray-400 text-xs mt-2 border-t border-gray-800 pt-3">
-                Versión del aviso: 1.0 — Aplicable desde la publicación del proyecto de tesis. Cualquier reproducción del sistema debe mantener este aviso legal íntegro y visible.
+              <p className="text-gray-300 text-sm leading-relaxed mt-2">
+                El acceso a esta plataforma no confiere al usuario ningún derecho de propiedad intelectual sobre sus contenidos o componentes.
               </p>
             </div>
 
-            {/* Pie */}
-            <div className="text-center text-xs text-gray-600 pt-2">
-              © 2026 — Proyecto de Tesis Académica · SERMETAVIA · Todos los derechos reservados sobre el código fuente.
+            {/* Art. 5: Aceptación */}
+            <div className="bg-amber-950/30 border border-amber-700/40 rounded-xl p-4">
+              <p className="text-amber-200/80 text-xs leading-relaxed">
+                <strong className="text-amber-300">Aceptación de condiciones:</strong> El acceso y uso de esta plataforma implica la aceptación plena, expresa e incondicional de todas las condiciones establecidas en el presente aviso legal. Quien no esté de acuerdo con estas condiciones deberá abstenerse de usar el sistema.
+              </p>
+              <p className="text-gray-600 text-[10px] mt-3 pt-2 border-t border-amber-900/40">
+                Versión 1.0 · República Bolivariana de Venezuela · © 2026 Luigi Beraldi — Todos los derechos reservados.
+              </p>
             </div>
+
           </div>
         );
 
