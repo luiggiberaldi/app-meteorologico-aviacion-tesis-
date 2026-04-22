@@ -4,8 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import { ShieldAlert, BookOpen, FlaskConical, Shield, CheckCircle, Loader2, Mail } from 'lucide-react';
 
 const ACCEPTED_KEY = 'sermetavia_terms_accepted_v1';
+const MODAL_ENABLED = process.env.NEXT_PUBLIC_LEGAL_MODAL_ENABLED === 'true';
 
 export default function LegalModal() {
+  if (!MODAL_ENABLED) return null;
   const [visible, setVisible] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(false);
