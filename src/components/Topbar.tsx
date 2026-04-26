@@ -299,17 +299,17 @@ export default function Topbar() {
           ></div>
 
           <aside className="relative flex flex-col w-[260px] bg-[#0f172a] h-full shadow-2xl animate-[slideRight_0.3s_ease-out]">
-            <div className="flex items-center justify-between p-4 border-b border-gray-800">
-               <div>
-                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">{tSidebar('metNetwork')}</p>
-                 <img src="/1.png" alt="Aerometrix Logo" className="h-[48px] w-auto object-contain" />
+            <div className="flex flex-col items-center p-4 pb-2 border-b border-gray-800">
+               <div className="flex w-full justify-end mb-1">
+                 <button
+                   onClick={() => setIsMobileMenuOpen(false)}
+                   className="p-2 text-gray-400 hover:text-white bg-gray-800/50 rounded-full"
+                 >
+                   <X size={20} />
+                 </button>
                </div>
-               <button
-                 onClick={() => setIsMobileMenuOpen(false)}
-                 className="p-2 text-gray-400 hover:text-white bg-gray-800/50 rounded-full"
-               >
-                 <X size={20} />
-               </button>
+               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">{tSidebar('metNetwork')}</p>
+               <img src="/1.png" alt="Aerometrix Logo" className="h-[100px] w-auto object-contain" />
             </div>
 
             <nav className="flex-1 overflow-y-auto py-2">
