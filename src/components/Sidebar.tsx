@@ -65,9 +65,9 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-[#0f172a] border-r border-gray-800 h-full shrink-0">
-      <div className="p-4 pt-3 pb-8 border-b border-gray-800 flex flex-col items-center justify-center">
+      <div className="p-4 pt-3 pb-2 border-b border-gray-800 flex flex-col items-center justify-center">
         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2">{t('controlPanel')}</p>
-        <img src="/1.png" alt="Aerometrix Logo" className="h-[130px] w-auto object-contain mb-3" />
+        <img src="/1.png" alt="Aerometrix Logo" className="h-[130px] w-auto object-contain mb-0" />
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4">
