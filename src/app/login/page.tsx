@@ -155,7 +155,6 @@ export default function LoginPage() {
         <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           <div style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <img src="/2.png" alt="AEROMETRIX" style={{ height: '56px', width: 'auto', objectFit: 'contain', margin: '0 auto 0.75rem' }} />
               <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>{t('accessSystem')}</h2>
               <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '4px' }}>{t('enterCredentials')}</p>
             </div>
