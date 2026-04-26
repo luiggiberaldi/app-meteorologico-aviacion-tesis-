@@ -192,7 +192,7 @@ export default function LoginPage() {
       <div className="flex lg:hidden" style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: '1.5rem', minHeight: '100vh' }}>
         <div style={{ width: '100%', maxWidth: '380px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '-10px' }}>
-            <img src="/2.png" alt="AEROMETRIX" style={{ height: '200px', width: 'auto', objectFit: 'contain', margin: '0 auto' }} />
+            <img src="/logo-mobile.png" alt="AEROMETRIX" style={{ height: '200px', width: 'auto', objectFit: 'contain', margin: '0 auto' }} />
           </div>
 
           {renderLoginForm()}
