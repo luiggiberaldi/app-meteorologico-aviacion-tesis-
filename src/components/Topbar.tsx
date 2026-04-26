@@ -156,11 +156,11 @@ export default function Topbar() {
           </button>
 
           <div className="hidden sm:flex items-center">
-            <img src="/2.png" alt="Aerometrix Logo" className="h-[38px] w-auto object-contain mr-2" />
+            <img src="/logo-shield.png" alt="Aerometrix Logo" className="h-[38px] w-auto object-contain mr-2" />
           </div>
 
           <div className="flex flex-1 sm:hidden items-center ml-2 mr-2">
-            <img src="/2.png" alt="Aerometrix Mobile" className="h-[36px] w-auto object-contain" />
+            <img src="/logo-shield.png" alt="Aerometrix Mobile" className="h-[36px] w-auto object-contain" />
           </div>
 
           <div className="hidden sm:block">
