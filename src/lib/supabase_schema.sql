@@ -1,4 +1,4 @@
--- Schema Updates for SERMETAVIA National Expansion
+-- Schema Updates for AEROMETRIX National Expansion
 
 -- 1. Crear tabla de bases_aereas
 CREATE TABLE IF NOT EXISTS public.bases_aereas (

@@ -112,7 +112,7 @@ export default function LoginPage() {
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.05) 0%, transparent 60%)' }} />
 
           <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '3rem', maxWidth: '480px' }}>
-            <img src="/1.png" alt="SERMETAVIA" style={{ height: '120px', width: 'auto', objectFit: 'contain', margin: '0 auto 1.5rem' }} />
+            <img src="/1.png" alt="AEROMETRIX" style={{ height: '120px', width: 'auto', objectFit: 'contain', margin: '0 auto 1.5rem' }} />
             <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', lineHeight: 1.2, marginBottom: '0.75rem' }}>
               {t('systemTitle')}<br/>
               <span style={{ color: '#34d399' }}>{t('systemSubtitle')}</span>
@@ -155,7 +155,7 @@ export default function LoginPage() {
         <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           <div style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <img src="/2.png" alt="SERMETAVIA" style={{ height: '56px', width: 'auto', objectFit: 'contain', margin: '0 auto 0.75rem' }} />
+              <img src="/2.png" alt="AEROMETRIX" style={{ height: '56px', width: 'auto', objectFit: 'contain', margin: '0 auto 0.75rem' }} />
               <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>{t('accessSystem')}</h2>
               <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '4px' }}>{t('enterCredentials')}</p>
             </div>
@@ -192,8 +192,8 @@ export default function LoginPage() {
       <div className="flex lg:hidden" style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: '1.5rem', minHeight: '100vh' }}>
         <div style={{ width: '100%', maxWidth: '380px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <img src="/2.png" alt="SERMETAVIA" style={{ height: '56px', width: 'auto', objectFit: 'contain', margin: '0 auto 0.75rem' }} />
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff' }}>SERMETAVIA</h1>
+            <img src="/2.png" alt="AEROMETRIX" style={{ height: '56px', width: 'auto', objectFit: 'contain', margin: '0 auto 0.75rem' }} />
+            <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff' }}>AEROMETRIX</h1>
             <p style={{ color: '#9ca3af', fontSize: '0.6875rem', marginTop: '4px' }}>{t('mobileSubtitle')}</p>
           </div>
 

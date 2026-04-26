@@ -5,8 +5,8 @@ import { useState } from "react";
 
 const secciones = [
   {
-    titulo: "¿Qué es SERMETAVIA?",
-    contenido: "SERMETAVIA (Servicio Meteorológico de la Aviación) es una plataforma PWA de pronóstico meteorológico diseñada para el control y la efectividad de las operaciones aéreas a nivel nacional de la República Bolivariana de Venezuela. Integra datos en tiempo real de múltiples estaciones meteorológicas, análisis predictivo basado en Inteligencia Artificial y herramientas de planificación de vuelos."
+    titulo: "¿Qué es AEROMETRIX?",
+    contenido: "AEROMETRIX (Servicio Meteorológico de la Aviación) es una plataforma PWA de pronóstico meteorológico diseñada para el control y la efectividad de las operaciones aéreas a nivel nacional de la República Bolivariana de Venezuela. Integra datos en tiempo real de múltiples estaciones meteorológicas, análisis predictivo basado en Inteligencia Artificial y herramientas de planificación de vuelos."
   },
   {
     titulo: "Centro de Mando (Dashboard)",
@@ -58,7 +58,7 @@ const secciones = [
   },
   {
     titulo: "Seguridad Cibernética",
-    contenido: "Panel que muestra el estado de todas las políticas de seguridad implementadas en SERMETAVIA. Incluye información sobre cifrado HTTPS/TLS, autenticación, Row Level Security en base de datos, protección de API keys, políticas CORS, auditoría y la infraestructura edge de Cloudflare Workers."
+    contenido: "Panel que muestra el estado de todas las políticas de seguridad implementadas en AEROMETRIX. Incluye información sobre cifrado HTTPS/TLS, autenticación, Row Level Security en base de datos, protección de API keys, políticas CORS, auditoría y la infraestructura edge de Cloudflare Workers."
   },
   {
     titulo: "Gestión de Usuarios",
@@ -81,7 +81,7 @@ export default function ManualPage() {
     <div className="space-y-6 pb-12">
       <div>
         <h2 className="text-2xl font-bold tracking-tight text-white mb-1">MANUAL DE USUARIO</h2>
-        <p className="text-gray-400 text-sm">Guía completa del sistema SERMETAVIA. Consulte cada sección para entender las funcionalidades disponibles y el glosario aeronáutico.</p>
+        <p className="text-gray-400 text-sm">Guía completa del sistema AEROMETRIX. Consulte cada sección para entender las funcionalidades disponibles y el glosario aeronáutico.</p>
       </div>
 
       <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-4 flex items-center gap-3">

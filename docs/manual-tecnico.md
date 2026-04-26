@@ -1,4 +1,4 @@
-# Manual Técnico y de Arquitectura - SERMETAVIA Baragua
+# Manual Técnico y de Arquitectura - AEROMETRIX Baragua
 
 ## 1. Introducción y Público Objetivo
 Este documento está dirigido a los desarrolladores, mantenedores técnicos y al equipo de Tecnologías de la Información (TI) de la Base Aérea Logística BARAGUA. 

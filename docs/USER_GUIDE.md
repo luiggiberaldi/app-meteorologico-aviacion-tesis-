@@ -1,6 +1,6 @@
-# Guía de Usuario - SERMETAVIA
+# Guía de Usuario - AEROMETRIX
 
-Bienvenido a la Guía de Usuario Oficial de SERMETAVIA (Red Meteorológica Nacional). Este documento está diseñado para operadores de consola, despachadores de vuelo y meteorólogos encargados de la toma de decisiones en rampa.
+Bienvenido a la Guía de Usuario Oficial de AEROMETRIX (Red Meteorológica Nacional). Este documento está diseñado para operadores de consola, despachadores de vuelo y meteorólogos encargados de la toma de decisiones en rampa.
 
 ## 1. Guía de Uso por Sección
 
@@ -21,7 +21,7 @@ En la parte superior de su pantalla (o dentro del botón menú en celulares), en
 
 ## 2. Interpretación de Códigos Meteorológicos
 
-| Acrónimo | Significado | Función en SERMETAVIA |
+| Acrónimo | Significado | Función en AEROMETRIX |
 | :--- | :--- | :--- |
 | **METAR** | *Meteorological Terminal Air Report* | Reporte de observación meteorológica rutinaria, emitido cada hora o media hora. Describe las condiciones actuales en el aeródromo. |
 | **TAF** | *Terminal Aerodrome Forecast* | Pronóstico meteorológico del aeródromo enfocado a las próximas 24 o 30 horas. Crítico para la planificación de vuelos futuros. |
@@ -61,9 +61,9 @@ El módulo de alertas evalúa las condiciones actuales simulando umbrales de seg
 ## 4. Preguntas Frecuentes (FAQ)
 
 **Q1: ¿Por qué aparece un cintillo rojo que dice "Sin conexión a Internet"?**
-A: SERMETAVIA es una Aplicación Web Progresiva (PWA). Si el equipo pierde señal Wi-Fi o red móvil, el sistema seguirá funcionando gracias a su Worker de Caché, mostrando el tablero tal y como estaba antes de caerse la conexión. Las gráficas no se actualizarán en vivo hasta que se restablezca el servicio.
+A: AEROMETRIX es una Aplicación Web Progresiva (PWA). Si el equipo pierde señal Wi-Fi o red móvil, el sistema seguirá funcionando gracias a su Worker de Caché, mostrando el tablero tal y como estaba antes de caerse la conexión. Las gráficas no se actualizarán en vivo hasta que se restablezca el servicio.
 
-**Q2: ¿Puedo instalar Sermetavia en mi Teléfono o Tablet?**
+**Q2: ¿Puedo instalar Aerometrix en mi Teléfono o Tablet?**
 A: Sí. Al abrir la herramienta desde un navegador moderno (Chrome, Safari, Edge), verá una sugerencia o ícono (usualmente al lado de la barra de direcciones o en el menú central) que dice "Agregar a la Pantalla de Inicio" o "Instalar App".
 
 **Q3: ¿Cómo exporto el reporte a PDF?**

@@ -78,7 +78,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   telemetryEnabled: false,
 };
 
-const STORAGE_KEY = 'sermetavia_settings';
+const STORAGE_KEY = 'aerometrix_settings';
 
 interface SettingsContextType {
   settings: AppSettings;

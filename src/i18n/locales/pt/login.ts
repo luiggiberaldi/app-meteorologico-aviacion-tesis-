@@ -26,7 +26,7 @@ const login: Record<keyof typeof es, string> = {
   auth: 'Auth',
   secureConnection: 'Conexao segura · HTTPS/TLS',
   mobileSubtitle: 'Servico Meteorologico — Aviacao Militar Bolivariana',
-  copyright: '© 2026 SERMETAVIA — Acesso Restrito',
+  copyright: '© 2026 AEROMETRIX — Acesso Restrito',
 } as const;
 
 export default login;

@@ -15,7 +15,7 @@ async function sendEmail(to: string, subject: string, html: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'SERMETAVIA <onboarding@resend.dev>',
+      from: 'AEROMETRIX <onboarding@resend.dev>',
       to,
       subject,
       html,
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     const htmlCliente = `
       <div style="font-family:sans-serif;max-width:600px;margin:auto;background:#0f172a;color:#e2e8f0;padding:32px;border-radius:12px">
         <div style="text-align:center;margin-bottom:24px">
-          <h1 style="color:#10b981;font-size:22px;margin:0">SERMETAVIA</h1>
+          <h1 style="color:#10b981;font-size:22px;margin:0">AEROMETRIX</h1>
           <p style="color:#94a3b8;font-size:13px;margin:4px 0">Plataforma Meteorológica Aeronáutica</p>
         </div>
         <h2 style="color:#f1f5f9;font-size:16px">Confirmación de Aceptación de Términos Legales</h2>
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
           <p style="margin:3px 0;font-size:12px;color:#94a3b8"><strong style="color:#cbd5e1">CLIENTE:</strong> ${fullName || 'No especificado'}</p>
         </div>
         <p style="color:#cbd5e1;font-size:14px;line-height:1.6">
-          Este correo confirma que usted ha aceptado los <strong>Términos y Condiciones de Uso</strong> de la plataforma SERMETAVIA,
+          Este correo confirma que usted ha aceptado los <strong>Términos y Condiciones de Uso</strong> de la plataforma AEROMETRIX,
           quedando constancia electrónica de dicha aceptación conforme a la <strong>Ley de Mensajes de Datos y Firmas Electrónicas</strong>
           de la República Bolivariana de Venezuela (G.O. N° 37.148, 2001).
         </p>
@@ -89,14 +89,14 @@ export async function POST(req: Request) {
           <p style="margin:4px 0;font-size:13px;color:#94a3b8"><strong style="color:#e2e8f0">Versión del documento:</strong> ${DOCUMENT_VERSION}</p>
         </div>
         <p style="color:#64748b;font-size:12px;margin-top:24px;border-top:1px solid #1e293b;padding-top:16px">
-          Este es un mensaje automático generado por la plataforma SERMETAVIA. Consérvelo como comprobante de aceptación.
+          Este es un mensaje automático generado por la plataforma AEROMETRIX. Consérvelo como comprobante de aceptación.
         </p>
       </div>
     `;
 
     const htmlDesarrollador = `
       <div style="font-family:sans-serif;max-width:600px;margin:auto;background:#0f172a;color:#e2e8f0;padding:32px;border-radius:12px">
-        <h2 style="color:#10b981">Nueva aceptación de términos — SERMETAVIA</h2>
+        <h2 style="color:#10b981">Nueva aceptación de términos — AEROMETRIX</h2>
         <div style="background:#1e293b;border-radius:8px;padding:16px;margin:16px 0">
           ${fullName ? `<p style="margin:4px 0;font-size:14px"><strong>Nombre completo:</strong> ${fullName}</p>` : ''}
           <p style="margin:4px 0;font-size:14px"><strong>Correo:</strong> ${email}</p>
@@ -111,8 +111,8 @@ export async function POST(req: Request) {
 
     // 2. ENVIAR CORREOS (en paralelo, sin bloquear si falla)
     await Promise.allSettled([
-      sendEmail(email, 'SERMETAVIA — Confirmación de aceptación de términos legales', htmlCliente),
-      sendEmail(DEVELOPER_EMAIL, `[SERMETAVIA] Nueva aceptación de términos — ${fullName || email}`, htmlDesarrollador),
+      sendEmail(email, 'AEROMETRIX — Confirmación de aceptación de términos legales', htmlCliente),
+      sendEmail(DEVELOPER_EMAIL, `[AEROMETRIX] Nueva aceptación de términos — ${fullName || email}`, htmlDesarrollador),
     ]);
 
     return NextResponse.json({ ok: true, acceptedAt });

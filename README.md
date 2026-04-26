@@ -1,8 +1,8 @@
-# Plataforma Meteorológica SERMETAVIA - Base Aérea Logística BARAGUA
+# Plataforma Meteorológica AEROMETRIX - Base Aérea Logística BARAGUA
 [![Deploy en Vercel](https://vercel.com/button)](https://sermetavia-baragua.vercel.app)
 
 ## Descripción General
-Esta aplicación web es el resultado de un proyecto de tesis enfocado en el diseño de una plataforma de pronóstico meteorológico para apoyar el control de las aeronaves por parte del Servicio de Meteorología de la Aviación (SERMETAVIA) en la Base Aérea Logística BARAGUA, ubicada en Maracay, estado Aragua. 
+Esta aplicación web es el resultado de un proyecto de tesis enfocado en el diseño de una plataforma de pronóstico meteorológico para apoyar el control de las aeronaves por parte del Servicio de Meteorología de la Aviación (AEROMETRIX) en la Base Aérea Logística BARAGUA, ubicada en Maracay, estado Aragua. 
 
 El sistema consolida información en tiempo real, decodificación de reportes estándar e instrumentos de validación académica en una sola interfaz moderna, oscura y responsiva pensada para entornos operativos 24/7.
 

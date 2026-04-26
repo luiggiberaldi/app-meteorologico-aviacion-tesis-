@@ -24,8 +24,8 @@ const DEFAULT_USERS: UserAccount[] = [
   { username: 'usuario2', password: '123456', displayName: 'Operador 2' },
 ];
 
-const STORAGE_KEY_USERS = 'sermetavia_users';
-const STORAGE_KEY_SESSION = 'sermetavia_session';
+const STORAGE_KEY_USERS = 'aerometrix_users';
+const STORAGE_KEY_SESSION = 'aerometrix_session';
 
 function loadUsers(): UserAccount[] {
   let users: UserAccount[] = [...DEFAULT_USERS];

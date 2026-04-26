@@ -1,4 +1,4 @@
-# Manual de Usuario - Plataforma SERMETAVIA Baragua
+# Manual de Usuario - Plataforma AEROMETRIX Baragua
 
 ## 1. Introducción
 El presente manual tiene como propósito orientar al personal de meteorología de la Base Aérea Logística BARAGUA en el uso correcto y eficiente de la Plataforma Web de Meteorología Aeronáutica. A continuación se describen los módulos disponibles y los procedimientos para su operación.

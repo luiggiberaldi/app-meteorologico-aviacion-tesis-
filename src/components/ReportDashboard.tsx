@@ -69,7 +69,7 @@ export default function ReportDashboard() {
 
       {/* Footer solo para versión de impresión */}
       <div className="hidden print:block text-center pt-8 border-t-2 border-black mt-8 text-xs text-gray-500">
-        <p>Generado automáticamente - Sistema Meteorológico SERMETAVIA</p>
+        <p>Generado automáticamente - Sistema Meteorológico AEROMETRIX</p>
         <p>Fecha de Impresión: {printDate} UTC-4</p>
         <p className="mt-1">DOCUMENTO USO OFICIAL</p>
       </div>

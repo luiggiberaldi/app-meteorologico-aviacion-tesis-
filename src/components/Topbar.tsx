@@ -156,17 +156,17 @@ export default function Topbar() {
           </button>
 
           <div className="hidden sm:flex items-center">
-            <img src="/2.png" alt="Sermetavia Logo" className="h-[38px] w-auto object-contain mr-2" />
+            <img src="/2.png" alt="Aerometrix Logo" className="h-[38px] w-auto object-contain mr-2" />
           </div>
 
           <div className="flex flex-1 sm:hidden items-center ml-2 mr-2">
-            <img src="/2.png" alt="Sermetavia Mobile" className="h-[36px] w-auto object-contain" />
+            <img src="/2.png" alt="Aerometrix Mobile" className="h-[36px] w-auto object-contain" />
           </div>
 
           <div className="hidden sm:block">
             <h1 className="text-sm font-bold text-white tracking-wide truncate max-w-[150px] sm:max-w-none">
               <span className="hidden xl:inline-block text-gray-300 font-medium tracking-normal mr-1">{t('nationalNetwork')}</span>
-              <span className="xl:hidden">SERMETAVIA</span>
+              <span className="xl:hidden">AEROMETRIX</span>
             </h1>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function Topbar() {
             <div className="flex items-center justify-between p-4 border-b border-gray-800">
                <div>
                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">{tSidebar('metNetwork')}</p>
-                 <img src="/1.png" alt="Sermetavia Logo" className="h-[48px] w-auto object-contain" />
+                 <img src="/1.png" alt="Aerometrix Logo" className="h-[48px] w-auto object-contain" />
                </div>
                <button
                  onClick={() => setIsMobileMenuOpen(false)}
@@ -340,7 +340,7 @@ export default function Topbar() {
               </ul>
             </nav>
             <div className="p-4 border-t border-gray-800 text-center">
-               <p className="text-[10px] text-gray-500">SERMETAVIA V 2.0.0</p>
+               <p className="text-[10px] text-gray-500">AEROMETRIX V 2.0.0</p>
             </div>
           </aside>
 

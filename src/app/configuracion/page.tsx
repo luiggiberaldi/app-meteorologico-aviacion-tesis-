@@ -480,7 +480,7 @@ export default function ConfiguracionPage() {
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement('a');
                   a.href = url;
-                  a.download = `sermetavia-config-${new Date().toISOString().split('T')[0]}.json`;
+                  a.download = `aerometrix-config-${new Date().toISOString().split('T')[0]}.json`;
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
@@ -596,8 +596,8 @@ export default function ConfiguracionPage() {
         return (
           <div className="space-y-6">
             <div className="text-center py-6">
-              <img src="/2.png" alt="SERMETAVIA" className="h-24 w-auto mx-auto mb-4 object-contain" />
-              <h2 className="text-2xl font-bold text-white">SERMETAVIA</h2>
+              <img src="/2.png" alt="AEROMETRIX" className="h-24 w-auto mx-auto mb-4 object-contain" />
+              <h2 className="text-2xl font-bold text-white">AEROMETRIX</h2>
               <p className="text-gray-400 text-sm mt-1">{t('aboutService')}</p>
               <div className="inline-block mt-3 bg-emerald-900/30 border border-emerald-600/40 rounded-full px-4 py-1">
                 <span className="text-emerald-300 text-sm font-mono">v2.0.0</span>
@@ -669,7 +669,7 @@ export default function ConfiguracionPage() {
                 <BookOpen size={15} /> Artículo 1 — Naturaleza y Alcance del Sistema
               </h4>
               <p className="text-gray-300 text-sm leading-relaxed">
-                La plataforma SERMETAVIA constituye un <strong>prototipo de software desarrollado con fines académicos</strong>, presentado como Trabajo Especial de Grado. No representa un sistema operacional certificado, ni ha sido sometido a procesos de validación técnica por parte de autoridades aeronáuticas, meteorológicas o militares de la República Bolivariana de Venezuela.
+                La plataforma AEROMETRIX constituye un <strong>prototipo de software desarrollado con fines académicos</strong>, presentado como Trabajo Especial de Grado. No representa un sistema operacional certificado, ni ha sido sometido a procesos de validación técnica por parte de autoridades aeronáuticas, meteorológicas o militares de la República Bolivariana de Venezuela.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mt-2">
                 El uso de denominaciones institucionales y referencias geográficas tiene carácter <strong>exclusivamente ilustrativo</strong> dentro del contexto académico de la investigación, sin que ello implique afiliación, aprobación ni respaldo de ningún organismo del Estado venezolano.

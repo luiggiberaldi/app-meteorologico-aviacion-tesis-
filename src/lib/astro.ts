@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- *  SERMETAVIA — Librería de Cálculos Astronómicos y Climáticos
+ *  AEROMETRIX — Librería de Cálculos Astronómicos y Climáticos
  *  Funciones puras sin dependencias externas.
  *  Precisión: ±1 min (sol), ±2 min (luna), exacta (fases/decl.)
  * ═══════════════════════════════════════════════════════════════

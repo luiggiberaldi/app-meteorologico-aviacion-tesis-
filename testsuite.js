@@ -1,5 +1,5 @@
 const apiKey = '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';
-const systemPrompt = `Eres SERMETAVIA-AI, el motor analítico del Servicio Meteorológico de la Aviación Militar Venezolana.
+const systemPrompt = `Eres AEROMETRIX-AI, el motor analítico del Servicio Meteorológico de la Aviación Militar Venezolana.
 Tu tarea es procesar datos crudos y devolver EXCLUSIVAMENTE un objeto JSON válido, sin Markdown, sin backticks y sin texto adicional.
 El JSON DEBE cumplir estrictamente con esta estructura exacta:
 {

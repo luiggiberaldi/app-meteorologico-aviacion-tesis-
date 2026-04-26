@@ -3,7 +3,7 @@ import type es from '../es/settings';
 const settings: Record<keyof typeof es, string> = {
   // Page header
   pageTitle: 'CONFIGURACAO',
-  pageDescription: 'Personalize o comportamento, aparencia e preferencias do sistema SERMETAVIA.',
+  pageDescription: 'Personalize o comportamento, aparencia e preferencias do sistema AEROMETRIX.',
   // Tabs
   tabAccount: 'Minha Conta',
   tabGeneral: 'Geral',
@@ -145,8 +145,8 @@ const settings: Record<keyof typeof es, string> = {
   thesisProject: 'Projeto de Tese',
   militaryAviation: 'Aviacao Militar Bolivariana',
   licenseTitle: 'Licenca e Uso',
-  licenseText: 'Este software e propriedade do Servico Meteorologico da Aviacao Militar Bolivariana (SERMETAVIA). Seu uso e exclusivamente autorizado para fins institucionais e academicos. E estritamente proibida sua distribuicao, copia ou modificacao sem autorizacao expressa.',
-  copyright: '© 2026 SERMETAVIA — Todos os direitos reservados.',
+  licenseText: 'Este software e propriedade do Servico Meteorologico da Aviacao Militar Bolivariana (AEROMETRIX). Seu uso e exclusivamente autorizado para fins institucionais e academicos. E estritamente proibida sua distribuicao, copia ou modificacao sem autorizacao expressa.',
+  copyright: '© 2026 AEROMETRIX — Todos os direitos reservados.',
   // Buttons
   save: 'Salvar Alteracoes',
   restore: 'Restaurar',

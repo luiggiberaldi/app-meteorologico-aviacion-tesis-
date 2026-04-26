@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ShieldAlert, BookOpen, FlaskConical, Shield, CheckCircle, Loader2, Mail, PackageCheck, AlertTriangle } from 'lucide-react';
 
-const ACCEPTED_KEY = 'sermetavia_terms_accepted_v1';
+const ACCEPTED_KEY = 'aerometrix_terms_accepted_v1';
 const MODAL_ENABLED = process.env.NEXT_PUBLIC_LEGAL_MODAL_ENABLED === 'true';
 
 export default function LegalModal() {
@@ -87,7 +87,7 @@ export default function LegalModal() {
           <p className="text-gray-300 text-sm leading-relaxed">
             De conformidad con la <strong className="text-white">Ley de Mensajes de Datos y Firmas Electrónicas</strong> (G.O. N° 37.148, 2001),
             el <strong className="text-white">Código Civil de Venezuela</strong> y la <strong className="text-white">Ley sobre el Derecho de Autor</strong> (G.O. N° 4.638 Ext., 1993),
-            se establecen las siguientes condiciones de uso para la plataforma SERMETAVIA.
+            se establecen las siguientes condiciones de uso para la plataforma AEROMETRIX.
           </p>
 
           {/* Art. 1 */}
@@ -97,7 +97,7 @@ export default function LegalModal() {
               <h4 className="text-amber-400 font-bold text-xs uppercase tracking-widest">Artículo 1 — Naturaleza y Alcance</h4>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
-              La plataforma SERMETAVIA es un <strong>prototipo de software de carácter académico</strong>, desarrollado como Trabajo Especial de Grado.
+              La plataforma AEROMETRIX es un <strong>prototipo de software de carácter académico</strong>, desarrollado como Trabajo Especial de Grado.
               No representa un sistema operacional certificado ni ha sido validado por autoridades aeronáuticas, meteorológicas o militares de la
               República Bolivariana de Venezuela. Las denominaciones institucionales y referencias geográficas tienen carácter
               <strong> exclusivamente ilustrativo</strong> dentro del contexto académico, sin implicar afiliación ni respaldo de ningún organismo del Estado.

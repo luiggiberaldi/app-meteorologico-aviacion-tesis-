@@ -25,7 +25,7 @@ const INITIAL_NEWS: Noticia[] = [
   },
   {
     id: "hist-2",
-    titulo: "Actualización del Sistema SERMETAVIA V2.0",
+    titulo: "Actualización del Sistema AEROMETRIX V2.0",
     fecha: "12 Mar 2026 09:30z",
     categoria: "Informativo",
     categoriaColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",

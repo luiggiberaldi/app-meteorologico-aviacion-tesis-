@@ -64,7 +64,7 @@ export default function SeguridadPage() {
     <div className="space-y-6 pb-12">
       <div>
         <h2 className="text-2xl font-bold tracking-tight text-white mb-1">SEGURIDAD CIBERNÉTICA</h2>
-        <p className="text-gray-400 text-sm">Políticas, protocolos y mecanismos de seguridad implementados en el sistema SERMETAVIA para la protección de datos e infraestructura.</p>
+        <p className="text-gray-400 text-sm">Políticas, protocolos y mecanismos de seguridad implementados en el sistema AEROMETRIX para la protección de datos e infraestructura.</p>
       </div>
 
       {/* Resumen de Estado */}

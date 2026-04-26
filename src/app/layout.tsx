@@ -6,7 +6,7 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata = {
-  title: "SERMETAVIA - Red Meteorológica Nacional",
+  title: "AEROMETRIX - Red Meteorológica Nacional",
   description: "Plataforma de pronóstico meteorológico para aviación militar",
   manifest: "/manifest.json",
 };

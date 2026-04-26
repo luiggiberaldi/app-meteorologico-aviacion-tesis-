@@ -1,7 +1,7 @@
 const settings = {
   // Page header
   pageTitle: 'CONFIGURACIÓN',
-  pageDescription: 'Personaliza el comportamiento, aspecto y preferencias del sistema SERMETAVIA.',
+  pageDescription: 'Personaliza el comportamiento, aspecto y preferencias del sistema AEROMETRIX.',
   // Tabs
   tabAccount: 'Mi Cuenta',
   tabGeneral: 'General',
@@ -143,8 +143,8 @@ const settings = {
   thesisProject: 'Proyecto de Tesis',
   militaryAviation: 'Aviación Militar Bolivariana',
   licenseTitle: 'Licencia y Uso',
-  licenseText: 'Este software es propiedad del Servicio Meteorológico de la Aviación Militar Bolivariana (SERMETAVIA). Su uso está exclusivamente autorizado para fines institucionales y académicos. Queda estrictamente prohibida su distribución, copia o modificación sin autorización expresa.',
-  copyright: '© 2026 SERMETAVIA — Todos los derechos reservados.',
+  licenseText: 'Este software es propiedad del Servicio Meteorológico de la Aviación Militar Bolivariana (AEROMETRIX). Su uso está exclusivamente autorizado para fines institucionales y académicos. Queda estrictamente prohibida su distribución, copia o modificación sin autorización expresa.',
+  copyright: '© 2026 AEROMETRIX — Todos los derechos reservados.',
   // Buttons
   save: 'Guardar Cambios',
   restore: 'Restaurar',

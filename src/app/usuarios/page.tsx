@@ -31,7 +31,7 @@ export default function UsuariosPage() {
     <div className="space-y-6 pb-12">
       <div>
         <h2 className="text-2xl font-bold tracking-tight text-white mb-1">GESTIÓN DE USUARIOS</h2>
-        <p className="text-gray-400 text-sm">Control de acceso y usuarios registrados en el sistema SERMETAVIA.</p>
+        <p className="text-gray-400 text-sm">Control de acceso y usuarios registrados en el sistema AEROMETRIX.</p>
       </div>
 
       {/* Sesión actual */}

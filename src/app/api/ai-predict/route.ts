@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No se encontró la clave API de Groq configurada en el servidor." }, { status: 500 });
     }
 
-    const systemPrompt = `Eres SERMETAVIA-AI, el analista táctico del Servicio Meteorológico de la Aviación Militar Venezolana.
+    const systemPrompt = `Eres AEROMETRIX-AI, el analista táctico del Servicio Meteorológico de la Aviación Militar Venezolana.
     Debes emitir un dictamen o recomendación operativa de máximo 3 oraciones.
 
     REGLAS ESTRICTAS:

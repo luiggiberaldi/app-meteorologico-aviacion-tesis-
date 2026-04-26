@@ -24,7 +24,7 @@ const login = {
   auth: 'Auth',
   secureConnection: 'Conexión segura · HTTPS/TLS',
   mobileSubtitle: 'Servicio Meteorológico — Aviación Militar Bolivariana',
-  copyright: '© 2026 SERMETAVIA — Acceso Restringido',
+  copyright: '© 2026 AEROMETRIX — Acceso Restringido',
 } as const;
 
 export default login;

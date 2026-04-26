@@ -53,7 +53,7 @@ export function BaseProvider({ children }: { children: ReactNode }) {
   // Cargar base predeterminada desde configuración
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('sermetavia_settings');
+      const stored = localStorage.getItem('aerometrix_settings');
       if (stored) {
         const settings = JSON.parse(stored);
         if (settings.defaultBase) {
