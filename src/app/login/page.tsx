@@ -112,7 +112,7 @@ export default function LoginPage() {
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.05) 0%, transparent 60%)' }} />
 
           <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '3rem', maxWidth: '480px' }}>
-            <img src="/1.png" alt="AEROMETRIX" style={{ height: '250px', width: 'auto', objectFit: 'contain', margin: '0 auto 4px' }} />
+            <img src="/1.png" alt="AEROMETRIX" style={{ height: '250px', width: 'auto', objectFit: 'contain', margin: '0 auto -20px' }} />
             <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', lineHeight: 1.2, marginBottom: '0.75rem' }}>
               {t('systemTitle')}<br/>
               <span style={{ color: '#34d399' }}>{t('systemSubtitle')}</span>
