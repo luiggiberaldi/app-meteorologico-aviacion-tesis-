@@ -9,6 +9,42 @@ function isLoginPage(path: string | null): boolean {
   return normalized === '/login';
 }
 
+function MilitaryLoader({ text }: { text: string }) {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-[#0f172a] z-50">
+      <div className="flex flex-col items-center gap-4">
+        <div className="custom-loader" />
+        <p className="text-gray-400 text-sm">{text}</p>
+      </div>
+      <style jsx>{`
+        .custom-loader {
+          width: 70px;
+          height: 70px;
+          background: #4b5e40;
+          border-radius: 50px;
+          -webkit-mask: radial-gradient(circle 31px at 50% calc(100% + 13px),#000 95%,#0000) top 4px left 50%,
+            radial-gradient(circle 31px,#000 95%,#0000) center,
+            radial-gradient(circle 31px at 50% -13px,#000 95%,#0000) bottom 4px left 50%,
+            linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          -webkit-mask-repeat: no-repeat;
+          animation: cu10 1.5s infinite;
+        }
+        @keyframes cu10 {
+          0%      { -webkit-mask-size: 0 18px, 0 18px, 0 18px, auto }
+          16.67%  { -webkit-mask-size: 100% 18px, 0 18px, 0 18px, auto }
+          33.33%  { -webkit-mask-size: 100% 18px, 100% 18px, 0 18px, auto }
+          50%     { -webkit-mask-size: 100% 18px, 100% 18px, 100% 18px, auto }
+          66.67%  { -webkit-mask-size: 0 18px, 100% 18px, 100% 18px, auto }
+          83.33%  { -webkit-mask-size: 0 18px, 0 18px, 100% 18px, auto }
+          100%    { -webkit-mask-size: 0 18px, 0 18px, 0 18px, auto }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -32,26 +68,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   // Mientras carga, spinner
   if (loading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#0f172a] z-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <p className="text-gray-400 text-sm">Verificando sesión...</p>
-        </div>
-      </div>
-    );
+    return <MilitaryLoader text="Verificando sesión..." />;
   }
 
   // Si no hay usuario, mostrar spinner mientras redirige
   if (!user) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#0f172a] z-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <p className="text-gray-400 text-sm">Redirigiendo al inicio de sesión...</p>
-        </div>
-      </div>
-    );
+    return <MilitaryLoader text="Redirigiendo al inicio de sesión..." />;
   }
 
   return <>{children}</>;
