@@ -127,7 +127,7 @@ function VideoPlayer({ video }: { video: typeof VIDEOS[0] }) {
       </div>
 
       {/* Video */}
-      <div className="relative flex-1 bg-black flex items-center justify-center min-h-[300px]">
+      <div className="relative flex-1 bg-black flex items-center justify-center min-h-[200px] lg:min-h-[300px]">
         {loading && !error && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0f1a] z-10">
             <div className="w-10 h-10 border-2 border-gray-700 border-t-emerald-400 rounded-full animate-spin" />
@@ -216,11 +216,36 @@ export default function InamehPage() {
         </p>
       </div>
 
+      {/* Selector de canales — horizontal en móvil, vertical en desktop */}
+      <div>
+        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1 mb-2 lg:hidden">Canales disponibles</p>
+        <div className="flex gap-2 overflow-x-auto pb-2 lg:hidden scrollbar-hide">
+          {VIDEOS.map(v => {
+            const Icon = v.icon;
+            return (
+              <button
+                key={v.id}
+                onClick={() => setActiveId(v.id)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border whitespace-nowrap shrink-0 transition-all ${
+                  activeId === v.id
+                    ? `${v.bg} ${v.border} ring-1 ring-inset`
+                    : 'bg-[#1e293b] border-gray-700/50 hover:border-gray-600'
+                }`}
+                style={activeId === v.id ? { '--tw-ring-color': v.accent } as React.CSSProperties : {}}
+              >
+                <Icon size={14} className={activeId === v.id ? v.color : 'text-gray-500'} />
+                <span className={`text-xs font-semibold ${activeId === v.id ? 'text-white' : 'text-gray-300'}`}>{v.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Layout principal */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 
-        {/* Selector de canales */}
-        <div className="lg:col-span-1 space-y-2">
+        {/* Selector de canales — solo visible en desktop */}
+        <div className="hidden lg:block lg:col-span-1 space-y-2">
           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1">Canales disponibles</p>
           {VIDEOS.map(v => (
             <VideoCard key={v.id} video={v} isActive={activeId === v.id} onClick={() => setActiveId(v.id)} />
@@ -243,13 +268,28 @@ export default function InamehPage() {
         </div>
 
         {/* Reproductor principal */}
-        <div className="lg:col-span-3 bg-[#1e293b] border border-gray-700/50 rounded-xl overflow-hidden" style={{ minHeight: 420 }}>
+        <div className="lg:col-span-3 bg-[#1e293b] border border-gray-700/50 rounded-xl overflow-hidden min-h-[250px] lg:min-h-[420px]">
           <VideoPlayer key={activeId} video={activeVideo} />
         </div>
       </div>
 
-      {/* Grid de miniaturas de los otros videos */}
-      <div>
+      {/* Fuente — visible en móvil debajo del video */}
+      <div className="lg:hidden p-3 bg-[#0f172a] rounded-xl border border-gray-800">
+        <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">Fuente</p>
+        <a
+          href="http://www.inameh.gob.ve/web/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+        >
+          <ExternalLink size={12} />
+          www.inameh.gob.ve
+        </a>
+        <p className="text-[10px] text-gray-600 mt-1">Satélite GOES-16 / NOAA</p>
+      </div>
+
+      {/* Grid de miniaturas — oculto en móvil para ahorrar datos y espacio */}
+      <div className="hidden md:block">
         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Vista rápida — todos los canales</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {VIDEOS.map(v => {
@@ -268,7 +308,7 @@ export default function InamehPage() {
                   loop
                   autoPlay
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   className="w-full aspect-video object-cover bg-black"
                 >
                   <source src={`${PROXY}/${v.id}.mp4`} type="video/mp4" />
