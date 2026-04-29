@@ -34,15 +34,21 @@ function seededRng(seed: number) {
   };
 }
 
-// Semilla = hora UTC actual + hash del nombre de la base
+// Semilla = bloque de 3 horas UTC + hash del código de la base
+// Esto garantiza que todos los dispositivos obtengan el mismo resultado en la misma ventana de 3h
 function getSeed(baseName: string): number {
-  const hour = Math.floor(Date.now() / (1000 * 60 * 60));
+  const block = Math.floor(Date.now() / (1000 * 60 * 60 * 3)); // bloques de 3 horas
   let hash = 0;
   for (let i = 0; i < baseName.length; i++) {
     hash = ((hash << 5) - hash) + baseName.charCodeAt(i);
     hash |= 0;
   }
-  return (hour + Math.abs(hash)) >>> 0;
+  return (block + Math.abs(hash)) >>> 0;
+}
+
+// Cuantizar valores meteorológicos para evitar diferencias entre llamadas API
+function quantize(value: number, step: number): number {
+  return Math.round(value / step) * step;
 }
 
 export default function AIPredictionModule() {
@@ -75,14 +81,15 @@ export default function AIPredictionModule() {
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-  // Generador Táctico Simulado Avanzado (Fallback hiperrealista)
+  // Generador Táctico Simulado — resultados 100% deterministas por ventana de 3h
   const generateSimulatedMatrix = (weather: any, baseName: string): PredictionData => {
     const rng = seededRng(getSeed(baseName));
-    const temp = weather.current.temperature_2m;
-    const wind = weather.current.wind_speed_10m;
-    const precip = weather.current.precipitation;
-    const clouds = weather.current.cloud_cover;
-    const vis = (weather.current.visibility || 10000) / 1000;
+    // Cuantizar datos meteorológicos para eliminar variaciones entre llamadas API
+    const temp = quantize(weather.current.temperature_2m, 2);
+    const wind = quantize(weather.current.wind_speed_10m, 5);
+    const precip = quantize(weather.current.precipitation, 1);
+    const clouds = quantize(weather.current.cloud_cover, 10);
+    const vis = quantize((weather.current.visibility || 10000) / 1000, 2);
 
     let iceRisk = 0;
     if (temp < 5 && precip > 0) iceRisk = 85;
@@ -92,19 +99,19 @@ export default function AIPredictionModule() {
     let turbRisk = Math.min(95, wind * 2.5);
     let visRisk = vis < 2 ? 90 : vis < 5 ? 60 : vis < 8 ? 30 : 5;
 
+    // Aplicar variación determinista (misma en todos los dispositivos)
+    const iceVal = Math.min(100, Math.max(0, Math.round(iceRisk + (rng()*10 - 5))));
+    const turbVal = Math.min(100, Math.max(0, Math.round(turbRisk + (rng()*10 - 5))));
+    const visVal = Math.min(100, Math.max(0, Math.round(visRisk + (rng()*10 - 5))));
+
     let rec = "";
-    if (iceRisk > 50 || turbRisk > 50 || visRisk > 50) {
-      rec = `[ALERTA TÁCTICA] Condiciones subóptimas proyectadas para ${activeBase.nombre}. Matriz estocástica revela riesgos severos. Se recomienda desvío IFR o retraso de operaciones VFR. Revise sistema anticongelante y evite aproximaciones de bajo nivel.`;
+    if (iceVal > 50 || turbVal > 50 || visVal > 50) {
+      rec = `[ALERTA TÁCTICA] Condiciones subóptimas proyectadas para ${baseName}. Matriz estocástica revela riesgos severos. Se recomienda desvío IFR o retraso de operaciones VFR. Revise sistema anticongelante y evite aproximaciones de bajo nivel.`;
     } else {
-      rec = `[FAVORABLE] La red neuronal termodinámica indica ventana operativa estable para aeronaves de ala fija y rotatoria sobre ${activeBase.nombre}. Parámetros de aproximación controlados.`;
+      rec = `[FAVORABLE] La red neuronal termodinámica indica ventana operativa estable para aeronaves de ala fija y rotatoria sobre ${baseName}. Parámetros de aproximación controlados.`;
     }
 
-    return {
-      ice: Math.min(100, Math.max(0, Math.round(iceRisk + (rng()*10 - 5)))),
-      turbulence: Math.min(100, Math.max(0, Math.round(turbRisk + (rng()*10 - 5)))),
-      visibility: Math.min(100, Math.max(0, Math.round(visRisk + (rng()*10 - 5)))),
-      recommendation: rec
-    };
+    return { ice: iceVal, turbulence: turbVal, visibility: visVal, recommendation: rec };
   };
 
   const fetchBaseWeather = async (base: any): Promise<any> => {
@@ -113,7 +120,8 @@ export default function AIPredictionModule() {
       if (!r.ok) throw new Error('API');
       return await r.json();
     } catch {
-      const rng = seededRng(getSeed(base.nombre));
+      // Fallback determinista — usa seed para generar datos consistentes entre dispositivos
+      const rng = seededRng(getSeed(base.codigo || base.nombre));
       const isWarm = base.latitud < 11 && base.longitud > -70;
       return { current: { visibility: 10000 - rng()*2000, cloud_cover: rng()*40, wind_speed_10m: 10+rng()*15, temperature_2m: isWarm ? 28+rng()*5 : 18+rng()*10, precipitation: 0 } };
     }
