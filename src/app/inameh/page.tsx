@@ -154,8 +154,9 @@ function VideoPlayer({ video }: { video: typeof VIDEOS[0] }) {
           className="w-full h-full object-contain"
           muted={muted}
           loop
+          autoPlay
           playsInline
-          preload="metadata"
+          preload="auto"
           onCanPlay={() => setLoading(false)}
           onError={() => { setLoading(false); setError(true); }}
           onPlay={() => setPlaying(true)}
