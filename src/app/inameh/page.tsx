@@ -202,7 +202,7 @@ export default function InamehPage() {
             <Tv2 size={18} className="text-emerald-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">ANIMACIONES INAMEH</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-white">DATOS INAMEH</h2>
             <p className="text-gray-400 text-xs">Satélite GOES-16 · Instituto Nacional de Meteorología e Hidrología</p>
           </div>
         </div>
