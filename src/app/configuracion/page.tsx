@@ -123,19 +123,19 @@ export default function ConfiguracionPage() {
   useEffect(() => {
     if (user) {
       setAccUsername(user.username);
-      setAccPassword(user.password);
+      setAccPassword('');
       setAccDisplayName(user.displayName);
     }
   }, [user]);
 
   // ─── Render de cada tab ───
-  const handleSaveAccount = () => {
+  const handleSaveAccount = async () => {
     setAccError(null);
     setAccSuccess(null);
     if (!accUsername.trim()) { setAccError(t('emptyUserError')); return; }
     if (accPassword.length < 6) { setAccError(t('shortPasswordError')); return; }
     if (!accDisplayName.trim()) { setAccError(t('emptyNameError')); return; }
-    const result = updateCredentials(accUsername.trim(), accPassword, accDisplayName.trim());
+    const result = await updateCredentials(accUsername.trim(), accPassword, accDisplayName.trim());
     if (result.error) { setAccError(result.error); }
     else { setAccSuccess(t('credentialsUpdated')); setTimeout(() => setAccSuccess(null), 4000); }
   };
@@ -771,8 +771,8 @@ export default function ConfiguracionPage() {
             {renderContent()}
           </div>
 
-          {/* Botones de acción (excepto en 'about' y 'account') */}
-          {activeTab !== 'about' && activeTab !== 'account' && (
+          {/* Botones de acción (excepto en 'about', 'account' y 'legal') */}
+          {activeTab !== 'about' && activeTab !== 'account' && activeTab !== 'legal' && (
             <div className="mt-4 flex items-center justify-between bg-[#1e293b] rounded-xl border border-gray-700 px-6 py-4">
               <div className="flex items-center gap-2">
                 {saved && (

@@ -9,6 +9,7 @@ const sidebar: Record<keyof typeof es, string> = {
   specializedSensors: 'Sensores Especializados',
   flightPlanning: 'Planejamento de Voos',
   satelliteImages: 'Imagens de Satélite',
+  inamehVideos: 'Animações INAMEH',
   statistics: 'Estatísticas e Operações',
   historicalData: 'Dados Históricos',
   aiPrediction: 'IA Preditiva',

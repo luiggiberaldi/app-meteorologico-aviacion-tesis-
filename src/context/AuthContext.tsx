@@ -1,10 +1,15 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export interface UserAccount {
   username: string;
-  password: string;
   displayName: string;
   isHidden?: boolean;
 }
@@ -12,38 +17,20 @@ export interface UserAccount {
 interface AuthContextType {
   user: UserAccount | null;
   loading: boolean;
-  signIn: (username: string, password: string) => { error: string | null };
+  signIn: (username: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => void;
-  updateCredentials: (newUsername: string, newPassword: string, newDisplayName: string) => { error: string | null };
-  getAllUsers: () => UserAccount[];
+  updateCredentials: (newUsername: string, newPassword: string, newDisplayName: string) => Promise<{ error: string | null }>;
+  getAllUsers: () => Promise<UserAccount[]>;
 }
 
-// ─── Usuarios por defecto ───
-const DEFAULT_USERS: UserAccount[] = [
-  { username: 'usuario1', password: '123456', displayName: 'Operador 1' },
-  { username: 'usuario2', password: '123456', displayName: 'Operador 2' },
-];
-
-const STORAGE_KEY_USERS = 'aerometrix_users';
 const STORAGE_KEY_SESSION = 'aerometrix_session';
 
-function loadUsers(): UserAccount[] {
-  let users: UserAccount[] = [...DEFAULT_USERS];
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY_USERS);
-    if (stored) users = JSON.parse(stored);
-  } catch { /* ignore */ }
-  
-  // Siempre incluir al usuario admin (desarrollador) oculta
-  if (!users.find(u => u.username === 'admin')) {
-    users.push({ username: 'admin', password: 'admin', displayName: 'Desarrollador (Admin)', isHidden: true });
-  }
-  
-  return users;
-}
-
-function saveUsers(users: UserAccount[]) {
-  try { localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users)); } catch { /* ignore */ }
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + 'aerometrix_salt');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function loadSession(): string | null {
@@ -60,33 +47,45 @@ function saveSession(username: string | null) {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signIn: () => ({ error: null }),
+  signIn: async () => ({ error: null }),
   signOut: () => {},
-  updateCredentials: () => ({ error: null }),
-  getAllUsers: () => [],
+  updateCredentials: async () => ({ error: null }),
+  getAllUsers: async () => [],
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Cargar sesión al inicio
   useEffect(() => {
-    const users = loadUsers();
     const sessionUsername = loadSession();
-    if (sessionUsername) {
-      const found = users.find(u => u.username === sessionUsername);
-      if (found) setUser(found);
-    }
-    setLoading(false);
+    if (!sessionUsername) { setLoading(false); return; }
+
+    supabase
+      .from('app_users')
+      .select('username, display_name, is_hidden')
+      .eq('username', sessionUsername)
+      .single()
+      .then(({ data }) => {
+        if (data) setUser({ username: data.username, displayName: data.display_name, isHidden: data.is_hidden });
+        setLoading(false);
+      });
   }, []);
 
-  const signIn = (username: string, password: string) => {
-    const users = loadUsers();
-    const found = users.find(u => u.username === username && u.password === password);
-    if (!found) return { error: 'Usuario o contraseña incorrectos' };
-    setUser(found);
-    saveSession(found.username);
+  const signIn = async (username: string, password: string): Promise<{ error: string | null }> => {
+    const passwordHash = await hashPassword(password);
+    const { data, error } = await supabase
+      .from('app_users')
+      .select('username, display_name, is_hidden')
+      .eq('username', username)
+      .eq('password_hash', passwordHash)
+      .single();
+
+    if (error || !data) return { error: 'Usuario o contraseña incorrectos' };
+
+    const account: UserAccount = { username: data.username, displayName: data.display_name, isHidden: data.is_hidden };
+    setUser(account);
+    saveSession(account.username);
     return { error: null };
   };
 
@@ -95,25 +94,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     saveSession(null);
   };
 
-  const updateCredentials = (newUsername: string, newPassword: string, newDisplayName: string) => {
+  const updateCredentials = async (newUsername: string, newPassword: string, newDisplayName: string): Promise<{ error: string | null }> => {
     if (!user) return { error: 'No hay sesión activa' };
-    const users = loadUsers();
-    const idx = users.findIndex(u => u.username === user.username);
-    if (idx === -1) return { error: 'Usuario no encontrado' };
 
-    // Verificar que el nuevo username no esté en uso por otro
-    if (newUsername !== user.username && users.some(u => u.username === newUsername)) {
-      return { error: 'Ese nombre de usuario ya está en uso' };
+    if (newUsername !== user.username) {
+      const { data: existing } = await supabase
+        .from('app_users')
+        .select('username')
+        .eq('username', newUsername)
+        .single();
+      if (existing) return { error: 'Ese nombre de usuario ya está en uso' };
     }
 
-    users[idx] = { username: newUsername, password: newPassword, displayName: newDisplayName };
-    saveUsers(users);
-    setUser(users[idx]);
+    const passwordHash = await hashPassword(newPassword);
+    const { error } = await supabase
+      .from('app_users')
+      .update({ username: newUsername, password_hash: passwordHash, display_name: newDisplayName })
+      .eq('username', user.username);
+
+    if (error) return { error: 'Error al guardar los cambios' };
+
+    const updated: UserAccount = { username: newUsername, displayName: newDisplayName, isHidden: user.isHidden };
+    setUser(updated);
     saveSession(newUsername);
     return { error: null };
   };
 
-  const getAllUsers = () => loadUsers();
+  const getAllUsers = async (): Promise<UserAccount[]> => {
+    const { data } = await supabase
+      .from('app_users')
+      .select('username, display_name, is_hidden')
+      .eq('is_hidden', false)
+      .order('created_at');
+    return (data || []).map(u => ({ username: u.username, displayName: u.display_name, isHidden: u.is_hidden }));
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signOut, updateCredentials, getAllUsers }}>

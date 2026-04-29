@@ -28,11 +28,11 @@ export default function LoginPage() {
     return () => clearInterval(i);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const result = signIn(username, password);
+    const result = await signIn(username, password);
     if (result.error) {
       setError(result.error);
       setLoading(false);

@@ -1,14 +1,17 @@
 "use client";
 
 import { Users, Shield, UserCheck, Search } from "lucide-react";
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from "react";
+import { useAuth, UserAccount } from "@/context/AuthContext";
 
 export default function UsuariosPage() {
   const { user, getAllUsers } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
+  const [allUsers, setAllUsers] = useState<UserAccount[]>([]);
 
-  const allUsers = getAllUsers().filter(u => !u.isHidden);
+  useEffect(() => {
+    getAllUsers().then(setAllUsers);
+  }, [getAllUsers]);
 
   const usuariosData = allUsers.map((u, i) => ({
     id: u.username,

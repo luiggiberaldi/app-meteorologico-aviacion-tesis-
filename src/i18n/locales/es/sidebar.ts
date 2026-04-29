@@ -7,6 +7,7 @@ const sidebar = {
   specializedSensors: 'Sensores Especializados',
   flightPlanning: 'Planificación de Vuelos',
   satelliteImages: 'Imágenes Satelitales',
+  inamehVideos: 'Animaciones INAMEH',
   statistics: 'Estadísticas y Operaciones',
   historicalData: 'Datos Históricos',
   aiPrediction: 'IA Predictiva',

@@ -19,7 +19,8 @@ import {
   Settings,
   Moon,
   Flame,
-  Waves
+  Waves,
+  Tv2
 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 
@@ -29,6 +30,7 @@ const mainNav = [
   { href: "/sensores", labelKey: 'specializedSensors' as const, icon: Map },
   { href: "/planificacion", labelKey: 'flightPlanning' as const, icon: Navigation },
   { href: "/imagenes-satelitales", labelKey: 'satelliteImages' as const, icon: Satellite },
+  { href: "/inameh", labelKey: 'inamehVideos' as const, icon: Tv2 },
   { href: "/estadisticas", labelKey: 'statistics' as const, icon: BarChart3 },
   { href: "/historico", labelKey: 'historicalData' as const, icon: FileText },
   { href: "/prediccion-ia", labelKey: 'aiPrediction' as const, icon: BrainCircuit },
