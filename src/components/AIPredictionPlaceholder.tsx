@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { BrainCircuit, Cpu, Radar, Server, Bot, AlertTriangle, ShieldCheck, Activity, Terminal, CheckCircle2, XCircle } from 'lucide-react';
+import { BrainCircuit, Cpu, Radar, Server, Bot, AlertTriangle, ShieldCheck, Activity, Terminal, CheckCircle2, XCircle, X, MapPin, Wind, Thermometer, Eye, CloudRain } from 'lucide-react';
 import { useBaseContext } from '@/context/BaseContext';
 
 interface LogEntry {
@@ -234,6 +234,9 @@ export default function AIPredictionModule() {
     if (!selectedBase) { startNationalAnalysis(); } else { startSingleAnalysis(); }
   };
 
+  // Modal para detalle de estación
+  const [modalBase, setModalBase] = useState<BasePrediction | null>(null);
+
   const getLogColor = (level: string) => {
     switch (level) {
       case 'info': return 'text-cyan-400';
@@ -422,7 +425,11 @@ export default function AIPredictionModule() {
                 const borderColor = maxR > 60 ? 'border-red-500/40' : maxR > 30 ? 'border-amber-500/30' : 'border-emerald-500/30';
                 const bgColor = maxR > 60 ? 'bg-red-900/10' : maxR > 30 ? 'bg-amber-900/10' : 'bg-emerald-900/10';
                 return (
-                  <div key={r.codigo} className={`${bgColor} border ${borderColor} rounded-lg p-3`}>
+                  <button
+                    key={r.codigo}
+                    onClick={() => setModalBase(r)}
+                    className={`${bgColor} border ${borderColor} rounded-lg p-3 text-left transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20 cursor-pointer active:scale-[0.98]`}
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-white font-bold text-xs">{r.codigo}</span>
                       <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${maxR > 60 ? 'bg-red-500/20 text-red-400' : maxR > 30 ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
@@ -434,15 +441,139 @@ export default function AIPredictionModule() {
                       <MiniBar label="TRB" value={r.data.turbulence} />
                       <MiniBar label="VIS" value={r.data.visibility} />
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           </div>
         )}
 
+        {/* Modal de Detalle de Estación */}
+        {modalBase && (
+          <StationModal
+            prediction={modalBase}
+            base={bases.find(b => b.codigo === modalBase.codigo)}
+            onClose={() => setModalBase(null)}
+          />
+        )}
+
       </div>
 
+    </div>
+  );
+}
+
+function StationModal({ prediction, base, onClose }: { prediction: BasePrediction; base: any; onClose: () => void }) {
+  const maxR = Math.max(prediction.data.ice, prediction.data.turbulence, prediction.data.visibility);
+  const statusColor = maxR > 60 ? 'text-red-400' : maxR > 30 ? 'text-amber-400' : 'text-emerald-400';
+  const statusBg = maxR > 60 ? 'bg-red-500/10 border-red-500/30' : maxR > 30 ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30';
+  const statusLabel = maxR > 60 ? 'ALERTA' : maxR > 30 ? 'PRECAUCIÓN' : 'NORMAL';
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div
+        className="relative bg-[#1e293b] border border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className={`px-6 py-4 border-b border-gray-700/50 flex items-center justify-between ${statusBg}`}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#0f172a] border border-gray-700 flex items-center justify-center">
+              <MapPin size={18} className={statusColor} />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg tracking-wide">{prediction.codigo}</h3>
+              <p className="text-gray-400 text-xs">{prediction.baseName}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg border ${statusBg} ${statusColor}`}>
+              {statusLabel}
+            </span>
+            <button onClick={onClose} className="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
+              <X size={16} className="text-gray-400" />
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-5">
+          {/* Info de la base */}
+          {base && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-[#0f172a] rounded-lg p-3 border border-gray-700/50">
+                <p className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Ubicación</p>
+                <p className="text-white text-sm font-medium">{base.ciudad}, {base.estado}</p>
+              </div>
+              <div className="bg-[#0f172a] rounded-lg p-3 border border-gray-700/50">
+                <p className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Coordenadas</p>
+                <p className="text-white text-sm font-mono">{base.latitud?.toFixed(3)}° / {base.longitud?.toFixed(3)}°</p>
+              </div>
+            </div>
+          )}
+
+          {/* Barras de riesgo detalladas */}
+          <div className="space-y-4">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Análisis de Riesgo Predictivo</p>
+
+            <RiskBar
+              label="Engelamiento / Hielo Estructural"
+              shortLabel="ICE"
+              value={prediction.data.ice}
+              icon={<Thermometer size={14} />}
+              description={prediction.data.ice > 60 ? 'Riesgo severo de formación de hielo en superficies aerodinámicas' : prediction.data.ice > 30 ? 'Condiciones propicias para hielo ligero a moderado' : 'Sin riesgo significativo de engelamiento'}
+            />
+
+            <RiskBar
+              label="Turbulencia / Cizalladura"
+              shortLabel="TRB"
+              value={prediction.data.turbulence}
+              icon={<Wind size={14} />}
+              description={prediction.data.turbulence > 60 ? 'Turbulencia severa esperada. Evitar zona si es posible' : prediction.data.turbulence > 30 ? 'Turbulencia moderada. Ajustar altitud de crucero' : 'Condiciones estables, turbulencia mínima'}
+            />
+
+            <RiskBar
+              label="Riesgo Operativo Visibilidad"
+              shortLabel="VIS"
+              value={prediction.data.visibility}
+              icon={<Eye size={14} />}
+              description={prediction.data.visibility > 60 ? 'Visibilidad muy reducida. Operaciones IFR requeridas' : prediction.data.visibility > 30 ? 'Visibilidad marginal. Precaución en aproximaciones' : 'Visibilidad adecuada para operaciones normales'}
+            />
+          </div>
+
+          {/* Recomendación */}
+          <div className="bg-[#0f172a] rounded-xl p-4 border border-gray-700/50">
+            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <BrainCircuit size={11} /> Dictamen IA
+            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {prediction.data.recommendation}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RiskBar({ label, shortLabel, value, icon, description }: { label: string; shortLabel: string; value: number; icon: React.ReactNode; description: string }) {
+  const color = value > 60 ? 'bg-red-500' : value > 30 ? 'bg-amber-500' : 'bg-emerald-500';
+  const textColor = value > 60 ? 'text-red-400' : value > 30 ? 'text-amber-400' : 'text-emerald-400';
+
+  return (
+    <div className="bg-[#0f172a] rounded-lg p-3 border border-gray-700/50">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-2">
+          <span className={textColor}>{icon}</span>
+          <span className="text-xs font-bold text-white">{label}</span>
+        </div>
+        <span className={`text-sm font-bold font-mono ${textColor}`}>{value}%</span>
+      </div>
+      <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden mb-2">
+        <div className={`h-full ${color} rounded-full transition-all duration-700`} style={{ width: `${value}%` }} />
+      </div>
+      <p className="text-[10px] text-gray-500">{description}</p>
     </div>
   );
 }
