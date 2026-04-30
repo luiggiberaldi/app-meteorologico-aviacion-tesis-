@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Plane, Menu, X, LayoutDashboard, BarChart3, FileText, ChevronDown,
   Navigation, Satellite, BrainCircuit, Newspaper, BookOpen, ShieldCheck, Users, Settings, LogOut, Bell,
-  Moon, Flame, Waves
+  Moon, Flame, Waves, Tv2
 } from "lucide-react";
 import { useBaseContext } from "@/context/BaseContext";
 import { useAuth } from "@/context/AuthContext";
@@ -25,6 +25,7 @@ const mainNavKeys = [
   { href: "/", labelKey: 'commandCenter' as const, icon: LayoutDashboard },
   { href: "/planificacion", labelKey: 'flightPlanning' as const, icon: Navigation },
   { href: "/imagenes-satelitales", labelKey: 'satelliteImages' as const, icon: Satellite },
+  { href: "/inameh", labelKey: 'inamehVideos' as const, icon: Tv2 },
   { href: "/estadisticas", labelKey: 'statistics' as const, icon: BarChart3 },
   { href: "/historico", labelKey: 'historicalData' as const, icon: FileText },
   { href: "/prediccion-ia", labelKey: 'aiPrediction' as const, icon: BrainCircuit },
