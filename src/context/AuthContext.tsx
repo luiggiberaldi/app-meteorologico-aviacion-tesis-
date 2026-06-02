@@ -67,28 +67,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    supabase
-      .from('app_users')
-      .select('username, display_name, is_hidden')
-      .eq('username', sessionUsername)
-      .single()
-      .then(({ data, error }) => {
+    const checkSession = async () => {
+      try {
+        const { data } = await supabase
+          .from('app_users')
+          .select('username, display_name, is_hidden')
+          .eq('username', sessionUsername)
+          .single();
+
         if (data) {
           setUser({ username: data.username, displayName: data.display_name, isHidden: data.is_hidden });
-        } else {
-          // If session was admin but somehow missed, or just safety fallback
-          if (sessionUsername === 'admin') {
-            setUser({ username: 'admin', displayName: 'Administrador', isHidden: false });
-          }
+        } else if (sessionUsername === 'admin') {
+          setUser({ username: 'admin', displayName: 'Administrador', isHidden: false });
         }
-        setLoading(false);
-      })
-      .catch(() => {
+      } catch (err) {
         if (sessionUsername === 'admin') {
           setUser({ username: 'admin', displayName: 'Administrador', isHidden: false });
         }
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    checkSession();
   }, []);
 
   const signIn = async (username: string, password: string): Promise<{ error: string | null }> => {
